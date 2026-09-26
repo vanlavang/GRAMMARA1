@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Mastering Simple Present Yes/No Questions</title>
+    <style>
+        @font-face { font-family: 'UTM Avo'; src: local('UTM Avo'); }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'UTM Avo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+            touch-action: none; 
+            padding-top: 10px;
+        }
+
+        /* --- HEADER & MENU --- */
+        header {
+            background-color: #d8c8b4; padding: 10px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid #d4bfa6; 
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 65px;
+            transition: all 0.3s ease;
+        }
+        .header-center { display: flex; gap: 10px; }
+        header button {
+            background-color: #fff; border: 2px solid #d4bfa6; padding: 8px 16px; border-radius: 20px;
+            cursor: pointer; font-family: 'UTM Avo'; color: #8b5e3c; transition: 0.3s;
+        }
+        header button.active-conv {
+            background-color: #8b5e3c; color: white; font-weight: bold; border-color: #5c3e26;
+        }
+        .menu-btn {
+            background-color: #8b7362 !important; color: white !important; border: none !important;
+            padding: 10px 20px !important; border-radius: 20px !important; font-weight: bold; cursor: pointer;
+        }
+
+        /* --- CONTROL BAR INTEGRATED TABS --- */
+        #controlBar {
+            background-color: #fff9f0; padding: 10px 20px; border-bottom: 2px solid #d4bfa6;
+            position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
+            display: flex; align-items: center; gap: 12px; height: 55px;
+            transition: all 0.3s ease;
+        }
+        .tool-btn {
+            padding: 6px 14px; border-radius: 12px; border: 1px solid #8b5e3c;
+            background: #fff; cursor: pointer; font-size: 15px; font-weight: bold; color: #8b5e3c; font-family: 'UTM Avo';
+            transition: 0.2s;
+        }
+        .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+        .tab-switcher {
+            display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; border: 1px solid #cbd5e1;
+        }
+        .tab-btn {
+            padding: 6px 16px; border-radius: 8px; border: none; background: transparent;
+            cursor: pointer; font-family: 'UTM Avo'; font-size: 14px; font-weight: bold; color: #475569; transition: 0.2s;
+        }
+        .tab-btn.active { background: white; color: #1e3a8a; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+        /* --- SIDEBAR MENU --- */
+        .side-menu {
+            position: fixed; top: 130px; bottom: 20px; width: 220px;
+            background-color: #f3dbc1; border: 2px solid #d4bfa6;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease;
+            z-index: 1100; padding: 20px; overflow-y: auto; 
+        }
+        .side-menu.left { left: 0; border-radius: 0 20px 20px 0; transform: translateX(-100%); }
+        .side-menu.right { right: 0; border-radius: 20px 0 0 20px; transform: translateX(100%); }
+        .side-menu.open { transform: translateX(0); }
+        .side-menu button {
+            display: block; width: 100%; background: #fff; border: 1px solid #d4bfa6;
+            margin-bottom: 10px; padding: 12px; border-radius: 12px; cursor: pointer;
+            font-family: 'UTM Avo'; font-size: 16px; font-weight: bold; color: #8b5e3c;
+        }
+        .side-menu button.active { background: #8b5e3c; color: #fff; }
+
+        /* --- TỪ ĐIỂN PANEL --- */
+        .dict-panel {
+            position: fixed; right: 20px; top: 135px; width: 340px;
+            background: white; border-radius: 20px; padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25); border: 4px solid #bae6fd;
+            display: none; flex-direction: column; gap: 10px; z-index: 1200;
+            transition: top 0.3s ease;
+        }
+        .dict-panel.active { display: flex; }
+        .dict-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        .close-dict { cursor: pointer; font-size: 26px; color: #f87171; font-weight: bold; line-height: 1; }
+        .dict-result { background: #f8fafc; border-radius: 12px; padding: 15px; min-height: 120px; font-size: 15px; color: #1e293b; border: 1px dashed #cbd5e1; max-height: 350px; overflow-y: auto;}
+        
+        .ipa-text { color: #d97706; font-family: 'Arial', sans-serif; margin-bottom: 4px; font-size: 16px; }
+        .pos-text { color: #10b981; font-style: italic; font-weight: bold; margin-bottom: 6px; }
+        .mean-text { color: #334155; font-size: 15px; line-height: 1.4; }
+
+        /* --- MAIN VIEW CONTAINER --- */
+        .container {
+            background: #ffffff; width: 98vw; max-width: 1440px; height: calc(100vh - 145px); margin-top: 125px;
+            padding: 20px 30px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; position: relative; z-index: 10; overflow-y: auto; overflow-x: hidden;
+            transition: all 0.3s ease; border: 10px solid #ffffff;
+        }
+        
+        .tab-content { display: none; flex-direction: column; height: 100%; width: 100%; position: relative; }
+        .tab-content.active { display: flex; }
+
+        .main-header { text-align: center; margin-bottom: 20px; }
+        .main-title { font-size: 32px; font-weight: 900; color: #1e293b; letter-spacing: -0.5px; margin-bottom: 5px;}
+
+        /* --- 3 COLUMN GRID STYLES (From Yes/No Question design) --- */
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; flex: 1; min-height: 0; }
+        .column { height: 100%; display: flex; flex-direction: column; padding-right: 5px; overflow-y: auto;}
+        .column::-webkit-scrollbar { width: 4px; }
+        .column::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .header-box { display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 20px; font-weight: bold; font-size: 18px; margin-bottom: 15px; text-align: center; text-transform: uppercase;}
+        .chat-section { background: #f0f9ff; border-radius: 15px; padding: 15px; margin-bottom: 12px; border: 2px solid #bae6fd; flex: 1; display: flex; flex-direction: column;}
+        
+        .bubble { background: white; padding: 12px; border-radius: 15px; border: 2px solid #e2e8f0; font-size: 15px; cursor: pointer; margin-bottom: 10px; font-weight: bold; color: #1e293b; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;}
+        .bubble:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .info-card { border-radius: 15px; padding: 15px; margin-bottom: 15px; color: white; cursor: pointer; display: flex; flex-direction: column; justify-content: center;}
+
+        .grammar-table { width: 100%; text-align: center; border-collapse: collapse; font-size: 14px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: auto;}
+        .grammar-table td { padding: 10px; border: 1px solid #e2e8f0; }
+
+        /* --- STEP BY STEP DYNAMIC SHOW/HIDE --- */
+        .step { opacity: 0.02; filter: blur(4px); transform: scale(0.97) translateY(5px); transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
+        .step.active { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); pointer-events: auto; }
+
+        /* Word slice features */
+        .dict-word { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 4px; transition: 0.15s; }
+        .dict-word:hover { background-color: #bae6fd; color: #0369a1; }
+        .clickable-block { cursor: context-menu; transition: background 0.2s; }
+        .clickable-block:hover { background-color: rgba(226, 232, 240, 0.4); border-radius: 6px; }
+
+        #inkCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; pointer-events: none; }
+        #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+    </style>
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+
+<nav class="side-menu left" id="leftMenu">
+ <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+ <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+ <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+ <button class="active" onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+ <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+ <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+ <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</nav>
+
+<nav class="side-menu right" id="rightMenu">
+   <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+    <button onclick="location.href='story.html'"><b>Story</b></button>
+
+</nav>
+
+<header id="mainHeader">
+    <button class="menu-btn" onclick="toggleMenu('left')">Menu ☰</button>
+    <div class="header-center">
+<button class="active-conv" onclick="window.location.href='../conversation_01/conversation_01.html'"><b>Conversation 01</b></button>
+<button onclick="window.location.href='../conversation_02/conversation_02.html'">Conversation 02</button>
+<button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+<button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu('right')">Menu ☰</button>
+</header>
+
+<div id="controlBar">
+    <button id="focusBtn" class="tool-btn" onclick="toggleFocusMode()" style="background: #10b981; color: white; border-color: #059669;">Phóng to 🔲</button>
+    <button id="penBtn" class="tool-btn" onclick="toggleInk()">Bút vẽ: Off</button>
+    <button class="tool-btn" onclick="clearInk()">Xóa mực</button>
+    
+    <div style="flex-grow: 1;"></div>
+    
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchPresentationTab('englishTab')">🇬🇧 English Tab</button>
+        <button class="tab-btn" onclick="switchPresentationTab('vietnameseTab')">🇻🇳 Vietnamese Tab</button>
+    </div>
+
+    <button class="tool-btn" onclick="goPrev()">⬅ Back</button>
+    <button class="tool-btn" onclick="goNext()">Next ➡</button>
+</div>
+
+<div class="dict-panel" id="dictPanel">
+    <div class="dict-header">
+        <span style="font-weight: bold; color: #0369a1; font-family: 'UTM Avo';">Tra từ & Dịch Nghĩa 📖</span>
+        <div class="close-dict" onclick="toggleDict()">×</div>
+    </div>
+    <div class="dict-result" id="resultArea">
+        <i>💡 Hướng dẫn:<br>👉 <b>Click chuột trái</b> vào chữ tiếng Anh để tra từ.<br>👉 <b>Click chuột phải</b> vào khối chữ để dịch toàn bộ câu.</i>
+    </div>
+</div>
+
+<div class="container" id="mainContainer">
+
+    <div id="englishTab" class="tab-content active">
+        
+        <div class="main-header step clickable-block">
+            <h1 class="main-title">Mastering Simple Present Yes/No Questions</h1>
+        </div>
+
+        <div class="main-grid">
+            <div class="column">
+                <div class="header-box step clickable-block" style="background: #e0f2fe; color: #0369a1;">Forming The Question</div>
+                <div class="chat-section step">
+                    <div class="step clickable-block" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <div style="background: #fde047; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 24px;">❓</div>
+                        <h3 style="color: #0369a1; margin: 0;">Start with "Do"</h3>
+                    </div>
+                    <p class="step clickable-block" style="font-size: 14px; margin-bottom: 20px; line-height: 1.4; color: #334155;">Most simple present Yes/No questions use the word "do" at the beginning to establish a basic question structure.</p>
+                    
+                    <div class="step clickable-block" style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #0f172a;">Everyday Question Examples</div>
+                    <div class="bubble step clickable-block">❓ Do you like pizza?</div>
+                    <div class="bubble step clickable-block">❓ Do you live here?</div>
+                    <div class="bubble step clickable-block">❓ Do you play sports?</div>
+                    <div class="bubble step clickable-block">❓ Do you have a dog?</div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="header-box step clickable-block" style="background: #f0fdfa; color: #0f766e;">Pronoun Agreement</div>
+                <div class="chat-section step" style="background: #f8fafc; border-color: #cbd5e1;">
+                    
+                    <div class="step clickable-block" style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #334155;">⚖️ Auxiliary Verb Selection</div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <div class="step clickable-block" style="flex: 1; background: #dbeafe; border-radius: 15px; padding: 15px 10px; text-align: center; border: 2px solid #93c5fd;">
+                            <b style="color: #1e3a8a; display: block; margin-bottom: 10px;">The "Do" Group</b>
+                            <div style="background: white; border-radius: 10px; padding: 5px; margin-bottom: 10px; font-weight: bold;">I<br>You<br>We<br>They</div>
+                            <i style="font-size: 12px; color: #0369a1;">"Do they speak English?"</i>
+                        </div>
+                        
+                        <div class="step clickable-block" style="flex: 1; background: #ffedd5; border-radius: 15px; padding: 15px 10px; text-align: center; border: 2px solid #fdba74;">
+                            <b style="color: #9a3412; display: block; margin-bottom: 10px;">The "Does" Group</b>
+                            <div style="background: white; border-radius: 10px; padding: 5px; margin-bottom: 10px; font-weight: bold;">He<br>She<br>It</div>
+                            <i style="font-size: 12px; color: #c2410c;">"Does he play tennis?"</i>
+                        </div>
+                    </div>
+
+                    <table class="grammar-table step clickable-block">
+                        <tr class="step" style="background: #f1f5f9; font-weight: bold; color: #475569;">
+                            <td>Subject Pronoun</td>
+                            <td>Auxiliary Verb</td>
+                            <td>Example Question</td>
+                        </tr>
+                        <tr class="step clickable-block">
+                            <td style="background: #e0f2fe; font-weight: bold;">I / You / We / They</td>
+                            <td style="background: #fef9c3; font-weight: bold; font-size: 18px;">Do</td>
+                            <td style="background: #e0f2fe;">Do we have time?</td>
+                        </tr>
+                        <tr class="step clickable-block">
+                            <td style="background: #ffedd5; font-weight: bold;">He / She / It</td>
+                            <td style="background: #bbf7d0; font-weight: bold; font-size: 18px;">Does</td>
+                            <td style="background: #ffedd5;">Does it snow in winter?</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="header-box step clickable-block" style="background: #fdf4ff; color: #86198f;">The 3-Word Answer Rule</div>
+                
+                <div class="info-card step clickable-block" style="background: white; color: #1e293b; border: 2px solid #cbd5e1; padding: 12px;">
+                    <h3 style="margin-bottom: 5px; font-size: 16px;">📖 The Politeness Principle</h3>
+                    <p style="font-size: 13px; line-height: 1.4;">In English, it is more polite to answer questions using three words rather than a single-word "Yes" or "No".</p>
+                </div>
+                
+                <div class="step clickable-block" style="background: #f0fdf4; border: 3px solid #86efac; border-radius: 20px; padding: 15px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <div style="background: #22c55e; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px;">👍</div>
+                        <b style="color: #166534; font-size: 16px;">Affirmative (Yes)</b>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
+                        <span style="background: #bbf7d0; color: #166534; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">Yes,</span>
+                        <span style="background: #bbf7d0; color: #166534; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">I,</span>
+                        <span style="background: #bbf7d0; color: #166534; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">do.</span>
+                    </div>
+                    <p style="font-size: 12px; text-align: center; color: #15803d; font-style: italic;">Match the auxiliary verb to the answer.</p>
+                </div>
+
+                <div class="step clickable-block" style="background: #fef2f2; border: 3px solid #fca5a5; border-radius: 20px; padding: 15px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <div style="background: #ef4444; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px;">👎</div>
+                        <b style="color: #991b1b; font-size: 16px;">Negative (No)</b>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
+                        <span style="background: #fecaca; color: #991b1b; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">No,</span>
+                        <span style="background: #fecaca; color: #991b1b; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">I,</span>
+                        <span style="background: #fecaca; color: #991b1b; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">don't.</span>
+                    </div>
+                    <p style="font-size: 12px; text-align: center; color: #b91c1c; font-style: italic;">Match the auxiliary verb to the answer.</p>
+                </div>
+
+                <div class="info-card step clickable-block" style="background: #fef9c3; color: #854d0e; padding: 12px; border: 2px dashed #eab308; flex: none;">
+                    <b style="font-size: 13px;">💬 Contractions are Common:</b>
+                    <p style="font-size: 12px; line-height: 1.4; margin-top: 5px;">While speakers can say "No, I do not," the contraction "don't" is much more commonly used in conversation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="vietnameseTab" class="tab-content">
+        
+        <div class="main-header step clickable-block">
+            <h1 class="main-title">Nắm Vững Câu Hỏi Có/Không Ở Thì Hiện Tại Đơn</h1>
+        </div>
+
+        <div class="main-grid">
+            <div class="column">
+                <div class="header-box step clickable-block" style="background: #e0f2fe; color: #0369a1;">Cấu Trúc Câu Hỏi</div>
+                <div class="chat-section step">
+                    <div class="step clickable-block" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <div style="background: #fde047; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 24px;">❓</div>
+                        <h3 style="color: #0369a1; margin: 0;">Bắt đầu bằng "Do/Does"</h3>
+                    </div>
+                    <p class="step clickable-block" style="font-size: 14px; margin-bottom: 20px; line-height: 1.4; color: #334155;">Hầu hết các câu hỏi Có/Không ở thì hiện tại đơn đều sử dụng từ "do" hoặc "does" ở đầu câu để tạo thành cấu trúc câu hỏi cơ bản.</p>
+                    
+                    <div class="step clickable-block" style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #0f172a;">Ví Dụ Câu Hỏi Hàng Ngày</div>
+                    <div class="bubble step clickable-block">❓ Do you like pizza? (Bạn có thích pizza không?)</div>
+                    <div class="bubble step clickable-block">❓ Do you live here? (Bạn sống ở đây à?)</div>
+                    <div class="bubble step clickable-block">❓ Do you play sports? (Bạn có chơi thể thao không?)</div>
+                    <div class="bubble step clickable-block">❓ Do you have a dog? (Bạn có nuôi chó không?)</div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="header-box step clickable-block" style="background: #f0fdfa; color: #0f766e;">Sự Tương Hợp Đại Từ</div>
+                <div class="chat-section step" style="background: #f8fafc; border-color: #cbd5e1;">
+                    
+                    <div class="step clickable-block" style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #334155;">⚖️ Lựa Chọn Trợ Động Từ</div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <div class="step clickable-block" style="flex: 1; background: #dbeafe; border-radius: 15px; padding: 15px 10px; text-align: center; border: 2px solid #93c5fd;">
+                            <b style="color: #1e3a8a; display: block; margin-bottom: 10px;">Nhóm "Do"</b>
+                            <div style="background: white; border-radius: 10px; padding: 5px; margin-bottom: 10px; font-weight: bold;">I<br>You<br>We<br>They</div>
+                            <i style="font-size: 12px; color: #0369a1;">"Do they speak English?"</i>
+                        </div>
+                        
+                        <div class="step clickable-block" style="flex: 1; background: #ffedd5; border-radius: 15px; padding: 15px 10px; text-align: center; border: 2px solid #fdba74;">
+                            <b style="color: #9a3412; display: block; margin-bottom: 10px;">Nhóm "Does"</b>
+                            <div style="background: white; border-radius: 10px; padding: 5px; margin-bottom: 10px; font-weight: bold;">He<br>She<br>It</div>
+                            <i style="font-size: 12px; color: #c2410c;">"Does he play tennis?"</i>
+                        </div>
+                    </div>
+
+                    <table class="grammar-table step clickable-block">
+                        <tr class="step" style="background: #f1f5f9; font-weight: bold; color: #475569;">
+                            <td>Đại Từ Chủ Ngữ</td>
+                            <td>Trợ Động Từ</td>
+                            <td>Ví Dụ Câu Hỏi</td>
+                        </tr>
+                        <tr class="step clickable-block">
+                            <td style="background: #e0f2fe; font-weight: bold;">I / You / We / They</td>
+                            <td style="background: #fef9c3; font-weight: bold; font-size: 18px;">Do</td>
+                            <td style="background: #e0f2fe;">Do we have time?<br>(Chúng ta có thời gian không?)</td>
+                        </tr>
+                        <tr class="step clickable-block">
+                            <td style="background: #ffedd5; font-weight: bold;">He / She / It</td>
+                            <td style="background: #bbf7d0; font-weight: bold; font-size: 18px;">Does</td>
+                            <td style="background: #ffedd5;">Does it snow in winter?<br>(Mùa đông có tuyết không?)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="header-box step clickable-block" style="background: #fdf4ff; color: #86198f;">Quy Tắc Trả Lời 3 Từ</div>
+                
+                <div class="info-card step clickable-block" style="background: white; color: #1e293b; border: 2px solid #cbd5e1; padding: 12px;">
+                    <h3 style="margin-bottom: 5px; font-size: 16px;">📖 Nguyên Tắc Lịch Sự</h3>
+                    <p style="font-size: 13px; line-height: 1.4;">Trong tiếng Anh, việc trả lời câu hỏi bằng ba từ sẽ lịch sự hơn thay vì chỉ nói "Yes" hoặc "No" cộc lốc.</p>
+                </div>
+                
+                <div class="step clickable-block" style="background: #f0fdf4; border: 3px solid #86efac; border-radius: 20px; padding: 15px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <div style="background: #22c55e; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px;">👍</div>
+                        <b style="color: #166534; font-size: 16px;">Khẳng Định (Có)</b>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
+                        <span style="background: #bbf7d0; color: #166534; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">Yes,</span>
+                        <span style="background: #bbf7d0; color: #166534; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">I,</span>
+                        <span style="background: #bbf7d0; color: #166534; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">do.</span>
+                    </div>
+                    <p style="font-size: 12px; text-align: center; color: #15803d; font-style: italic;">Giữ sự tương hợp giữa trợ động từ và câu trả lời.</p>
+                </div>
+
+                <div class="step clickable-block" style="background: #fef2f2; border: 3px solid #fca5a5; border-radius: 20px; padding: 15px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <div style="background: #ef4444; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px;">👎</div>
+                        <b style="color: #991b1b; font-size: 16px;">Phủ Định (Không)</b>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
+                        <span style="background: #fecaca; color: #991b1b; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">No,</span>
+                        <span style="background: #fecaca; color: #991b1b; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">I,</span>
+                        <span style="background: #fecaca; color: #991b1b; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 16px;">don't.</span>
+                    </div>
+                    <p style="font-size: 12px; text-align: center; color: #b91c1c; font-style: italic;">Giữ sự tương hợp giữa trợ động từ và câu trả lời.</p>
+                </div>
+
+                <div class="info-card step clickable-block" style="background: #fef9c3; color: #854d0e; padding: 12px; border: 2px dashed #eab308; flex: none;">
+                    <b style="font-size: 13px;">💬 Dạng Viết Tắt Rất Phổ Biến:</b>
+                    <p style="font-size: 12px; line-height: 1.4; margin-top: 5px;">Mặc dù bạn có thể nói "No, I do not," nhưng dạng viết tắt "don't" được sử dụng phổ biến hơn rất nhiều trong giao tiếp.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let stepsArray = [];
+    let currentStepIndex = -1;
+    let isFocusMode = false;
+
+    function toggleFocusMode() {
+        isFocusMode = !isFocusMode;
+        const header = document.getElementById('mainHeader');
+        const controlBar = document.getElementById('controlBar');
+        const container = document.getElementById('mainContainer');
+        const focusBtn = document.getElementById('focusBtn');
+        const sideMenus = document.querySelectorAll('.side-menu');
+        const dictPanel = document.getElementById('dictPanel');
+
+        if (isFocusMode) {
+            header.style.transform = 'translateY(-100%)';
+            controlBar.style.top = '0px';
+            container.style.marginTop = '70px';
+            container.style.height = 'calc(100vh - 85px)';
+            sideMenus.forEach(m => m.style.top = '70px');
+            dictPanel.style.top = '75px';
+            
+            focusBtn.innerHTML = 'Thu nhỏ 🔳';
+            focusBtn.style.background = '#fef3c7';
+            focusBtn.style.color = '#d97706';
+            focusBtn.style.borderColor = '#d97706';
+        } else {
+            header.style.transform = 'translateY(0)';
+            controlBar.style.top = '65px';
+            container.style.marginTop = '125px';
+            container.style.height = 'calc(100vh - 145px)';
+            sideMenus.forEach(m => m.style.top = '130px');
+            dictPanel.style.top = '135px';
+            
+            focusBtn.innerHTML = 'Phóng to 🔲';
+            focusBtn.style.background = '#10b981';
+            focusBtn.style.color = 'white';
+            focusBtn.style.borderColor = '#059669';
+        }
+    }
+
+    function switchPresentationTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        const activeTab = document.getElementById(tabId);
+        activeTab.classList.add('active');
+        
+        const activeBtn = document.querySelector(`[onclick="switchPresentationTab('${tabId}')"]`);
+        if(activeBtn) activeBtn.classList.add('active');
+        
+        initStepsForActiveTab();
+    }
+
+    function initStepsForActiveTab() {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const activeTab = document.querySelector('.tab-content.active');
+        stepsArray = activeTab.querySelectorAll('.step');
+        currentStepIndex = -1;
+    }
+
+    function goNext() {
+        if (currentStepIndex < stepsArray.length - 1) {
+            currentStepIndex++;
+            stepsArray[currentStepIndex].classList.add('active');
+            stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function goPrev() {
+        if (currentStepIndex >= 0) {
+            stepsArray[currentStepIndex].classList.remove('active');
+            currentStepIndex--;
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goNext(); }
+        if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); goPrev(); }
+    });
+
+    function toggleMenu(side) { document.getElementById(side + 'Menu').classList.toggle('open'); }
+    function toggleDict() { document.getElementById('dictPanel').classList.toggle('active'); }
+
+    async function lookupDictionary(word) {
+        const panel = document.getElementById('dictPanel');
+        if(!panel.classList.contains('active')) panel.classList.add('active');
+        
+        const resArea = document.getElementById('resultArea');
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang kết nối từ điển <b>"${word}"</b>... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const data = await res.json();
+            
+            const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(word)}`);
+            const transData = await transRes.json();
+            const vietMeaning = transData[0][0][0];
+
+            if(data.title || !Array.isArray(data)) { 
+                resArea.innerHTML = `
+                    <div style="font-size:22px; font-weight:bold; color:#0f172a;">${word}</div>
+                    <div class="mean-text" style="margin-top:10px;"><b>Nghĩa tiếng Việt:</b> <span style="color:#b91c1c; font-weight:bold;">${vietMeaning}</span></div>
+                `;
+                speakFallback(word);
+                return; 
+            }
+
+            const entry = data[0];
+            let phonetic = '';
+            let audioUrl = '';
+            
+            for(let p of entry.phonetics) {
+                if(p.text && !phonetic) phonetic = p.text;
+                if(p.audio && !audioUrl) audioUrl = p.audio;
+            }
+            if(!phonetic && entry.phonetic) phonetic = entry.phonetic;
+
+            const pos = entry.meanings[0] ? entry.meanings[0].partOfSpeech : 'vocabulary';
+            const enDef = entry.meanings[0] && entry.meanings[0].definitions[0] ? entry.meanings[0].definitions[0].definition : '';
+
+            resArea.innerHTML = `
+                <div style="font-size:24px; font-weight:bold; color:#1e3a8a; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${word}</span>
+                    <button onclick="playDirectAudio('${audioUrl}', '${word}')" style="background:#e0f2fe; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; font-size:18px;">🔊</button>
+                </div>
+                <div class="ipa-text">${phonetic ? phonetic : '[no phonetic]'}</div>
+                <div class="pos-text">(${pos})</div>
+                <div style="height:1px; background:#e2e8f0; margin: 8px 0;"></div>
+                <div class="mean-text"><b>🇻🇳 Nghĩa:</b> <span style="color:#b91c1c; font-weight:bold; font-size:16px;">${vietMeaning}</span></div>
+                ${enDef ? `<div class="mean-text" style="margin-top:6px; font-size:13px; color:#64748b;"><b>English Definition:</b> ${enDef}</div>` : ''}
+            `;
+            
+            playDirectAudio(audioUrl, word);
+
+        } catch(e) { 
+            resArea.innerHTML = `<span style="color:red;">Lỗi phân tích hoặc không tìm thấy từ.</span>`; 
+        }
+    }
+
+    function playDirectAudio(url, wordFallback) {
+        if(url && url.startsWith('http')) {
+            let audio = new Audio(url);
+            audio.play().catch(() => speakFallback(wordFallback));
+        } else {
+            speakFallback(wordFallback);
+        }
+    }
+
+    function speakFallback(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US'; u.rate = 0.8;
+        window.speechSynthesis.speak(u);
+    }
+
+    async function translateFullBlock(text) {
+        const panel = document.getElementById('dictPanel');
+        if(!panel.classList.contains('active')) panel.classList.add('active');
+        
+        const resArea = document.getElementById('resultArea');
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang biên dịch đoạn... ⏳</div>`;
+        
+        try {
+            const cleanText = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(cleanText)}`);
+            const data = await res.json();
+            
+            let fullResult = '';
+            data[0].forEach(segment => { if(segment[0]) fullResult += segment[0]; });
+
+            resArea.innerHTML = `
+                <div style="font-size:13px; color:#64748b; font-style:italic; margin-bottom:8px; border-left:3px solid #cbd5e1; padding-left:8px;">"${cleanText}"</div>
+                <div style="font-size:16px; color:#1e293b; font-weight:bold;">🇻🇳 Bản dịch Việt ngữ:</div>
+                <div class="mean-text" style="color:#0369a1; font-weight:bold; font-size:16px; margin-top:4px;">${fullResult}</div>
+                <div style="text-align:right; margin-top:12px;">
+                    <button class="tool-btn" style="font-size:12px; padding:3px 8px;" onclick="speakFallback('${cleanText.replace(/'/g, "\\'")}')">Nghe đọc khối 🔊</button>
+                </div>
+            `;
+        } catch(e) {
+            resArea.innerHTML = `<span style="color:red;">Lỗi kết nối máy chủ dịch thuật.</span>`;
+        }
+    }
+
+    function makeWordsClickable() {
+        const elements = document.querySelectorAll('.clickable-block');
+        
+        elements.forEach(el => {
+            el.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                translateFullBlock(el.innerText);
+            });
+
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) textNodes.push(node);
+
+            textNodes.forEach(textNode => {
+                if (!textNode.nodeValue.trim()) return;
+                
+                const units = textNode.nodeValue.split(/([ \n.,!?'"\[\]()\/]+)/);
+                const containerFrag = document.createDocumentFragment();
+                
+                units.forEach(unit => {
+                    if (/[a-zA-Z]/.test(unit)) {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'dict-word';
+                        wordSpan.innerText = unit;
+                        
+                        wordSpan.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            lookupDictionary(unit.replace(/[^a-zA-Z']/g, ''));
+                        });
+                        containerFrag.appendChild(wordSpan);
+                    } else {
+                        containerFrag.appendChild(document.createTextNode(unit));
+                    }
+                });
+                textNode.parentNode.replaceChild(containerFrag, textNode);
+            });
+        });
+    }
+
+    let inkCanvas, inkCtx, isDrawing = false, lastX = 0, lastY = 0;
+    function initInk() {
+        inkCanvas = document.getElementById("inkCanvas");
+        inkCtx = inkCanvas.getContext("2d");
+        inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        
+        inkCanvas.addEventListener("pointerdown", e => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; lastX = e.clientX; lastY = e.clientY; } });
+        inkCanvas.addEventListener("pointermove", e => {
+            if (!isDrawing) return;
+            inkCtx.strokeStyle = "#e67e22"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round";
+            inkCtx.beginPath(); inkCtx.moveTo(lastX, lastY); inkCtx.lineTo(e.clientX, e.clientY); inkCtx.stroke();
+            lastX = e.clientX; lastY = e.clientY;
+        });
+        window.addEventListener("pointerup", () => isDrawing = false);
+    }
+    
+    function toggleInk() {
+        const active = inkCanvas.classList.toggle("drawing");
+        document.getElementById("penBtn").textContent = active ? "Bút vẽ: On" : "Bút vẽ: Off";
+        document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    window.onload = () => {
+        initInk();
+        makeWordsClickable();
+        initStepsForActiveTab(); 
+    };
+</script>
+
+</body>
+</html>

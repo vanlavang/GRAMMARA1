@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>03 Vocabulary Memory Matching</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', Roboto, sans-serif;
+    }
+    
+    /* Style cho tất cả nút trong header */
+    header button {
+      background-color: #fff;
+      border: 2px solid #d4bfa6;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: normal; 
+      color: #8b5e3c;
+      transition: 0.3s;
+    }
+
+    /* Style dành riêng cho nút đang hoạt động (Active) */
+    header button.active-nav {
+      font-weight: bold; 
+      background-color: #e6ccb2; 
+      border-color: #8b5e3c;     
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    body {
+      background: #f0e2cd;
+      text-align: center;
+      padding-top: 120px;
+      padding-bottom: 100px;
+      overflow-x: hidden;
+    }
+
+    /* Canvas Layer cho tính năng Pen */
+    #penCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 500;
+      pointer-events: none;
+    }
+    #penCanvas.active {
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    header {
+      background-color: #f3dbc1;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+    }
+
+    #topInfoBar {
+      background-color: #fff9f0;
+      padding: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #8b5e3c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 60px; left: 0; right: 0;
+      z-index: 998;
+    }
+
+    .tool-btn {
+      padding: 5px 12px;
+      border-radius: 10px;
+      border: 1px solid #8b5e3c;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      color: #8b5e3c;
+    }
+    .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+    /* Sidebars */
+    .sidebar {
+      width: 180px;
+      background-color: #f3dbc1;
+      padding: 15px 10px;
+      position: fixed;
+      top: 100px; bottom: 0;
+      border: 2px solid #d4bfa6;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 997;
+    }
+    .sidebar.left { left: 0; transform: translateX(-100%); }
+    .sidebar.right { right: 0; transform: translateX(100%); }
+    .sidebar.visible { transform: translateX(0); }
+
+    .sidebar button {
+      display: block; width: 100%;
+      background-color: #fff;
+      border: 1px solid #d4bfa6;
+      margin-bottom: 8px; padding: 12px;
+      border-radius: 10px; cursor: pointer;
+      font-size: 15px; color: #8b5e3c;
+      text-align: left;
+    }
+    .sidebar button:hover { background-color: #e6ccb2; }
+    
+    .sidebar button.active {
+      background-color: #d35400; 
+      color: #fff;               
+      border: 2px solid #a04000;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .sidebar button.active b { color: #fff; }    
+    
+    .toggle-btn {
+      position: fixed;
+      top: 10px; 
+      z-index: 1020;
+      padding: 10px 20px;
+      background: #8d6e63; 
+      border: none;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 25px; 
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'UTM Avo', sans-serif;
+    }
+
+    .toggle-left { left: 10px; }
+    .toggle-right { right: 10px; }
+
+    .content {
+      max-width: 90%; 
+      margin: 40px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+
+    .part-selector {
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .part-btn {
+      padding: 10px 30px;
+      font-size: 20px;
+      border-radius: 25px;
+      border: 2px solid #8b5e3c;
+      background: #fff;
+      cursor: pointer;
+      font-weight: bold;
+      color: #8b5e3c;
+    }
+    .part-btn.active { background: #8b5e3c; color: #fff; }
+
+    /* Memory Board (Part 1 & 2) */
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      height: 100px;
+      background-color: #f3dbc1;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 4px solid transparent;
+      transition: all 0.2s ease;
+      padding: 10px;
+    }
+
+    .card:hover { transform: translateY(-3px); background-color: #e6ccb2; }
+    .card.selected { border-color: #d35400; background-color: #ffe4e1; }
+    .card.correct { opacity: 0; pointer-events: none; transform: scale(0.8); transition: 0.6s; }
+    .card.en { color: #2980b9; }
+    .card.vi { color: #27ae60; }
+
+    /* Match Board (Part 3) */
+       #match-board {
+      display: none;
+      position: relative;
+      width: 100%;
+      min-height: 200px;
+      justify-content: space-between;
+      gap: 100px;
+    }
+
+    .match-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 2;
+    }
+    .match-card {
+      background: #f3dbc1;
+      padding: 18px 20px;
+      border-radius: 15px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      color: #8b5e3c;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 70px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .match-card:hover { transform: translateY(-2px); background: #e6ccb2; }
+    .match-card.selected { border-color: #d35400; background: #ffe4e1; transform: scale(1.02); }
+    .match-card.correct { background: #27ae60; color: #fff; border-color: #27ae60; pointer-events: none; opacity: 0.9; }
+    .match-card.wrong { animation: shake 0.4s; border-color: #e74c3c; background: #ffcccb; }
+    
+    #match-svg {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+    .connecting-line {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+      animation: drawLine 0.4s ease forwards;
+    }
+    .line-correct { stroke: #27ae60; }
+    .line-wrong { stroke: #e74c3c; }
+
+    @keyframes drawLine {
+      from { stroke-dasharray: 1500; stroke-dashoffset: 1500; }
+      to { stroke-dasharray: 1500; stroke-dashoffset: 0; }
+    }
+
+    #bottomNotice {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 25px;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="penCanvas"></canvas>
+
+  <header>
+     <button onclick="window.location.href='../conversation_01/conversation_01.html'">
+    Conversation 01
+  </button>
+  <button onclick="window.location.href='../conversation_02/conversation_02.html'">
+    Conversation 02
+  </button>
+  <button onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  <button class="active-nav" onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+  </header>
+
+  <div id="topInfoBar">
+    <span id="score">Matched: 0 / 8</span>
+    <span id="timer">Time: 0s</span>
+    <button id="musicBtn" class="tool-btn" onclick="toggleMusic()">Music: OFF</button>
+    <button id="penBtn" class="tool-btn" onclick="togglePen()">Pen: OFF</button>
+    <button class="tool-btn" onclick="clearCanvas()">Clear Pen</button>
+  </div>
+
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu ☰</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu ☰</button>
+
+ <nav class="sidebar left">
+  <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+ <button class="active" onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+  </nav>
+
+  <main class="content">
+    <div class="part-selector">
+      <button class="part-btn active" id="btnPart1" onclick="loadPart(1)">Part 1</button>
+      <button class="part-btn" id="btnPart2" onclick="loadPart(2)">Part 2</button>
+      <button class="part-btn" id="btnPart3" onclick="loadPart(3)">Part 3</button>
+    </div>
+    
+    <!-- Game lật thẻ cho Part 1 & 2 -->
+    <div class="game-board" id="board"></div>
+    
+    <!-- Game nối dây 2 cột cho Part 3 -->
+    <div id="match-board">
+        <svg id="match-svg"></svg>
+        <div class="match-col" id="col-left"></div>
+        <div class="match-col" id="col-right"></div>
+    </div>
+  </main>
+
+  <nav class="sidebar right">
+     <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>story</b></button>
+  </nav>
+
+  <div id="bottomNotice"></div>
+  <audio id="bgMusic" loop><source src="sounds/background_music.mp3" type="audio/mpeg"></audio>
+
+  <script>
+   const allPairs = [
+      // Part 1 (8 words)
+      { en: "small town", vi: "thị trấn nhỏ" },
+      { en: "city center", vi: "trung tâm thành phố" },
+      { en: "downtown", vi: "trung tâm thành phố" },
+      { en: "bus station", vi: "trạm xe buýt" },
+      { en: "take the bus", vi: "đi xe buýt" },
+      { en: "work", vi: "công việc / đi làm" },
+      { en: "walk", vi: "đi bộ" },
+      { en: "close", vi: "gần" },
+
+      // Part 2 (8 words)
+      { en: "far away", vi: "xa" },
+      { en: "drive", vi: "lái xe" },
+      { en: "car", vi: "xe hơi" },
+      { en: "expensive", vi: "đắt" },
+      { en: "old car", vi: "xe hơi cũ" },
+      { en: "weekend", vi: "cuối tuần" },
+      { en: "enjoy", vi: "thích / tận hưởng" },
+      { en: "coffee", vi: "cà phê" },
+
+      // Part 3 - Tích hợp mp3 (7 sentences)
+      { en: "Do you live downtown?", vi: "Bạn có sống ở trung tâm thành phố không?", audio: "sounds/sentence1.mp3" },
+      { en: "Yes, I live near the train station.", vi: "Vâng, tôi sống gần trạm xe lửa.", audio: "sounds/sentence2.mp3" },
+      { en: "Do you take the train to work?", vi: "Bạn có đi xe lửa đi làm không?", audio: "sounds/sentence3.mp3" },
+      { en: "Yes, most days. What about you?", vi: "Vâng, hầu hết các ngày. Còn bạn thì sao?", audio: "sounds/sentence4.mp3" },
+      { en: "I live far away, so I drive to work.", vi: "Tôi sống ở xa, nên tôi lái xe đi làm.", audio: "sounds/sentence5.mp3" },
+      { en: "Do you have a nice car?", vi: "Bạn có một chiếc xe hơi đẹp không?", audio: "sounds/sentence6.mp3" },
+      { en: "No, my car is old, but I like it.", vi: "Không, xe hơi của tôi cũ, nhưng tôi thích nó.", audio: "sounds/sentence7.mp3" }
+    ];
+
+    let currentPartPairs = [];
+    let selected = [];
+    let matched = 0;
+    let seconds = 0;
+    let timerInterval = null;
+    let currentAudioNode = null; // Quản lý audio để không bị đè tiếng
+
+    // --- Line Matching Variables (Part 3) ---
+    let selectedL = null;
+    let selectedR = null;
+    let matchMatchedPairs = [];
+
+    // --- Pen & Music Logic ---
+    const bgMusic = document.getElementById('bgMusic');
+    const penCanvas = document.getElementById('penCanvas');
+    const ctx = penCanvas.getContext('2d');
+    let isPenActive = false;
+    let isDrawing = false;
+
+    function resizeCanvas() {
+      penCanvas.width = window.innerWidth;
+      penCanvas.height = window.innerHeight;
+      
+      // Vẽ lại đường nối nếu đang ở Part 3
+      if (document.getElementById('match-board').style.display === 'flex') {
+          const svg = document.getElementById('match-svg');
+          if (svg) {
+              svg.innerHTML = '';
+              matchMatchedPairs.forEach(pair => drawSvgLine(pair.l, pair.r, true));
+          }
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function toggleMusic() {
+      const btn = document.getElementById('musicBtn');
+      if (bgMusic.paused) { bgMusic.play(); btn.textContent = "Music: ON"; btn.classList.add('active'); }
+      else { bgMusic.pause(); btn.textContent = "Music: OFF"; btn.classList.remove('active'); }
+    }
+
+    function togglePen() {
+      isPenActive = !isPenActive;
+      const btn = document.getElementById('penBtn');
+      if (isPenActive) { penCanvas.classList.add('active'); btn.textContent = "Pen: ON"; btn.classList.add('active'); }
+      else { penCanvas.classList.remove('active'); btn.textContent = "Pen: OFF"; btn.classList.remove('active'); }
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, penCanvas.width, penCanvas.height); }
+
+    function startDrawing(e) { if (!isPenActive) return; isDrawing = true; draw(e); }
+    function stopDrawing() { isDrawing = false; ctx.beginPath(); }
+    function draw(e) {
+      if (!isDrawing || !isPenActive) return;
+      ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#d35400';
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const y = e.clientY || (e.touches && e.touches[0].clientY);
+      ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
+    }
+
+    penCanvas.addEventListener('mousedown', startDrawing);
+    penCanvas.addEventListener('mousemove', draw);
+    window.addEventListener('mouseup', stopDrawing);
+    penCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+    penCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+    penCanvas.addEventListener('touchend', stopDrawing);
+
+    // --- Audio Logic (Phân luồng MP3 gốc hoặc TTS) ---
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = speechSynthesis.getVoices();
+        let selectedVoice = voices.find(voice => (voice.name.includes("Google") && voice.lang === "en-US") || (voice.lang === "en-US" && voice.name.includes("Female")));
+        if (selectedVoice) utterance.voice = selectedVoice;
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    function playCardAudio(text, audioSrc) {
+      // Dừng audio cũ nếu đang phát
+      if (currentAudioNode) {
+          currentAudioNode.pause();
+          currentAudioNode.currentTime = 0;
+      }
+      
+      // Nếu có file MP3 -> Phát MP3, nếu lỗi hoặc không có -> Dùng TTS dự phòng
+      if (audioSrc && audioSrc !== "undefined") {
+          currentAudioNode = new Audio(audioSrc);
+          currentAudioNode.play().catch(e => {
+              console.log("Audio file not found, fallback to TTS");
+              speak(text);
+          });
+      } else {
+          speak(text);
+      }
+    }
+
+    // --- CẤU TRÚC PHÂN LUỒNG PART ---
+    function loadPart(partNum) {
+      clearInterval(timerInterval);
+      seconds = 0; timerInterval = null; matched = 0; selected = [];
+      matchMatchedPairs = []; selectedL = null; selectedR = null;
+      document.getElementById("timer").textContent = `Time: 0s`;
+      document.querySelectorAll('.part-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btnPart${partNum}`).classList.add('active');
+      
+      // Phân tách data chuẩn không lẹm nhau
+      let pStart = 0, pEnd = 8;
+      if (partNum === 1) { pStart = 0; pEnd = 8; } // 8 items
+      if (partNum === 2) { pStart = 8; pEnd = 16; } // 8 items
+      if (partNum === 3) { pStart = 16; pEnd = 23; } // 7 items
+      currentPartPairs = allPairs.slice(pStart, pEnd);
+      
+      document.getElementById("score").textContent = `Matched: 0 / ${currentPartPairs.length}`;
+      
+      if (partNum === 3) {
+          document.getElementById('board').style.display = 'none';
+          document.getElementById('match-board').style.display = 'flex';
+          renderMatchBoard();
+      } else {
+          document.getElementById('board').style.display = 'grid';
+          document.getElementById('match-board').style.display = 'none';
+          renderBoard();
+      }
+    }
+
+    // --- LOGIC LẬT THẺ TRUYỀN THỐNG (PART 1 & 2) ---
+    function renderBoard() {
+      const board = document.getElementById("board");
+      board.innerHTML = "";
+      let cardsData = [];
+      currentPartPairs.forEach((p, i) => {
+        cardsData.push({ id: i, lang: 'en', text: p.en, audio: p.audio });
+        cardsData.push({ id: i, lang: 'vi', text: p.vi });
+      });
+      cardsData = cardsData.sort(() => Math.random() - 0.5);
+      cardsData.forEach(data => {
+        const card = document.createElement("div");
+        card.className = `card ${data.lang}`;
+        card.textContent = data.text;
+        card.dataset.id = data.id;
+        card.dataset.lang = data.lang;
+        card.onclick = () => { 
+            if (data.lang === 'en') playCardAudio(data.text, data.audio); 
+            selectCard(card); 
+        };
+        board.appendChild(card);
+      });
+    }
+
+    function selectCard(card) {
+      if (selected.length === 2 || card.classList.contains('selected') || card.classList.contains('correct')) return;
+      if (!timerInterval) { timerInterval = setInterval(() => { seconds++; document.getElementById("timer").textContent = `Time: ${seconds}s`; }, 1000); }
+      card.classList.add('selected');
+      selected.push(card);
+      if (selected.length === 2) {
+        const [c1, c2] = selected;
+        if (c1.dataset.id === c2.dataset.id && c1.dataset.lang !== c2.dataset.lang) {
+          matched++;
+          document.getElementById("score").textContent = `Matched: ${matched} / ${currentPartPairs.length}`;
+          showNotice("Excellent! 🌟", "#27ae60", "sounds/correct.mp3");
+          setTimeout(() => { c1.classList.add('correct'); c2.classList.add('correct'); selected = []; if (matched === currentPartPairs.length) { new Audio("sounds/win.mp3").play(); clearInterval(timerInterval); } }, 600);
+        } else {
+          showNotice("Try Again 😢", "#e74c3c", "sounds/incorrect.mp3");
+          setTimeout(() => { c1.classList.remove('selected'); c2.classList.remove('selected'); selected = []; }, 800);
+        }
+      }
+    }
+
+    // --- LOGIC NỐI DÂY (PART 3) ---
+    function renderMatchBoard() {
+      const colLeft = document.getElementById('col-left');
+      const colRight = document.getElementById('col-right');
+      const svg = document.getElementById('match-svg');
+      colLeft.innerHTML = '';
+      colRight.innerHTML = '';
+      svg.innerHTML = '';
+
+      let leftItems = [];
+      let rightItems = [];
+      currentPartPairs.forEach((p, i) => {
+          leftItems.push({ id: i, text: p.en, type: 'L', audio: p.audio });
+          rightItems.push({ id: i, text: p.vi, type: 'R' });
+      });
+
+      leftItems = leftItems.sort(() => Math.random() - 0.5);
+      rightItems = rightItems.sort(() => Math.random() - 0.5);
+
+      leftItems.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'match-card';
+          card.textContent = item.text;
+          card.dataset.id = item.id;
+          card.dataset.type = 'L';
+          if(item.audio) card.dataset.audio = item.audio;
+          card.onclick = () => handleMatchClick(card);
+          colLeft.appendChild(card);
+      });
+
+      rightItems.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'match-card';
+          card.textContent = item.text;
+          card.dataset.id = item.id;
+          card.dataset.type = 'R';
+          card.onclick = () => handleMatchClick(card);
+          colRight.appendChild(card);
+      });
+    }
+
+    function handleMatchClick(card) {
+      if (card.classList.contains('correct')) return;
+      if (!timerInterval) { timerInterval = setInterval(() => { seconds++; document.getElementById("timer").textContent = `Time: ${seconds}s`; }, 1000); }
+      
+      if (card.dataset.type === 'L') {
+          playCardAudio(card.textContent, card.dataset.audio);
+          
+          if (selectedL) selectedL.classList.remove('selected');
+          if (selectedL === card) { selectedL = null; return; }
+          selectedL = card;
+      } else {
+          if (selectedR) selectedR.classList.remove('selected');
+          if (selectedR === card) { selectedR = null; return; }
+          selectedR = card;
+      }
+      
+      card.classList.add('selected');
+
+      if (selectedL && selectedR) {
+          checkMatchLine();
+      }
+    }
+
+    function checkMatchLine() {
+      const idL = selectedL.dataset.id;
+      const idR = selectedR.dataset.id;
+      const cL = selectedL;
+      const cR = selectedR;
+
+      document.getElementById('col-left').style.pointerEvents = 'none';
+      document.getElementById('col-right').style.pointerEvents = 'none';
+
+      if (idL === idR) {
+          matched++;
+          matchMatchedPairs.push({ l: cL, r: cR });
+          document.getElementById("score").textContent = `Matched: ${matched} / ${currentPartPairs.length}`;
+          cL.classList.remove('selected'); cR.classList.remove('selected');
+          cL.classList.add('correct'); cR.classList.add('correct');
+          
+          drawSvgLine(cL, cR, true);
+          showNotice("Correct! 🌟", "#27ae60", "sounds/correct.mp3");
+
+          setTimeout(() => {
+              selectedL = null; selectedR = null;
+              document.getElementById('col-left').style.pointerEvents = 'all';
+              document.getElementById('col-right').style.pointerEvents = 'all';
+              if (matched === currentPartPairs.length) {
+                  new Audio("sounds/win.mp3").play();
+                  clearInterval(timerInterval);
+              }
+          }, 600);
+      } else {
+          cL.classList.add('wrong'); cR.classList.add('wrong');
+          const lineId = drawSvgLine(cL, cR, false);
+          showNotice("Try Again 😢", "#e74c3c", "sounds/incorrect.mp3");
+
+          setTimeout(() => {
+              cL.classList.remove('wrong', 'selected');
+              cR.classList.remove('wrong', 'selected');
+              const line = document.getElementById(lineId);
+              if(line) line.remove();
+              selectedL = null; selectedR = null;
+              document.getElementById('col-left').style.pointerEvents = 'all';
+              document.getElementById('col-right').style.pointerEvents = 'all';
+          }, 800);
+      }
+    }
+
+    function drawSvgLine(el1, el2, isCorrect) {
+      const svg = document.getElementById('match-svg');
+      const svgRect = svg.getBoundingClientRect();
+      const r1 = el1.getBoundingClientRect();
+      const r2 = el2.getBoundingClientRect();
+
+      const x1 = r1.right - svgRect.left;
+      const y1 = r1.top + r1.height / 2 - svgRect.top;
+      const x2 = r2.left - svgRect.left;
+      const y2 = r2.top + r2.height / 2 - svgRect.top;
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const id = `line-${Date.now()}`;
+      path.setAttribute("id", id);
+      const cx1 = x1 + (x2 - x1) / 2;
+      path.setAttribute("d", `M ${x1} ${y1} C ${cx1} ${y1}, ${cx1} ${y2}, ${x2} ${y2}`);
+      path.setAttribute("class", `connecting-line ${isCorrect ? 'line-correct' : 'line-wrong'}`);
+      svg.appendChild(path);
+      return id;
+    }
+
+    // --- CHUNG ---
+    function showNotice(text, bgColor, soundPath) {
+      const notice = document.getElementById("bottomNotice");
+      notice.textContent = text; notice.style.backgroundColor = bgColor; notice.style.display = "flex";
+      new Audio(soundPath).play();
+      setTimeout(() => notice.style.display = "none", 1000);
+    }
+
+    function toggleSidebar(side) { document.querySelector(`.sidebar.${side}`).classList.toggle('visible'); }
+    window.speechSynthesis.onvoiceschanged = () => {};
+    
+    // Bắt đầu tại Part 1
+    loadPart(1);
+  </script>
+</body>
+</html>
