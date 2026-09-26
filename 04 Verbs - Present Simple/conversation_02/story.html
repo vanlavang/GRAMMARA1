@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conversation – Modern Learning</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6; /* Màu beige đậm hơn như trong hình */
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+/* Style cho tất cả nút trong header */
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal; /* Bình thường không đậm */
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+/* Style dành riêng cho nút đang hoạt động (Active) */
+header button.active-nav {
+  font-weight: bold; /* Làm đậm chữ */
+  background-color: #e6ccb2; /* Đổi màu nền nhẹ để phân biệt */
+  border-color: #8b5e3c;     /* Viền đậm hơn */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1; /* Màu Header đậm hơn body */
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+/* Thanh trên cùng: Menu - Conv 01-04 - Menu */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d; /* Màu cam đậm */
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Thanh dưới: Play, Pause, Stop, Pen, Clear */
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+/* Style thêm cho dropdown chọn tốc độ */
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+/* Nút Menu hai bên */
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+#mainVideo{
+  width:100%; max-width:700px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; /* Viền đen dày như hình */
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 40px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+    <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+      <a href="../conversation_01/conversation_01.html" >Conversation 01</a>
+      <a href="../conversation_02/conversation_02.html" class="active-link">Conversation 02</a>
+      <a href="../conversation_03/conversation_03.html">Conversation 03</a>
+      <a href="../conversation_04/conversation_04.html">Conversation 04</a>
+    </nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+  </div>
+</header>
+
+<div class="content">
+  <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+    <source src="videos/story.mp4" type="video/mp4">
+  </video>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+// Thêm hàm đổi tốc độ video
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// Dữ liệu từ điển và câu
+const dictionary = {
+  "i": { meaning: "tôi", phonetic: "/aɪ/", type: "pronoun" },
+  "usually": { meaning: "thường xuyên", phonetic: "/ˈjuːʒuəli/", type: "adverb" },
+  "wake": { meaning: "thức dậy", phonetic: "/weɪk/", type: "verb" },
+  "up": { meaning: "lên", phonetic: "/ʌp/", type: "adverb" },
+  "at": { meaning: "vào lúc", phonetic: "/æt/", type: "preposition" },
+  "7:00": { meaning: "7 giờ", phonetic: "/ˈsevən/", type: "number" },
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "morning": { meaning: "buổi sáng", phonetic: "/ˈmɔːrnɪŋ/", type: "noun" },
+  "my": { meaning: "của tôi", phonetic: "/maɪ/", type: "possessive" },
+  "alarm": { meaning: "báo thức", phonetic: "/əˈlɑːrm/", type: "noun" },
+  "rings": { meaning: "reo", phonetic: "/rɪŋz/", type: "verb" },
+  "and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+  "turn": { meaning: "tắt", phonetic: "/tɜːrn/", type: "verb" },
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+  "off": { meaning: "tắt", phonetic: "/ɒf/", type: "adverb" },
+
+  "sometimes": { meaning: "đôi khi", phonetic: "/ˈsʌmtaɪmz/", type: "adverb" },
+  "want": { meaning: "muốn", phonetic: "/wɒnt/", type: "verb" },
+  "to": { meaning: "để", phonetic: "/tuː/", type: "particle" },
+  "sleep": { meaning: "ngủ", phonetic: "/sliːp/", type: "verb" },
+  "more": { meaning: "nhiều hơn", phonetic: "/mɔːr/", type: "adverb" },
+  "but": { meaning: "nhưng", phonetic: "/bʌt/", type: "conjunction" },
+  "know": { meaning: "biết", phonetic: "/nəʊ/", type: "verb" },
+  "have": { meaning: "phải", phonetic: "/hæv/", type: "verb" },
+  "get": { meaning: "trở nên / đi", phonetic: "/ɡet/", type: "verb" },
+
+  "sit": { meaning: "ngồi", phonetic: "/sɪt/", type: "verb" },
+  "on": { meaning: "trên", phonetic: "/ɒn/", type: "preposition" },
+  "bed": { meaning: "giường", phonetic: "/bed/", type: "noun" },
+  "stretch": { meaning: "duỗi", phonetic: "/stretʃ/", type: "verb" },
+  "arms": { meaning: "cánh tay", phonetic: "/ɑːrmz/", type: "noun" },
+  "go": { meaning: "đi", phonetic: "/ɡəʊ/", type: "verb" },
+  "bathroom": { meaning: "phòng tắm", phonetic: "/ˈbɑːθruːm/", type: "noun" },
+
+  "brush": { meaning: "đánh", phonetic: "/brʌʃ/", type: "verb" },
+  "teeth": { meaning: "răng", phonetic: "/tiːθ/", type: "noun" },
+  "wash": { meaning: "rửa", phonetic: "/wɒʃ/", type: "verb" },
+  "face": { meaning: "khuôn mặt", phonetic: "/feɪs/", type: "noun" },
+  "with": { meaning: "với", phonetic: "/wɪð/", type: "preposition" },
+  "cold": { meaning: "lạnh", phonetic: "/kəʊld/", type: "adjective" },
+  "water": { meaning: "nước", phonetic: "/ˈwɔːtər/", type: "noun" },
+
+  "really": { meaning: "thực sự", phonetic: "/ˈrɪəli/", type: "adverb" },
+  "helps": { meaning: "giúp", phonetic: "/helps/", type: "verb" },
+  "me": { meaning: "tôi (tân ngữ)", phonetic: "/miː/", type: "pronoun" },
+
+  "take": { meaning: "tắm / lấy", phonetic: "/teɪk/", type: "verb" },
+  "a": { meaning: "một", phonetic: "/ə/", type: "article" },
+  "shower": { meaning: "tắm", phonetic: "/ˈʃaʊər/", type: "noun" },
+  "if": { meaning: "nếu", phonetic: "/ɪf/", type: "conjunction" },
+  "time": { meaning: "thời gian", phonetic: "/taɪm/", type: "noun" },
+
+  "then": { meaning: "sau đó", phonetic: "/ðen/", type: "adverb" },
+  "kitchen": { meaning: "nhà bếp", phonetic: "/ˈkɪtʃɪn/", type: "noun" },
+  "make": { meaning: "làm", phonetic: "/meɪk/", type: "verb" },
+  "breakfast": { meaning: "bữa sáng", phonetic: "/ˈbrekfəst/", type: "noun" },
+
+  "eat": { meaning: "ăn", phonetic: "/iːt/", type: "verb" },
+  "toast": { meaning: "bánh mì nướng", phonetic: "/təʊst/", type: "noun" },
+  "butter": { meaning: "bơ", phonetic: "/ˈbʌtər/", type: "noun" },
+  "eggs": { meaning: "trứng", phonetic: "/eɡz/", type: "noun" },
+
+  "cereal": { meaning: "ngũ cốc", phonetic: "/ˈsɪəriəl/", type: "noun" },
+  "or": { meaning: "hoặc", phonetic: "/ɔːr/", type: "conjunction" },
+  "fruit": { meaning: "trái cây", phonetic: "/fruːt/", type: "noun" },
+
+  "always": { meaning: "luôn luôn", phonetic: "/ˈɔːlweɪz/", type: "adverb" },
+  "drink": { meaning: "uống", phonetic: "/drɪŋk/", type: "verb" },
+  "hot": { meaning: "nóng", phonetic: "/hɒt/", type: "adjective" },
+  "cup": { meaning: "cốc", phonetic: "/kʌp/", type: "noun" },
+  "of": { meaning: "của", phonetic: "/ɒv/", type: "preposition" },
+  "green": { meaning: "xanh", phonetic: "/ɡriːn/", type: "adjective" },
+  "tea": { meaning: "trà", phonetic: "/tiː/", type: "noun" },
+  "feel": { meaning: "cảm thấy", phonetic: "/fiːl/", type: "verb" },
+  "calm": { meaning: "bình tĩnh", phonetic: "/kɑːm/", type: "adjective" },
+  "ready": { meaning: "sẵn sàng", phonetic: "/ˈredi/", type: "adjective" },
+  "for": { meaning: "cho", phonetic: "/fɔːr/", type: "preposition" },
+  "day": { meaning: "ngày", phonetic: "/deɪ/", type: "noun" },
+
+  "while": { meaning: "trong khi", phonetic: "/waɪl/", type: "conjunction" },
+  "listen": { meaning: "nghe", phonetic: "/ˈlɪsən/", type: "verb" },
+  "music": { meaning: "âm nhạc", phonetic: "/ˈmjuːzɪk/", type: "noun" },
+  "check": { meaning: "kiểm tra", phonetic: "/tʃek/", type: "verb" },
+  "phone": { meaning: "điện thoại", phonetic: "/fəʊn/", type: "noun" },
+
+  "like": { meaning: "thích", phonetic: "/laɪk/", type: "verb" },
+  "reading": { meaning: "việc đọc", phonetic: "/ˈriːdɪŋ/", type: "verb" },
+  "messages": { meaning: "tin nhắn", phonetic: "/ˈmesɪdʒɪz/", type: "noun" },
+  "checking": { meaning: "việc kiểm tra", phonetic: "/ˈtʃekɪŋ/", type: "verb" },
+  "weather": { meaning: "thời tiết", phonetic: "/ˈweðər/", type: "noun" },
+
+  "after": { meaning: "sau", phonetic: "/ˈɑːftər/", type: "preposition" },
+  "back": { meaning: "trở lại", phonetic: "/bæk/", type: "adverb" },
+  "room": { meaning: "phòng", phonetic: "/ruːm/", type: "noun" },
+  "choose": { meaning: "chọn", phonetic: "/tʃuːz/", type: "verb" },
+  "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "pronoun" },
+  "wear": { meaning: "mặc", phonetic: "/weər/", type: "verb" },
+
+  "jeans": { meaning: "quần jean", phonetic: "/dʒiːnz/", type: "noun" },
+  "simple": { meaning: "đơn giản", phonetic: "/ˈsɪmpl/", type: "adjective" },
+  "shirt": { meaning: "áo", phonetic: "/ʃɜːrt/", type: "noun" },
+
+  "it's": { meaning: "nó là", phonetic: "/ɪts/", type: "contraction" },
+  "add": { meaning: "thêm", phonetic: "/æd/", type: "verb" },
+  "sweater": { meaning: "áo len", phonetic: "/ˈswetər/", type: "noun" },
+
+  "hair": { meaning: "tóc", phonetic: "/heər/", type: "noun" },
+  "bag": { meaning: "túi", phonetic: "/bæɡ/", type: "noun" },
+  "sure": { meaning: "chắc chắn", phonetic: "/ʃʊər/", type: "adjective" },
+  "keys": { meaning: "chìa khóa", phonetic: "/kiːz/", type: "noun" },
+  "wallet": { meaning: "ví", phonetic: "/ˈwɒlɪt/", type: "noun" },
+
+  "finally": { meaning: "cuối cùng", phonetic: "/ˈfaɪnəli/", type: "adverb" },
+  "put": { meaning: "đặt / mang", phonetic: "/pʊt/", type: "verb" },
+  "shoes": { meaning: "giày", phonetic: "/ʃuːz/", type: "noun" },
+  "leave": { meaning: "rời đi", phonetic: "/liːv/", type: "verb" },
+  "house": { meaning: "nhà", phonetic: "/haʊs/", type: "noun" },
+
+  "walk": { meaning: "đi bộ", phonetic: "/wɔːk/", type: "verb" },
+  "bus": { meaning: "xe buýt", phonetic: "/bʌs/", type: "noun" },
+  "stop": { meaning: "trạm dừng", phonetic: "/stɒp/", type: "noun" },
+
+  "only": { meaning: "chỉ", phonetic: "/ˈəʊnli/", type: "adverb" },
+  "minutes": { meaning: "phút", phonetic: "/ˈmɪnɪts/", type: "noun" },
+  "from": { meaning: "từ", phonetic: "/frɒm/", type: "preposition" },
+  "home": { meaning: "nhà", phonetic: "/həʊm/", type: "noun" },
+
+  "work": { meaning: "làm việc", phonetic: "/wɜːrk/", type: "verb" },
+  "ride": { meaning: "chuyến đi", phonetic: "/raɪd/", type: "noun" },
+  "takes": { meaning: "mất (thời gian)", phonetic: "/teɪks/", type: "verb" },
+  "about": { meaning: "khoảng", phonetic: "/əˈbaʊt/", type: "adverb" },
+
+  "full": { meaning: "đầy", phonetic: "/fʊl/", type: "adjective" },
+  "find": { meaning: "tìm", phonetic: "/faɪnd/", type: "verb" },
+  "seat": { meaning: "chỗ ngồi", phonetic: "/siːt/", type: "noun" },
+
+  "window": { meaning: "cửa sổ", phonetic: "/ˈwɪndəʊ/", type: "noun" },
+  "watching": { meaning: "nhìn", phonetic: "/ˈwɒtʃɪŋ/", type: "verb" },
+  "city": { meaning: "thành phố", phonetic: "/ˈsɪti/", type: "noun" },
+  "pass": { meaning: "trôi qua", phonetic: "/pɑːs/", type: "verb" },
+
+  "when": { meaning: "khi", phonetic: "/wen/", type: "conjunction" },
+  "arrive": { meaning: "đến", phonetic: "/əˈraɪv/", type: "verb" },
+  "say": { meaning: "nói", phonetic: "/seɪ/", type: "verb" },
+  "good": { meaning: "tốt", phonetic: "/ɡʊd/", type: "adjective" },
+  "elevator": { meaning: "thang máy", phonetic: "/ˈelɪveɪtər/", type: "noun" },
+  "third": { meaning: "thứ ba", phonetic: "/θɜːrd/", type: "number" },
+  "floor": { meaning: "tầng", phonetic: "/flɔːr/", type: "noun" },
+
+  "office": { meaning: "văn phòng", phonetic: "/ˈɒfɪs/", type: "noun" },
+  "start": { meaning: "bắt đầu", phonetic: "/stɑːrt/", type: "verb" },
+  "job": { meaning: "công việc", phonetic: "/dʒɒb/", type: "noun" },
+  "busy": { meaning: "bận rộn", phonetic: "/ˈbɪzi/", type: "adjective" },
+  "enjoy": { meaning: "thích", phonetic: "/ɪnˈdʒɔɪ/", type: "verb" },
+
+  "emails": { meaning: "email", phonetic: "/ˈiːmeɪlz/", type: "noun" },
+  "write": { meaning: "viết", phonetic: "/raɪt/", type: "verb" },
+  "reports": { meaning: "báo cáo", phonetic: "/rɪˈpɔːrts/", type: "noun" },
+  "talk": { meaning: "nói chuyện", phonetic: "/tɔːk/", type: "verb" },
+  "clients": { meaning: "khách hàng", phonetic: "/ˈklaɪənts/", type: "noun" },
+  "short": { meaning: "ngắn", phonetic: "/ʃɔːrt/", type: "adjective" },
+  "meetings": { meaning: "cuộc họp", phonetic: "/ˈmiːtɪŋz/", type: "noun" },
+
+  "lunch": { meaning: "bữa trưa", phonetic: "/lʌntʃ/", type: "noun" },
+  "break": { meaning: "nghỉ", phonetic: "/breɪk/", type: "noun" },
+
+  "sandwiches": { meaning: "bánh mì kẹp", phonetic: "/ˈsænwɪtʃɪz/", type: "noun" },
+  "rice": { meaning: "cơm", phonetic: "/raɪs/", type: "noun" },
+  "vegetables": { meaning: "rau", phonetic: "/ˈvedʒtəblz/", type: "noun" },
+
+  "go": { meaning: "đi", phonetic: "/ɡəʊ/", type: "verb" },
+  "out": { meaning: "ra ngoài", phonetic: "/aʊt/", type: "adverb" },
+  "buy": { meaning: "mua", phonetic: "/baɪ/", type: "verb" },
+  "something": { meaning: "cái gì đó", phonetic: "/ˈsʌmθɪŋ/", type: "pronoun" },
+  "small": { meaning: "nhỏ", phonetic: "/smɔːl/", type: "adjective" },
+
+  "coworkers": { meaning: "đồng nghiệp", phonetic: "/ˌkəʊˈwɜːrkərz/", type: "noun" },
+  "we": { meaning: "chúng tôi", phonetic: "/wiː/", type: "pronoun" },
+  "movies": { meaning: "phim", phonetic: "/ˈmuːviz/", type: "noun" },
+  "weekend": { meaning: "cuối tuần", phonetic: "/ˌwiːkˈend/", type: "noun" },
+  "plans": { meaning: "kế hoạch", phonetic: "/plænz/", type: "noun" },
+
+  "nice": { meaning: "tốt đẹp", phonetic: "/naɪs/", type: "adjective" },
+  "relax": { meaning: "thư giãn", phonetic: "/rɪˈlæks/", type: "verb" },
+  "laugh": { meaning: "cười", phonetic: "/læf/", type: "verb" },
+  "little": { meaning: "một chút", phonetic: "/ˈlɪtl/", type: "adjective" },
+
+  "fresh": { meaning: "tươi mới", phonetic: "/freʃ/", type: "adjective" },
+  "continue": { meaning: "tiếp tục", phonetic: "/kənˈtɪnjuː/", type: "verb" },
+  "working": { meaning: "làm việc", phonetic: "/ˈwɜːrkɪŋ/", type: "verb" },
+
+  "finish": { meaning: "kết thúc", phonetic: "/ˈfɪnɪʃ/", type: "verb" },
+  "pm": { meaning: "buổi chiều", phonetic: "/ˌpiːˈem/", type: "time" },
+
+  "computer": { meaning: "máy tính", phonetic: "/kəmˈpjuːtər/", type: "noun" },
+  "pack": { meaning: "đóng gói", phonetic: "/pæk/", type: "verb" },
+  "goodbye": { meaning: "tạm biệt", phonetic: "/ˌɡʊdˈbaɪ/", type: "expression" },
+
+  "ride": { meaning: "chuyến đi", phonetic: "/raɪd/", type: "noun" },
+  "think": { meaning: "nghĩ", phonetic: "/θɪŋk/", type: "verb" },
+
+  "change": { meaning: "thay đổi", phonetic: "/tʃeɪndʒ/", type: "verb" },
+  "into": { meaning: "thành", phonetic: "/ˈɪntuː/", type: "preposition" },
+  "comfortable": { meaning: "thoải mái", phonetic: "/ˈkʌmfərtəbl/", type: "adjective" },
+  "clothes": { meaning: "quần áo", phonetic: "/kləʊðz/", type: "noun" },
+
+  "feels": { meaning: "cảm thấy", phonetic: "/fiːlz/", type: "verb" },
+  "so": { meaning: "rất", phonetic: "/səʊ/", type: "adverb" },
+
+  "around": { meaning: "khoảng", phonetic: "/əˈraʊnd/", type: "adverb" },
+  "making": { meaning: "nấu", phonetic: "/ˈmeɪkɪŋ/", type: "verb" },
+  "dinner": { meaning: "bữa tối", phonetic: "/ˈdɪnər/", type: "noun" },
+
+  "simple": { meaning: "đơn giản", phonetic: "/ˈsɪmpl/", type: "adjective" },
+  "meals": { meaning: "bữa ăn", phonetic: "/miːlz/", type: "noun" },
+  "pasta": { meaning: "mì ý", phonetic: "/ˈpæstə/", type: "noun" },
+  "salad": { meaning: "salad", phonetic: "/ˈsæləd/", type: "noun" },
+
+  "cooking": { meaning: "nấu ăn", phonetic: "/ˈkʊkɪŋ/", type: "noun" },
+  "play": { meaning: "phát", phonetic: "/pleɪ/", type: "verb" },
+  "soft": { meaning: "nhẹ", phonetic: "/sɒft/", type: "adjective" },
+  "moment": { meaning: "khoảnh khắc", phonetic: "/ˈməʊmənt/", type: "noun" },
+
+  "dishes": { meaning: "bát đĩa", phonetic: "/ˈdɪʃɪz/", type: "noun" },
+  "clean": { meaning: "dọn", phonetic: "/kliːn/", type: "verb" },
+
+  "tidy": { meaning: "gọn gàng", phonetic: "/ˈtaɪdi/", type: "adjective" },
+  "space": { meaning: "không gian", phonetic: "/speɪs/", type: "noun" },
+
+  "evening": { meaning: "buổi tối", phonetic: "/ˈiːvnɪŋ/", type: "noun" },
+  "some": { meaning: "một số", phonetic: "/sʌm/", type: "determiner" },
+  "free": { meaning: "rảnh", phonetic: "/friː/", type: "adjective" },
+
+  "watch": { meaning: "xem", phonetic: "/wɒtʃ/", type: "verb" },
+  "movie": { meaning: "phim", phonetic: "/ˈmuːvi/", type: "noun" },
+  "call": { meaning: "gọi", phonetic: "/kɔːl/", type: "verb" },
+  "friend": { meaning: "bạn", phonetic: "/frend/", type: "noun" },
+
+  "other": { meaning: "khác", phonetic: "/ˈʌðər/", type: "adjective" },
+  "times": { meaning: "lần", phonetic: "/taɪmz/", type: "noun" },
+  "journal": { meaning: "nhật ký", phonetic: "/ˈdʒɜːrnl/", type: "noun" },
+
+  "favorite": { meaning: "yêu thích", phonetic: "/ˈfeɪvərɪt/", type: "adjective" },
+  "quiet": { meaning: "yên tĩnh", phonetic: "/ˈkwaɪət/", type: "adjective" },
+  "peaceful": { meaning: "yên bình", phonetic: "/ˈpiːsfl/", type: "adjective" },
+
+  "get": { meaning: "trở nên", phonetic: "/ɡet/", type: "verb" },
+  "ready": { meaning: "sẵn sàng", phonetic: "/ˈredi/", type: "adjective" },
+  "bed": { meaning: "giường", phonetic: "/bed/", type: "noun" },
+
+  "warm": { meaning: "ấm", phonetic: "/wɔːrm/", type: "adjective" },
+
+  "change": { meaning: "thay", phonetic: "/tʃeɪndʒ/", type: "verb" },
+  "soft": { meaning: "mềm", phonetic: "/sɒft/", type: "adjective" },
+  "light": { meaning: "nhạt", phonetic: "/laɪt/", type: "adjective" },
+  "blue": { meaning: "xanh dương", phonetic: "/bluː/", type: "adjective" },
+  "pajamas": { meaning: "đồ ngủ", phonetic: "/pəˈdʒɑːməz/", type: "noun" },
+
+  "read": { meaning: "đọc", phonetic: "/riːd/", type: "verb" },
+  "few": { meaning: "vài", phonetic: "/fjuː/", type: "determiner" },
+  "pages": { meaning: "trang", phonetic: "/ˈpeɪdʒɪz/", type: "noun" },
+  "book": { meaning: "sách", phonetic: "/bʊk/", type: "noun" },
+
+  "before": { meaning: "trước khi", phonetic: "/bɪˈfɔːr/", type: "conjunction" },
+
+  "think": { meaning: "nghĩ", phonetic: "/θɪŋk/", type: "verb" },
+  "better": { meaning: "tốt hơn", phonetic: "/ˈbetər/", type: "adjective" },
+  "tomorrow": { meaning: "ngày mai", phonetic: "/təˈmɒrəʊ/", type: "noun" },
+
+  "light": { meaning: "đèn", phonetic: "/laɪt/", type: "noun" },
+  "close": { meaning: "nhắm", phonetic: "/kləʊz/", type: "verb" },
+  "eyes": { meaning: "mắt", phonetic: "/aɪz/", type: "noun" },
+  "myself": { meaning: "bản thân tôi", phonetic: "/maɪˈself/", type: "pronoun" },
+  "good": { meaning: "tốt", phonetic: "/ɡʊd/", type: "adjective" },
+  "night": { meaning: "chúc ngủ ngon", phonetic: "/naɪt/", type: "expression" }
+};
+
+document.querySelectorAll('.line').forEach(line => {
+  line.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+
+    const id = this.dataset.sentence;
+
+    const translations = {
+      1: "Bạn làm gì vào ban ngày?",
+      2: "À, tôi đi học. Tôi dạy học sinh.",
+      3: "Ồ! Bạn dạy gì?",
+      4: "Tôi dạy toán. Bạn làm gì?",
+      5: "Tôi làm việc ở cửa hàng xe đạp.",
+      6: "Thật à? Bạn làm gì ở cửa hàng?",
+      7: "Tôi sửa và bán xe đạp.",
+      8: "Nghe vui đó."
+    };
+
+    const text = translations[id];
+
+    if (text) {
+      document.getElementById("dictWord").textContent = "🌐 Dịch câu";
+      document.getElementById("dictType").textContent = "";
+      document.getElementById("dictPhonetic").textContent = "";
+      document.getElementById("dictMeaning").textContent = text;
+
+      document.getElementById("dictionaryPopup").style.display = "block";
+    }
+  });
+});
+
+// Đã bổ sung thuộc tính translation cho tất cả các câu
+const sentences = [
+{ text: "I usually wake up at 7:00 in the morning, my alarm rings and I turn it off.", start: 0, end: 12, translation: "Tôi thường thức dậy lúc 7:00 sáng, chuông báo thức reo và tôi tắt nó đi." },
+{ text: "Sometimes I want to sleep more, but I know I have to get up.", start: 12, end: 21, translation: "Đôi khi tôi muốn ngủ thêm, nhưng tôi biết mình phải dậy." },
+{ text: "I sit on my bed, stretch my arms and go to the bathroom.", start: 21, end: 29, translation: "Tôi ngồi trên giường, vươn tay và đi vào phòng tắm." },
+{ text: "I brush my teeth, wash my face with cold water.", start: 29, end: 34, translation: "Tôi đánh răng, rửa mặt bằng nước lạnh." },
+{ text: "It really helps me wake up.", start: 34, end: 38, translation: "Nó thực sự giúp tôi tỉnh táo." },
+{ text: "Sometimes I take a shower if I have time.", start: 38, end: 44, translation: "Đôi khi tôi tắm vòi sen nếu có thời gian." },
+{ text: "Then I go to the kitchen to make breakfast.", start: 44, end: 50, translation: "Sau đó tôi vào bếp để làm bữa sáng." },
+{ text: "I usually eat toast with butter and eggs.", start: 50, end: 56, translation: "Tôi thường ăn bánh mì nướng với bơ và trứng." },
+{ text: "But sometimes I eat cereal or fruit.", start: 56, end: 61, translation: "Nhưng đôi khi tôi ăn ngũ cốc hoặc trái cây." },
+{ text: "I always drink a hot cup of green tea, it helps me feel calm and ready for the day.", start: 61, end: 72, translation: "Tôi luôn uống một tách trà xanh nóng, nó giúp tôi cảm thấy bình tĩnh và sẵn sàng cho ngày mới." },
+{ text: "While I eat, I listen to music or check my phone.", start: 72, end: 78, translation: "Trong khi ăn, tôi nghe nhạc hoặc kiểm tra điện thoại." },
+{ text: "I like reading messages or checking the weather.", start: 78, end: 84, translation: "Tôi thích đọc tin nhắn hoặc kiểm tra thời tiết." },
+{ text: "After breakfast, I go back to my room and choose what to wear.", start: 84, end: 92, translation: "Sau bữa sáng, tôi trở lại phòng và chọn đồ để mặc." },
+{ text: "Usually I wear jeans and a simple shirt.", start: 92, end: 96, translation: "Tôi thường mặc quần jean và một chiếc áo sơ mi đơn giản." },
+{ text: "If it's cold I add a sweater.", start: 96, end: 101, translation: "Nếu trời lạnh, tôi mặc thêm áo len." },
+{ text: "Then I brush my hair, check my bag and make sure I have my phone, keys and wallet.", start: 101, end: 113, translation: "Sau đó tôi chải tóc, kiểm tra túi xách và đảm bảo tôi có điện thoại, chìa khóa và ví." },
+{ text: "Finally, I put on my shoes and leave the house.", start: 113, end: 117, translation: "Cuối cùng, tôi mang giày và rời khỏi nhà." },
+{ text: "I walk to the bus stop.", start: 117, end: 119, translation: "Tôi đi bộ đến trạm xe buýt." },
+{ text: "It's only 5 minutes from my home.", start: 119, end: 122, translation: "Nó chỉ cách nhà tôi 5 phút." },
+{ text: "I usually take the bus to work.", start: 122, end: 124, translation: "Tôi thường đi xe buýt đến chỗ làm." },
+{ text: "The ride takes about 20 minutes.", start: 124, end: 127, translation: "Chuyến đi mất khoảng 20 phút." },
+{ text: "Sometimes the bus is full, but I usually find a seat.", start: 127, end: 132, translation: "Đôi khi xe buýt chật kín, nhưng tôi thường tìm được chỗ ngồi." },
+{ text: "I like sitting by the window, watching the city pass by.", start: 132, end: 137, translation: "Tôi thích ngồi cạnh cửa sổ, ngắm nhìn thành phố lướt qua." },
+{ text: "When I arrive at work, I say good morning and take the elevator to the third floor.", start: 137, end: 145, translation: "Khi đến chỗ làm, tôi chào buổi sáng và đi thang máy lên tầng ba." },
+{ text: "That's where my office is.", start: 145, end: 147, translation: "Đó là nơi có văn phòng của tôi." },
+{ text: "I start work at 9:00.", start: 147, end: 149, translation: "Tôi bắt đầu làm việc lúc 9:00." },
+{ text: "My job is busy, but I really enjoy it.", start: 149, end: 153, translation: "Công việc của tôi bận rộn, nhưng tôi thực sự thích nó." },
+{ text: "I check emails, write reports, talk to clients, and have short meetings.", start: 153, end: 159, translation: "Tôi kiểm tra email, viết báo cáo, nói chuyện với khách hàng và có những cuộc họp ngắn." },
+{ text: "At 12:30 I take my lunch break.", start: 159, end: 162, translation: "Lúc 12:30 tôi nghỉ trưa." },
+{ text: "I usually eat sandwiches, fruit or rice with vegetables.", start: 162, end: 165, translation: "Tôi thường ăn bánh mì kẹp, trái cây hoặc cơm với rau." },
+{ text: "Sometimes I go out to buy something small.", start: 165, end: 169, translation: "Đôi khi tôi ra ngoài mua một thứ gì đó nhỏ." },
+{ text: "I eat lunch with my coworkers.", start: 169, end: 171, translation: "Tôi ăn trưa với đồng nghiệp của mình." },
+{ text: "We talk about movies, the weather, or weekend plans.", start: 171, end: 175, translation: "Chúng tôi nói chuyện về phim ảnh, thời tiết, hoặc kế hoạch cuối tuần." },
+{ text: "It's a nice time to relax and laugh a little.", start: 175, end: 182, translation: "Đó là một khoảng thời gian tuyệt vời để thư giãn và cười một chút." },
+{ text: "After lunch, I feel fresh and ready to continue working.", start: 182, end: 186, translation: "Sau bữa trưa, tôi cảm thấy sảng khoái và sẵn sàng tiếp tục làm việc." },
+{ text: "I usually finish around 5:00 PM.", start: 186, end: 188, translation: "Tôi thường hoàn thành công việc vào khoảng 5:00 chiều." },
+{ text: "I turn off my computer, pack my bag and say goodbye.", start: 188, end: 195, translation: "Tôi tắt máy tính, thu dọn túi xách và chào tạm biệt." },
+{ text: "On the bus ride home, I listen to music or think about my day.", start: 195, end: 203, translation: "Trên chuyến xe buýt về nhà, tôi nghe nhạc hoặc suy nghĩ về ngày của mình." },
+{ text: "When I get home, I change into comfortable clothes.", start: 203, end: 212, translation: "Khi về đến nhà, tôi thay quần áo thoải mái." },
+{ text: "It feels so nice to relax.", start: 212, end: 215, translation: "Cảm giác thư giãn thật tuyệt." },
+{ text: "Around 7:00 I start making dinner.", start: 215, end: 218, translation: "Khoảng 7:00 tôi bắt đầu làm bữa tối." },
+{ text: "I like simple meals, pasta, rice with vegetables or salad.", start: 218, end: 224, translation: "Tôi thích những bữa ăn đơn giản, mì ý, cơm với rau hoặc salad." },
+{ text: "Cooking helps me feel calm.", start: 224, end: 226, translation: "Nấu ăn giúp tôi cảm thấy bình tĩnh." },
+{ text: "I play soft music and enjoy the moment.", start: 226, end: 230, translation: "Tôi bật nhạc nhẹ và tận hưởng khoảnh khắc này." },
+{ text: "After dinner I wash the dishes and clean the kitchen.", start: 230, end: 234, translation: "Sau bữa tối, tôi rửa bát và dọn dẹp nhà bếp." },
+{ text: "A tidy space helps me relax.", start: 234, end: 238, translation: "Một không gian gọn gàng giúp tôi thư giãn." },
+{ text: "In the evening, I enjoy some free time.", start: 238, end: 241, translation: "Vào buổi tối, tôi tận hưởng chút thời gian rảnh rỗi." },
+{ text: "Sometimes I watch a movie or call a friend.", start: 241, end: 245, translation: "Đôi khi tôi xem một bộ phim hoặc gọi cho một người bạn." },
+{ text: "Other times I write in my journal or listen to music.", start: 245, end: 249, translation: "Những lúc khác, tôi viết nhật ký hoặc nghe nhạc." },
+{ text: "It's my favorite time of the day, quiet and peaceful.", start: 249, end: 253, translation: "Đó là khoảng thời gian yêu thích của tôi trong ngày, tĩnh lặng và yên bình." },
+{ text: "At around 9:30 or 10:00, I get ready for bed.", start: 253, end: 257, translation: "Khoảng 9:30 hoặc 10:00, tôi chuẩn bị đi ngủ." },
+{ text: "I brush my teeth and wash my face with warm water.", start: 257, end: 260, translation: "Tôi đánh răng và rửa mặt bằng nước ấm." },
+{ text: "Then I change into my soft light blue pajamas.", start: 260, end: 264, translation: "Sau đó tôi thay bộ đồ ngủ màu xanh nhạt mềm mại." },
+{ text: "Then I read a few pages of a book.", start: 264, end: 267, translation: "Sau đó tôi đọc vài trang sách." },
+{ text: "It helps me relax before I sleep.", start: 267, end: 270, translation: "Nó giúp tôi thư giãn trước khi ngủ." },
+{ text: "I think about my day and what I can do better tomorrow.", start: 270, end: 277, translation: "Tôi nghĩ về ngày của mình và những gì tôi có thể làm tốt hơn vào ngày mai." },
+{ text: "Finally I turn off the light, close my eyes and say to myself, good night.", start: 277, end: 285, translation: "Cuối cùng, tôi tắt đèn, nhắm mắt lại và tự nhủ, chúc ngủ ngon." }
+];
+
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+// LẮNG NGHE SỰ KIỆN CLICK CHUỘT PHẢI (CONTEXTMENU) VÀO KHUNG CÂU (BUBBLE)
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); // Ngăn hiển thị menu mặc định của trình duyệt
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    // Tìm lại câu hiện tại trong mảng sentences dựa vào activeStart
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      // Hiển thị bản dịch lên popup từ điển có sẵn
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000); // Bản dịch sẽ hiển thị 4 giây
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  // 1. Chỉ phát âm từ (giữ nguyên tính năng cũ)
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  // 2. Tra từ điển và hiển thị thêm từ loại
+  const data = dictionary[word];
+  if (data) {
+    // Thêm phần hiển thị từ loại (data.type) vào trong popup
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    // Vị trí hiển thị popup
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    // Tự động ẩn sau 3 giây
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; // ẩn luôn text
+  }
+}
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+</script>
+
+</body>
+</html>

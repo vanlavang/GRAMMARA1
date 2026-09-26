@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conversation – Modern Learning</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+/* Bọc Video và Quiz */
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: stretch; 
+  gap: 20px; 
+  max-width: 900px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:550px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* Giao diện Quiz */
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 300px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 15px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.quiz-option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 40px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+      <a href="../conversation_01/conversation_01.html" >Conversation 01</a>
+      <a href="../conversation_02/conversation_02.html">Conversation 02</a>
+      <a href="../conversation_03/conversation_03.html" class="active-link" >Conversation 03</a>
+      <a href="../conversation_04/conversation_04.html">Conversation 04</a>
+    </nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+    <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+      <source src="videos/story.mp4" type="video/mp4">
+    </video>
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// --- LOGIC QUIZ MỚI THÊM ---
+const quizData = [
+  { q: "What is Mom making for the family?", opts: ["Dinner", "Breakfast", "Lunch"], ans: 1 },
+  { q: "Why does Dad go out?", opts: ["To go to work", "To buy food", "To rest"], ans: 0 },
+  { q: "What do the children decide to do?", opts: ["Watch TV", "Help with housework", "Go to sleep"], ans: 1 },
+  { q: "What problem do they have when cooking rice?", opts: ["No fire", "Too much water", "No pot"], ans: 1 },
+  { q: "How does Mom feel at the end?", opts: ["Angry", "Proud and happy", "Tired"], ans: 1 }
+];
+let currentQIndex = 0;
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = "<h4 style='text-align:center; color: #28a745; margin-top:20px;'>🎉 You finished the quiz!</h4><button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>Play Again</button>";
+    return;
+  }
+  const q = quizData[currentQIndex];
+  let html = `<div style="text-align: left;">
+    <div style="font-weight: bold; margin-bottom: 15px; font-size: 16px;">Question ${currentQIndex + 1}: ${q.q}</div>
+  `;
+  q.opts.forEach((opt, idx) => {
+    html += `<button class="quiz-option" onclick="checkAns(this, ${idx === q.ans})">${opt}</button>`;
+  });
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  if (isCorrect) {
+    btn.classList.add('correct');
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 1000);
+  } else {
+    btn.classList.add('wrong');
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+// --------------------------
+
+const dictionary = {
+  "that's": { meaning: "đó là", phonetic: "/ðæts/", type: "contraction" },
+  "too": { meaning: "quá", phonetic: "/tuː/", type: "adverb" },
+  "much": { meaning: "nhiều", phonetic: "/mʌtʃ/", type: "determiner" },
+  "water": { meaning: "nước", phonetic: "/ˈwɔːtər/", type: "noun" },
+
+  "i": { meaning: "tôi", phonetic: "/aɪ/", type: "pronoun" },
+  "can't": { meaning: "không thể", phonetic: "/kænt/", type: "modal" },
+  "even": { meaning: "thậm chí", phonetic: "/ˈiːvən/", type: "adverb" },
+  "see": { meaning: "nhìn thấy", phonetic: "/siː/", type: "verb" },
+
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+  "feels": { meaning: "cảm thấy", phonetic: "/fiːlz/", type: "verb" },
+  "good": { meaning: "tốt", phonetic: "/ɡʊd/", type: "adjective" },
+  "when": { meaning: "khi", phonetic: "/wen/", type: "conjunction" },
+  "we": { meaning: "chúng ta", phonetic: "/wiː/", type: "pronoun" },
+  "all": { meaning: "tất cả", phonetic: "/ɔːl/", type: "determiner" },
+  "sit": { meaning: "ngồi", phonetic: "/sɪt/", type: "verb" },
+  "together": { meaning: "cùng nhau", phonetic: "/təˈɡeðər/", type: "adverb" },
+  "like": { meaning: "như", phonetic: "/laɪk/", type: "preposition" },
+  "this": { meaning: "này", phonetic: "/ðɪs/", type: "pronoun" },
+
+  "yes": { meaning: "vâng", phonetic: "/jes/", type: "expression" },
+  "love": { meaning: "yêu", phonetic: "/lʌv/", type: "verb" },
+  "these": { meaning: "những cái này", phonetic: "/ðiːz/", type: "determiner" },
+  "quiet": { meaning: "yên tĩnh", phonetic: "/ˈkwaɪət/", type: "adjective" },
+  "family": { meaning: "gia đình", phonetic: "/ˈfæməli/", type: "noun" },
+  "moments": { meaning: "khoảnh khắc", phonetic: "/ˈməʊmənts/", type: "noun" },
+
+  "i'm": { meaning: "tôi đang", phonetic: "/aɪm/", type: "contraction" },
+  "making": { meaning: "đang làm", phonetic: "/ˈmeɪkɪŋ/", type: "verb" },
+  "breakfast": { meaning: "bữa sáng", phonetic: "/ˈbrekfəst/", type: "noun" },
+  "will": { meaning: "sẽ", phonetic: "/wɪl/", type: "modal" },
+  "be": { meaning: "là", phonetic: "/biː/", type: "verb" },
+  "ready": { meaning: "sẵn sàng", phonetic: "/ˈredi/", type: "adjective" },
+  "soon": { meaning: "sớm", phonetic: "/suːn/", type: "adverb" },
+
+  "great": { meaning: "tuyệt", phonetic: "/ɡreɪt/", type: "adjective" },
+  "really": { meaning: "rất", phonetic: "/ˈrɪəli/", type: "adverb" },
+  "hungry": { meaning: "đói", phonetic: "/ˈhʌŋɡri/", type: "adjective" },
+
+  "ohh": { meaning: "ồ", phonetic: "/oʊ/", type: "expression" },
+
+  "don't": { meaning: "không", phonetic: "/doʊnt/", type: "auxiliary" },
+  "feel": { meaning: "cảm thấy", phonetic: "/fiːl/", type: "verb" },
+  "very": { meaning: "rất", phonetic: "/ˈveri/", type: "adverb" },
+  "well": { meaning: "khỏe", phonetic: "/wel/", type: "adjective" },
+
+  "mom": { meaning: "mẹ", phonetic: "/mɒm/", type: "noun" },
+  "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "pronoun" },
+  "happened": { meaning: "đã xảy ra", phonetic: "/ˈhæpənd/", type: "verb" },
+
+  "are": { meaning: "là", phonetic: "/ɑːr/", type: "verb" },
+  "you": { meaning: "bạn", phonetic: "/juː/", type: "pronoun" },
+  "sick": { meaning: "ốm", phonetic: "/sɪk/", type: "adjective" },
+
+  "just": { meaning: "chỉ", phonetic: "/dʒʌst/", type: "adverb" },
+  "need": { meaning: "cần", phonetic: "/niːd/", type: "verb" },
+  "some": { meaning: "một ít", phonetic: "/sʌm/", type: "determiner" },
+  "rest": { meaning: "nghỉ ngơi", phonetic: "/rest/", type: "noun" },
+
+  "sweetheart": { meaning: "con yêu", phonetic: "/ˈswiːthɑːrt/", type: "noun" },
+
+  "about": { meaning: "về", phonetic: "/əˈbaʊt/", type: "preposition" },
+  "the": { meaning: "mạo từ", phonetic: "/ðə/", type: "article" },
+  "work": { meaning: "công việc", phonetic: "/wɜːrk/", type: "noun" },
+
+  "but": { meaning: "nhưng", phonetic: "/bʌt/", type: "conjunction" },
+  "there": { meaning: "có", phonetic: "/ðer/", type: "adverb" },
+  "is": { meaning: "là", phonetic: "/ɪz/", type: "verb" },
+  "still": { meaning: "vẫn", phonetic: "/stɪl/", type: "adverb" },
+  "so": { meaning: "rất", phonetic: "/soʊ/", type: "adverb" },
+  "to": { meaning: "để", phonetic: "/tuː/", type: "particle" },
+  "do": { meaning: "làm", phonetic: "/duː/", type: "verb" },
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "house": { meaning: "nhà", phonetic: "/haʊs/", type: "noun" },
+
+  "have": { meaning: "phải", phonetic: "/hæv/", type: "verb" },
+  "go": { meaning: "đi", phonetic: "/ɡoʊ/", type: "verb" },
+  "now": { meaning: "bây giờ", phonetic: "/naʊ/", type: "adverb" },
+
+  "please": { meaning: "làm ơn", phonetic: "/pliːz/", type: "expression" },
+  "stay": { meaning: "ở lại", phonetic: "/steɪ/", type: "verb" },
+  "with": { meaning: "với", phonetic: "/wɪð/", type: "preposition" },
+  "help": { meaning: "giúp", phonetic: "/help/", type: "verb" },
+  "her": { meaning: "cô ấy", phonetic: "/hɜːr/", type: "pronoun" },
+
+  "dad": { meaning: "bố", phonetic: "/dæd/", type: "noun" },
+  "take": { meaning: "chăm sóc", phonetic: "/teɪk/", type: "verb" },
+  "care": { meaning: "chăm sóc", phonetic: "/ker/", type: "noun" },
+  "of": { meaning: "của", phonetic: "/əv/", type: "preposition" },
+
+  "going": { meaning: "đang sẽ", phonetic: "/ˈɡoʊɪŋ/", type: "verb" },
+
+  "everything": { meaning: "mọi thứ", phonetic: "/ˈevriθɪŋ/", type: "pronoun" },
+  "today": { meaning: "hôm nay", phonetic: "/təˈdeɪ/", type: "noun" },
+
+  "let's": { meaning: "chúng ta hãy", phonetic: "/lets/", type: "expression" },
+  "housework": { meaning: "việc nhà", phonetic: "/ˈhaʊswɜːrk/", type: "noun" },
+  "ourselves": { meaning: "tự mình", phonetic: "/aʊərˈselvz/", type: "pronoun" },
+
+  "start": { meaning: "bắt đầu", phonetic: "/stɑːrt/", type: "verb" },
+  "cooking": { meaning: "nấu ăn", phonetic: "/ˈkʊkɪŋ/", type: "verb" },
+  "think": { meaning: "nghĩ", phonetic: "/θɪŋk/", type: "verb" },
+  "should": { meaning: "nên", phonetic: "/ʃʊd/", type: "modal" },
+  "cook": { meaning: "nấu", phonetic: "/kʊk/", type: "verb" },
+  "rice": { meaning: "cơm", phonetic: "/raɪs/", type: "noun" },
+
+  "how": { meaning: "như thế nào", phonetic: "/haʊ/", type: "adverb" },
+
+  "know": { meaning: "biết", phonetic: "/noʊ/", type: "verb" },
+  "maybe": { meaning: "có lẽ", phonetic: "/ˈmeɪbi/", type: "adverb" },
+  "fine": { meaning: "ổn", phonetic: "/faɪn/", type: "adjective" },
+
+  "stop": { meaning: "dừng lại", phonetic: "/stɒp/", type: "verb" },
+
+  "no": { meaning: "không", phonetic: "/noʊ/", type: "expression" },
+  "didn't": { meaning: "đã không", phonetic: "/ˈdɪdənt/", type: "auxiliary" },
+  "mean": { meaning: "cố ý", phonetic: "/miːn/", type: "verb" },
+
+  "careful": { meaning: "cẩn thận", phonetic: "/ˈkerfl/", type: "adjective" },
+  "trying": { meaning: "đang cố", phonetic: "/ˈtraɪɪŋ/", type: "verb" },
+
+  "hope": { meaning: "hy vọng", phonetic: "/hoʊp/", type: "verb" },
+  "works": { meaning: "hoạt động", phonetic: "/wɜːrks/", type: "verb" },
+
+  "spilling": { meaning: "tràn", phonetic: "/ˈspɪlɪŋ/", type: "verb" },
+  "everywhere": { meaning: "khắp nơi", phonetic: "/ˈevriwer/", type: "adverb" },
+
+  "turn": { meaning: "tắt", phonetic: "/tɜːrn/", type: "verb" },
+  "off": { meaning: "tắt", phonetic: "/ɒf/", type: "adverb" },
+
+  "wrong": { meaning: "sai", phonetic: "/rɒŋ/", type: "adjective" },
+
+  "watch": { meaning: "coi chừng", phonetic: "/wɒtʃ/", type: "verb" },
+  "out": { meaning: "ra ngoài", phonetic: "/aʊt/", type: "adverb" },
+
+  "hard": { meaning: "khó", phonetic: "/hɑːrd/", type: "adjective" },
+
+  "already": { meaning: "đã", phonetic: "/ɔːlˈredi/", type: "adverb" },
+  "tired": { meaning: "mệt", phonetic: "/ˈtaɪərd/", type: "adjective" },
+  "finished": { meaning: "hoàn thành", phonetic: "/ˈfɪnɪʃt/", type: "verb" },
+  "anything": { meaning: "bất cứ gì", phonetic: "/ˈeniθɪŋ/", type: "pronoun" },
+  "yet": { meaning: "chưa", phonetic: "/jet/", type: "adverb" },
+
+  "does": { meaning: "làm", phonetic: "/dʌz/", type: "verb" },
+  "every": { meaning: "mỗi", phonetic: "/ˈevri/", type: "determiner" },
+  "day": { meaning: "ngày", phonetic: "/deɪ/", type: "noun" },
+
+  "understand": { meaning: "hiểu", phonetic: "/ˌʌndərˈstænd/", type: "verb" },
+  "before": { meaning: "trước đây", phonetic: "/bɪˈfɔːr/", type: "adverb" },
+
+  "give": { meaning: "bỏ", phonetic: "/ɡɪv/", type: "verb" },
+  "up": { meaning: "bỏ cuộc", phonetic: "/ʌp/", type: "adverb" },
+
+  "clean": { meaning: "dọn dẹp", phonetic: "/kliːn/", type: "verb" },
+  "again": { meaning: "lại", phonetic: "/əˈɡen/", type: "adverb" },
+
+  "dropped": { meaning: "làm rơi", phonetic: "/drɒpt/", type: "verb" },
+  "break": { meaning: "làm vỡ", phonetic: "/breɪk/", type: "verb" },
+
+  "never": { meaning: "không bao giờ", phonetic: "/ˈnevər/", type: "adverb" },
+  "complains": { meaning: "than phiền", phonetic: "/kəmˈpleɪnz/", type: "verb" },
+
+  "noticed": { meaning: "nhận ra", phonetic: "/ˈnoʊtɪst/", type: "verb" },
+
+  "needs": { meaning: "cần", phonetic: "/niːdz/", type: "verb" },
+
+  "better": { meaning: "tốt hơn", phonetic: "/ˈbetər/", type: "adjective" },
+
+  "look": { meaning: "trông", phonetic: "/lʊk/", type: "verb" },
+
+  "try": { meaning: "thử", phonetic: "/traɪ/", type: "verb" },
+  "properly": { meaning: "đúng cách", phonetic: "/ˈprɒpərli/", type: "adverb" },
+
+  "step": { meaning: "bước", phonetic: "/step/", type: "noun" },
+
+  "measure": { meaning: "đo", phonetic: "/ˈmeʒər/", type: "verb" },
+
+  "enough": { meaning: "đủ", phonetic: "/ɪˈnʌf/", type: "adjective" },
+  "perfect": { meaning: "hoàn hảo", phonetic: "/ˈpɜːrfekt/", type: "adjective" },
+
+  "getting": { meaning: "trở nên", phonetic: "/ˈɡetɪŋ/", type: "verb" },
+
+  "smells": { meaning: "có mùi", phonetic: "/smelz/", type: "verb" },
+
+  "easier": { meaning: "dễ hơn", phonetic: "/ˈiːziər/", type: "adjective" },
+  "slowly": { meaning: "chậm", phonetic: "/ˈsloʊli/", type: "adverb" },
+
+  "two": { meaning: "hai", phonetic: "/tuː/", type: "number" },
+
+  "tried": { meaning: "đã cố", phonetic: "/traɪd/", type: "verb" },
+  "best": { meaning: "tốt nhất", phonetic: "/best/", type: "adjective" },
+
+  "proud": { meaning: "tự hào", phonetic: "/praʊd/", type: "adjective" },
+  "both": { meaning: "cả hai", phonetic: "/boʊθ/", type: "determiner" },
+
+  "learned": { meaning: "đã học", phonetic: "/lɜːrnd/", type: "verb" },
+
+  "made": { meaning: "đã làm", phonetic: "/meɪd/", type: "verb" },
+
+  "eat": { meaning: "ăn", phonetic: "/iːt/", type: "verb" },
+  "little": { meaning: "một chút", phonetic: "/ˈlɪtl/", type: "adjective" },
+
+  "thank": { meaning: "cảm ơn", phonetic: "/θæŋk/", type: "verb" },
+  "children": { meaning: "những đứa trẻ", phonetic: "/ˈtʃɪldrən/", type: "noun" },
+
+  "wanted": { meaning: "muốn", phonetic: "/ˈwɒntɪd/", type: "verb" },
+
+  "tastes": { meaning: "có vị", phonetic: "/teɪsts/", type: "verb" },
+  "wonderful": { meaning: "tuyệt vời", phonetic: "/ˈwʌndərfl/", type: "adjective" },
+
+  "amazing": { meaning: "tuyệt vời", phonetic: "/əˈmeɪzɪŋ/", type: "adjective" },
+
+  "strength": { meaning: "sức mạnh", phonetic: "/streŋθ/", type: "noun" },
+
+  "always": { meaning: "luôn luôn", phonetic: "/ˈɔːlweɪz/", type: "adverb" },
+
+  "forget": { meaning: "quên", phonetic: "/fərˈɡet/", type: "verb" }
+};
+
+const sentences = [
+{ text: "That's too much water.", start: 0, end: 5, translation: "Nước nhiều quá." },
+{ text: "I can't even see.", start: 5, end: 9, translation: "Tôi còn không nhìn thấy gì." },
+{ text: "It feels good when we all sit together like this.", start: 9, end: 14, translation: "Cảm giác thật tuyệt khi cả nhà ngồi cùng nhau như thế này." },
+{ text: "Yes, I love these quiet family moments.", start: 14, end: 17, translation: "Đúng vậy, tôi yêu những khoảnh khắc gia đình yên bình này." },
+{ text: "I'm making breakfast, it will be ready soon.", start: 17, end: 21, translation: "Mẹ đang làm bữa sáng, sắp xong rồi." },
+{ text: "Great, I'm really hungry.", start: 21, end: 25, translation: "Tuyệt, con đói lắm rồi." },
+{ text: "Ohh. I don't feel very well.", start: 25, end: 31, translation: "Ôi. Mẹ cảm thấy không khỏe." },
+{ text: "Mom, what happened?", start: 31, end: 35, translation: "Mẹ ơi, chuyện gì vậy?" },
+{ text: "Are you very sick?", start: 35, end: 38, translation: "Mẹ bị ốm nặng à?" },
+{ text: "I just need some rest.", start: 38, end: 40, translation: "Mẹ chỉ cần nghỉ ngơi thôi." },
+{ text: "Sweetheart, you need to rest now.", start: 40, end: 42, translation: "Mẹ à, mẹ cần nghỉ ngơi ngay." },
+{ text: "Don't worry about the work.", start: 42, end: 43, translation: "Đừng lo việc nhà." },
+{ text: "But there is still so much to do in the house.", start: 43, end: 47, translation: "Nhưng vẫn còn rất nhiều việc phải làm." },
+{ text: "I have to go to work now.", start: 47, end: 50, translation: "Bố phải đi làm bây giờ." },
+{ text: "Please stay with mom and help her.", start: 50, end: 52, translation: "Các con ở nhà chăm mẹ nhé." },
+{ text: "Don't worry dad, we will take care of her.", start: 52, end: 59, translation: "Bố đừng lo, chúng con sẽ chăm sóc mẹ." },
+
+{ text: "What are we going to do now?", start: 59, end: 61, translation: "Giờ chúng ta làm gì đây?" },
+{ text: "We need to help mom with everything today.", start: 61, end: 66, translation: "Hôm nay chúng ta phải giúp mẹ mọi việc." },
+{ text: "Let's do the housework ourselves.", start: 66, end: 68, translation: "Chúng ta tự làm việc nhà nhé." },
+{ text: "All of it by ourselves.", start: 68, end: 73, translation: "Tất cả, tự làm hết." },
+{ text: "Yes, we can do it together.", start: 73, end: 76, translation: "Ừ, chúng ta làm cùng nhau." },
+{ text: "OK, let's try our best.", start: 76, end: 79, translation: "Được, cố gắng hết sức nhé." },
+
+{ text: "Where do we even start?", start: 79, end: 83, translation: "Bắt đầu từ đâu đây?" },
+{ text: "Let's start with cooking.", start: 83, end: 88, translation: "Bắt đầu nấu ăn đi." },
+{ text: "I think we should cook rice first.", start: 88, end: 93, translation: "Mình nghĩ nên nấu cơm trước." },
+{ text: "But how do we cook it?", start: 93, end: 95, translation: "Nhưng nấu thế nào?" },
+{ text: "Is that too much rice?", start: 95, end: 99, translation: "Có nhiều gạo quá không?" },
+{ text: "I don't know. Maybe it's fine.", start: 99, end: 103, translation: "Không biết, chắc ổn." },
+{ text: "Stop. That's too much water.", start: 103, end: 108, translation: "Dừng lại, nước nhiều quá!" },
+
+{ text: "Oh no, I didn't mean to.", start: 108, end: 111, translation: "Ôi không, mình không cố ý." },
+{ text: "Be careful, I'm trying.", start: 111, end: 114, translation: "Cẩn thận đi, mình đang cố." },
+{ text: "I hope this works.", start: 114, end: 118, translation: "Hy vọng nó ổn." },
+{ text: "It's spilling everywhere.", start: 118, end: 121, translation: "Nó tràn ra khắp nơi." },
+{ text: "Turn it off now.", start: 121, end: 124, translation: "Tắt đi ngay!" },
+
+{ text: "This is going wrong.", start: 124, end: 129, translation: "Mọi thứ đang sai hết rồi." },
+{ text: "I can't even see.", start: 129, end: 133, translation: "Tôi không thấy gì cả." },
+{ text: "Watch out, I'm OK, but this is really hard.", start: 133, end: 140, translation: "Coi chừng, mình ổn nhưng khó thật." },
+{ text: "I'm already so tired and we haven't finished anything yet.", start: 140, end: 147, translation: "Mình mệt rồi mà chưa xong gì cả." },
+
+{ text: "How does mom do all this every day?", start: 147, end: 151, translation: "Mẹ làm hết việc này mỗi ngày kiểu gì nhỉ?" },
+{ text: "We didn't understand before.", start: 151, end: 155, translation: "Trước giờ mình không hiểu." },
+{ text: "Mom does this every day.", start: 155, end: 160, translation: "Mẹ làm điều này mỗi ngày." },
+{ text: "We can't give up now.", start: 160, end: 162, translation: "Chúng ta không được bỏ cuộc." },
+
+{ text: "There's water everywhere.", start: 162, end: 166, translation: "Nước khắp nơi rồi." },
+{ text: "Let's clean first before we cook again.", start: 166, end: 170, translation: "Dọn trước rồi nấu lại." },
+
+{ text: "Mom does all of this every day.", start: 170, end: 175, translation: "Mẹ làm tất cả những việc này mỗi ngày." },
+{ text: "And she never complains.", start: 175, end: 180, translation: "Mà mẹ không bao giờ than phiền." },
+{ text: "We never noticed how hard she works.", start: 180, end: 185, translation: "Chúng ta chưa từng nhận ra mẹ vất vả thế nào." },
+
+{ text: "Let's try again, properly this time.", start: 185, end: 189, translation: "Làm lại lần nữa, lần này cho đúng." },
+{ text: "We should measure it properly first.", start: 189, end: 193, translation: "Phải đo cho đúng trước." },
+{ text: "That looks perfect.", start: 193, end: 197, translation: "Trông hoàn hảo rồi." },
+{ text: "We're getting better.", start: 197, end: 201, translation: "Chúng ta làm tốt hơn rồi." },
+
+{ text: "Did you two do all of this?", start: 201, end: 205, translation: "Hai con làm hết à?" },
+{ text: "Yes, we tried our best.", start: 205, end: 209, translation: "Dạ, chúng con đã cố hết sức." },
+{ text: "I'm really proud of both of you.", start: 209, end: 213, translation: "Mẹ rất tự hào về các con." },
+
+{ text: "Mom, we made this for you.", start: 213, end: 217, translation: "Mẹ ơi, tụi con làm cái này cho mẹ." },
+{ text: "You made this for me?", start: 217, end: 220, translation: "Các con làm cho mẹ à?" },
+{ text: "Thank you, my dear children.", start: 220, end: 224, translation: "Cảm ơn các con yêu." },
+
+{ text: "You both did an amazing job today.", start: 224, end: 228, translation: "Hôm nay các con làm rất tốt." },
+{ text: "We understand now.", start: 228, end: 231, translation: "Bây giờ chúng con hiểu rồi." },
+{ text: "Mom, you do so much for us every day.", start: 231, end: 235, translation: "Mẹ làm rất nhiều điều cho chúng con mỗi ngày." },
+{ text: "We didn't understand before, but now we do.", start: 235, end: 240, translation: "Trước đây chúng con không hiểu, nhưng giờ thì hiểu rồi." }
+];
+
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+</script>
+
+</body>
+</html>
