@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>04 WH Questions - Commuting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* TONE MÀU NÂU VÀ NÂU NHẠT CHỦ ĐẠO */
+      --primary: #8b5e3c;         /* Nâu chủ đạo */
+      --primary-hover: #704b30;   /* Nâu đậm khi hover */
+      --secondary: #fdf5eb;       /* Nâu cực nhạt (màu kem) cho nền nút/box */
+      --accent: #d35400;          /* Cam đất/Nâu đỏ tạo điểm nhấn */
+      --text-main: #3e2723;       /* Nâu đen cho chữ chính (đọc không mỏi mắt) */
+      --text-muted: #795548;      /* Nâu xám cho chữ phụ */
+      --bg-color: #f5ebe0;        /* Nâu nhạt làm màu nền tổng thể */
+      --card-bg: #ffffff;         /* Trắng cho các thẻ/bảng để nổi bật nội dung */
+      --border-color: #e6ccb2;    /* Nâu nhạt cho viền */
+      
+      --success: #10b981;         /* Xanh lá cho đáp án đúng */
+      --danger: #ef4444;          /* Đỏ cho đáp án sai / Bút vẽ */
+      
+      --shadow-sm: 0 1px 2px 0 rgb(139 94 60 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(139 94 60 / 0.1), 0 2px 4px -2px rgb(139 94 60 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(139 94 60 / 0.1), 0 4px 6px -4px rgb(139 94 60 / 0.1);
+      --radius-md: 12px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+    }
+
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding-top: 100px;
+      padding-bottom: 120px !important;
+      margin: 0 !important; 
+      min-height: 100vh;
+      background-image: radial-gradient(circle at top right, #fffcf9, #f5ebe0);
+    }
+
+    /* HEADER - GLASSMORPHISM */
+    header {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+    }
+
+    header nav {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    header button {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500; 
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    header button:hover {
+      background-color: var(--secondary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    header button.active-nav {
+      font-weight: 700; 
+      background-color: var(--primary); 
+      border-color: var(--primary);     
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* SIDEBARS */
+    .sidebar {
+      width: 200px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      position: fixed;
+      top: 130px;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+    .sidebar.left {
+      left: 0;
+      transform: translateX(-100%); 
+      border-right: 1px solid var(--border-color);
+      border-top-right-radius: var(--radius-lg);
+    }
+    .sidebar.left.visible { transform: translateX(0); }
+
+    .sidebar.right {
+      right: 0;
+      transform: translateX(100%);
+      border-left: 1px solid var(--border-color);
+      border-top-left-radius: var(--radius-lg);
+    }
+    .sidebar.right.visible { transform: translateX(0); }
+
+    .sidebar button {
+      font-size: 16px;
+      padding: 14px 16px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-align: left;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .sidebar button:hover {
+      background: var(--secondary);
+      border-color: var(--border-color);
+    }
+
+    .sidebar button.active {
+      background-color: var(--primary); 
+      color: white;               
+      box-shadow: var(--shadow-md);
+    }
+    .sidebar button.active b { color: white; }
+
+    /* TOGGLE BUTTONS */
+    .toggle-btn {
+      position: fixed;
+      top: 80px;
+      z-index: 90;
+      padding: 12px 18px; 
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toggle-btn:hover { 
+      background: var(--secondary); 
+      color: var(--primary-hover); 
+    }
+    
+    .toggle-left { 
+      left: 0; 
+      border-left: none; 
+      border-radius: 0 var(--radius-full) var(--radius-full) 0; 
+    }
+    
+    .toggle-right { 
+      right: 0; 
+      border-right: none; 
+      border-radius: var(--radius-full) 0 0 var(--radius-full); 
+    }
+
+    /* MAIN CONTENT AREA */
+    .outer-box {
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      max-width: 1200px;
+      margin: 20px auto;
+      border: 1px solid rgba(255,255,255,0.7);
+      position: relative;
+      z-index: 10;
+    }
+
+    h2 {
+      color: var(--text-main);
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    audio {
+      display: block;
+      margin: 0 auto 30px auto;
+      height: 40px;
+      border-radius: var(--radius-full);
+      outline: none;
+    }
+
+    .question-box {
+      background: var(--secondary);
+      padding: 30px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    #questionLabel {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+      display: block;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .word {
+      cursor: pointer;
+      color: var(--text-main);
+      border-bottom: 2px dotted var(--primary);
+      transition: color 0.2s;
+    }
+    .word:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    input {
+      font-size: 28px;
+      padding: 12px 20px;
+      width: 100%;
+      max-width: 1000px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--primary);
+      font-weight: 600;
+      background: var(--card-bg);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(139, 94, 60, 0.15);
+    }
+
+    .feedback {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: 700;
+      min-height: 30px;
+    }
+    .correct { color: var(--success); }
+    .wrong { color: var(--danger); }
+
+    /* ACTION BUTTONS */
+    #navigation {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 28px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    button:active { transform: translateY(0); }
+
+    #submitBtn {
+      display: block;
+      margin: 20px auto 0;
+      background: var(--success);
+    }
+    #submitBtn:hover { background: #059669; }
+
+    #result {
+      margin-top: 30px;
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      color: var(--primary);
+    }
+
+    /* DICTIONARY POPUP */
+    #dictionaryPopup {
+      display: none;
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      padding: 25px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 25px -5px rgba(139,94,60,0.2), 0 10px 10px -5px rgba(139,94,60,0.1);
+      font-size: 22px;
+      z-index: 9999;
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+    }
+
+    #dictWord { font-weight: 700; font-size: 32px; color: var(--primary); margin-bottom: 5px; }
+    #dictPhonetic { font-style: italic; color: var(--text-muted); font-size: 20px; }
+    #dictType { color: var(--accent); font-weight: 600; font-size: 18px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    #dictMeaning { margin: 15px 0 20px; font-weight: 500; color: var(--text-main); }
+    
+    #dictionaryPopup button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 0 5px;
+      background: var(--secondary);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+    #dictionaryPopup button:hover { background: var(--bg-color); color: var(--primary); }
+
+    /* CANVAS */
+    #paintCanvas {
+        position: fixed;
+        top: 0; 
+        left: 0;
+        z-index: 5; 
+        pointer-events: none;
+        display: block;
+    }
+
+    #paintCanvas.active {
+        pointer-events: auto;
+        z-index: 9998; 
+        cursor: crosshair;
+    }
+
+    /* FLOATING FOOTER DOCK */
+    footer {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 25px;
+        border-radius: var(--radius-full);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        z-index: 9999;
+    }
+
+    footer button {
+        padding: 10px 20px;
+        border-radius: var(--radius-full);
+        border: 1px solid transparent;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        background: var(--secondary);
+        color: var(--primary);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    footer button:hover { background: var(--border-color); }
+    
+    footer button#penBtn.active { background: var(--danger); color: white; border-color: var(--danger); }
+    footer button#musicBtn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    footer button:last-child { background: #fff0e6; color: var(--danger); }
+    footer button:last-child:hover { background: #fecaca; }
+
+  </style>
+</head>
+<body>
+<header>
+  <nav>
+   <button onclick="window.location.href='../conversation_01/conversation_01.html'">Conversation 01</button>
+   <button onclick="window.location.href='../conversation_02/conversation_02.html'">Conversation 02</button>
+   <button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+   <button class="active-nav" onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+ 
+  </nav>
+</header>
+
+<button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">☰ Menu</button>
+<button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">☰ Menu</button>
+
+<div class="sidebar left">
+  <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</div>
+
+<div class="sidebar right">
+  <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button class="active" onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>Story</b></button>
+</div>
+
+  <div class="outer-box">
+    <h2>WH-Questions – Answer One by One</h2>
+    <!-- ĐỔI AUDIO VÀO ĐÂY NẾU CẦN -->
+    <audio id="audioPlayer" controls src="sounds/A1-05-4-Verb-Yes-No-Questions-Housing.mp3"></audio>
+    <div id="quiz" class="question-box"></div>
+
+    <div id="navigation">
+      <button onclick="startQuiz()" id="playBtn">▶️ Play</button>
+      <button onclick="prevPage()" id="prevBtn" style="display:none;">Previous</button>
+      <button onclick="nextPage()" id="nextBtn" style="display:none;">Next</button>
+      <button onclick="resetQuiz()" id="resetBtn" style="display:none;">🔁 Làm lại từ đầu</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <div id="dictionaryPopup">
+    <div id="dictWord"></div>
+    <div id="dictPhonetic"></div>
+    <div id="dictType"></div>
+    <div id="dictMeaning"></div>
+    <button onclick="speakWord()">🔊</button>
+    <button onclick="closeDict()">❌</button>
+  </div>
+
+  <audio id="audioWordPlayer"></audio>
+<canvas id="paintCanvas"></canvas>
+
+<footer>
+    <button id="musicBtn" onclick="toggleMusic()">🎵 Music: OFF</button>
+    <button id="penBtn" onclick="togglePen()">✏️ Pen: OFF</button>
+    <button onclick="clearCanvas()">🗑️ Clear</button>
+</footer>
+
+<audio id="bgMusic" loop src="sounds/background_music.mp3"></audio>
+
+  <script>
+    // ===== CÂU HỎI MỨC 2: Câu trả lời đầy đủ, phân biệt hoa thường, có/không dấu chấm =====
+    const questions = [
+      { 
+        q: "1. Where does the woman live?", 
+        a: ["She lives downtown.", "She lives downtown", "She lives near the train station.", "She lives near the train station", "The woman lives downtown.", "The woman lives downtown", "The woman lives near the train station.", "The woman lives near the train station"] 
+      },
+      { 
+        q: "2. What does she take to work?", 
+        a: ["She takes the train to work.", "She takes the train to work", "She takes the train.", "She takes the train", "The woman takes the train to work.", "The woman takes the train to work"] 
+      },
+      { 
+        q: "3. Where does the man live?", 
+        a: ["He lives far away.", "He lives far away", "The man lives far away.", "The man lives far away"] 
+      },
+      { 
+        q: "4. How does the man go to work?", 
+        a: ["He drives to work.", "He drives to work", "The man drives to work.", "The man drives to work"] 
+      },
+      { 
+        q: "5. What kind of car does the man have?", 
+        a: ["He has an old car.", "He has an old car", "His car is old.", "His car is old", "The man has an old car.", "The man has an old car"] 
+      }
+    ];
+   
+    const dictionary = {
+      // ===== PRONOUNS & QUESTION WORDS =====
+      "where": { meaning: "ở đâu", phonetic: "/weə(r)/", type: "question word" },
+      "how": { meaning: "như thế nào / bằng cách nào", phonetic: "/haʊ/", type: "question word" },
+      "what": { meaning: "cái gì / phương tiện gì", phonetic: "/wɒt/", type: "question word" },
+      "you": { meaning: "bạn", phonetic: "/juː/", type: "pronoun" },
+      "i": { meaning: "tôi", phonetic: "/aɪ/", type: "pronoun" },
+      "she": { meaning: "cô ấy", phonetic: "/ʃiː/", type: "pronoun" },
+      "he": { meaning: "anh ấy", phonetic: "/hiː/", type: "pronoun" },
+      "my": { meaning: "của tôi", phonetic: "/maɪ/", type: "pronoun" },
+      "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+
+      // ===== NOUNS =====
+      "man": { meaning: "người đàn ông", phonetic: "/mæn/", type: "noun" },
+      "woman": { meaning: "người phụ nữ", phonetic: "/ˈwʊmən/", type: "noun" },
+      "train": { meaning: "xe lửa / tàu hỏa", phonetic: "/treɪn/", type: "noun" },
+      "station": { meaning: "nhà ga / trạm", phonetic: "/ˈsteɪʃn/", type: "noun" },
+      "work": { meaning: "công việc / chỗ làm", phonetic: "/wɜːk/", type: "noun" },
+      "days": { meaning: "những ngày", phonetic: "/deɪz/", type: "noun" },
+      "car": { meaning: "xe ô tô", phonetic: "/kɑː(r)/", type: "noun" },
+      "kind": { meaning: "loại", phonetic: "/kaɪnd/", type: "noun" },
+
+      // ===== VERBS =====
+      "do": { meaning: "làm / trợ động từ", phonetic: "/duː/", type: "verb" },
+      "live": { meaning: "sống", phonetic: "/lɪv/", type: "verb" },
+      "lives": { meaning: "sống (số ít)", phonetic: "/lɪvz/", type: "verb" },
+      "take": { meaning: "bắt (xe, tàu)", phonetic: "/teɪk/", type: "verb" },
+      "takes": { meaning: "bắt (số ít)", phonetic: "/teɪks/", type: "verb" },
+      "drive": { meaning: "lái xe", phonetic: "/draɪv/", type: "verb" },
+      "drives": { meaning: "lái xe (số ít)", phonetic: "/draɪvz/", type: "verb" },
+      "go": { meaning: "đi", phonetic: "/ɡəʊ/", type: "verb" },
+      "have": { meaning: "có", phonetic: "/hæv/", type: "verb" },
+      "has": { meaning: "có (số ít)", phonetic: "/hæz/", type: "verb" },
+      "is": { meaning: "là / thì / ở", phonetic: "/ɪz/", type: "verb" },
+      "like": { meaning: "thích", phonetic: "/laɪk/", type: "verb" },
+
+      // ===== ADJECTIVES & ADVERBS =====
+      "downtown": { meaning: "trung tâm thành phố", phonetic: "/ˌdaʊnˈtaʊn/", type: "adverb/noun" },
+      "near": { meaning: "gần", phonetic: "/nɪə(r)/", type: "preposition/adverb" },
+      "far": { meaning: "xa", phonetic: "/fɑː(r)/", type: "adverb" },
+      "away": { meaning: "xa / đi xa", phonetic: "/əˈweɪ/", type: "adverb" },
+      "most": { meaning: "hầu hết", phonetic: "/məʊst/", type: "adjective/adverb" },
+      "nice": { meaning: "đẹp / tốt", phonetic: "/naɪs/", type: "adjective" },
+      "old": { meaning: "cũ / già", phonetic: "/əʊld/", type: "adjective" },
+      "yes": { meaning: "vâng / có", phonetic: "/jes/", type: "adverb" },
+      "no": { meaning: "không", phonetic: "/nəʊ/", type: "adverb" },
+
+      // ===== PREPOSITIONS & CONJUNCTIONS =====
+      "to": { meaning: "đến / để", phonetic: "/tuː/", type: "preposition" },
+      "about": { meaning: "về (còn bạn thì sao)", phonetic: "/əˈbaʊt/", type: "preposition" },
+      "so": { meaning: "vì vậy / nên", phonetic: "/səʊ/", type: "conjunction" },
+      "but": { meaning: "nhưng", phonetic: "/bʌt/", type: "conjunction" },
+      "of": { meaning: "của", phonetic: "/əv/", type: "preposition" }
+    };
+
+    let currentPage = 0;
+    const userAnswers = Array(questions.length).fill("");
+    let googleUSVoice = null;
+
+    speechSynthesis.onvoiceschanged = () => {
+      const voices = speechSynthesis.getVoices();
+      googleUSVoice = voices.find(v => v.name.toLowerCase().includes("google") && v.lang === "en-US");
+    };
+
+    function speak(text, callback) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      if (googleUSVoice) utter.voice = googleUSVoice;
+      utter.onend = callback || (() => {});
+      utter.onerror = callback || (() => {}); 
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    function normalizeWord(word) {
+      word = word.toLowerCase().replace(/[^a-z']/g, "");
+      if (word.endsWith("'s")) return { base: word.slice(0, -2), possessive: true };
+      return { base: word };
+    }
+
+    function startQuiz() {
+      currentPage = 0;
+      document.getElementById("playBtn").style.display = "none";
+      document.getElementById("prevBtn").style.display = "inline-block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+      document.getElementById("resetBtn").style.display = "none";
+      renderPage();
+    }
+
+    function renderPage() {
+      const q = questions[currentPage];
+      const quizDiv = document.getElementById("quiz");
+
+      // Xử lý an toàn các dấu nháy đơn
+      const highlighted = q.q.replace(/\b[\w’']+\b/g, (word) => {
+        let safeWord = word.replace(/'/g, "\\'"); // Tránh lỗi ngoặc đơn trong HTML
+        return `<span class="word" onclick="showDict('${safeWord}')">${word}</span>`;
+      });
+
+      quizDiv.innerHTML = `
+        <label id="questionLabel">${highlighted}</label><br>
+        <input type="text" id="answerInput" onkeypress="if(event.key === 'Enter') submitAnswer()" placeholder="Type your answer here..." />
+        <button onclick="submitAnswer()" id="submitBtn">Submit Answer</button>
+        <div class="feedback" id="feedback"></div>
+      `;
+
+      speak(q.q);
+
+      setTimeout(() => { document.getElementById("answerInput").focus(); }, 100);
+
+      document.getElementById("prevBtn").style.display = currentPage > 0 ? "inline-block" : "none";
+      document.getElementById("nextBtn").style.display = currentPage < questions.length - 1 ? "inline-block" : "none";
+      
+      if(userAnswers[currentPage]) {
+          document.getElementById("answerInput").value = userAnswers[currentPage];
+      }
+    }
+
+    function submitAnswer() {
+      let input = document.getElementById("answerInput").value.trim().replace(/\s+/g, ' ');
+      if(!input) return; 
+      
+      userAnswers[currentPage] = input;
+      const correctAnswers = questions[currentPage].a;
+      const feedbackDiv = document.getElementById("feedback");
+
+      // So sánh chính xác phân biệt hoa thường
+      if (correctAnswers.includes(input)) {
+        feedbackDiv.textContent = "Correct!";
+        feedbackDiv.className = "feedback correct";
+      } else {
+        feedbackDiv.textContent = `Wrong! Correct answer: ${correctAnswers[0]}`;
+        feedbackDiv.className = "feedback wrong";
+      }
+
+      speak(feedbackDiv.textContent);
+      updateScore();
+    }
+
+    function nextPage() {
+      if (currentPage < questions.length - 1) {
+        currentPage++;
+        renderPage();
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        renderPage();
+      }
+    }
+
+    function resetQuiz() {
+      currentPage = 0;
+      userAnswers.fill("");
+      document.getElementById("result").textContent = "";
+      document.getElementById("resetBtn").style.display = "none";
+      document.getElementById("playBtn").style.display = "inline-block";
+      document.getElementById("prevBtn").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("quiz").innerHTML = "";
+      speechSynthesis.cancel();
+    }
+
+    function updateScore() {
+      const resultEl = document.getElementById("result");
+      let correct = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (questions[i].a.includes(userAnswers[i])) correct++;
+      }
+      resultEl.textContent = `Score: ${correct} / ${questions.length}`;
+      if (currentPage === questions.length - 1) {
+        document.getElementById("resetBtn").style.display = "inline-block";
+      }
+    }
+
+    function speakWord() {
+      const word = document.getElementById("dictWord").textContent;
+      speak(word);
+    }
+
+    function showDict(rawWord) {
+      const info = normalizeWord(rawWord);
+      const dictData = dictionary[info.base];
+
+      if (dictData) {
+        let finalMeaning = dictData.meaning;
+        if (info.possessive) {
+          finalMeaning = "của " + finalMeaning; 
+        }
+
+        document.getElementById("dictWord").textContent = rawWord;
+        document.getElementById("dictPhonetic").textContent = dictData.phonetic;
+        
+        // Hiển thị từ loại có bọc ngoặc
+        const typeText = dictData.type ? `(${dictData.type})` : "";
+        document.getElementById("dictType").textContent = typeText;
+
+        document.getElementById("dictMeaning").textContent = finalMeaning;
+        document.getElementById("dictionaryPopup").style.display = "block";
+        speakWord();
+      } else {
+        document.getElementById("dictWord").textContent = rawWord;
+        document.getElementById("dictPhonetic").textContent = "";
+        document.getElementById("dictType").textContent = ""; 
+        document.getElementById("dictMeaning").textContent = "(Từ này chưa có trong từ điển)";
+        document.getElementById("dictionaryPopup").style.display = "block";
+      }
+    }
+
+    function closeDict() {
+      document.getElementById("dictionaryPopup").style.display = "none";
+    }
+
+    function toggleSidebar(side) {
+      const sidebar = document.querySelector(`.sidebar.${side}`);
+      sidebar.classList.toggle('visible');
+    }
+
+    const canvas = document.getElementById('paintCanvas');
+    const ctx = canvas.getContext('2d');
+    const bgMusic = document.getElementById('bgMusic');
+    let isPainting = false;
+    let penActive = false;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight; 
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function toggleMusic() {
+        const btn = document.getElementById('musicBtn');
+        if (bgMusic.paused) {
+            bgMusic.play().catch(() => alert("Click vào màn hình để cho phép phát nhạc"));
+            btn.textContent = "🎵 Music: ON";
+            btn.classList.add('active');
+        } else {
+            bgMusic.pause();
+            btn.textContent = "🎵 Music: OFF";
+            btn.classList.remove('active');
+        }
+    }
+
+    function togglePen() {
+        penActive = !penActive;
+        const btn = document.getElementById('penBtn');
+        if (penActive) {
+            canvas.classList.add('active');
+            btn.textContent = "✏️ Pen: ON";
+            btn.classList.add('active');
+        } else {
+            canvas.classList.remove('active');
+            btn.textContent = "✏️ Pen: OFF";
+            btn.classList.remove('active');
+            isPainting = false;
+        }
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function getEventPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function startDraw(e) {
+        if (!penActive) return;
+        isPainting = true;
+        const pos = getEventPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        if (e.cancelable) e.preventDefault();
+    }
+
+    function doDraw(e) {
+        if (!isPainting || !penActive) return;
+        const pos = getEventPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.strokeStyle = "#ef4444";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        if (e.cancelable) e.preventDefault();
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', doDraw);
+    window.addEventListener('mouseup', () => isPainting = false);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', doDraw, { passive: false });
+    canvas.addEventListener('touchend', () => isPainting = false);
+
+    // ===== REMOTE CONTROL (BÚT TRÌNH CHIẾU) =====
+    document.addEventListener("keydown", function(e) {
+        const key = e.key.toLowerCase();
+        
+        // BẢO VỆ: Nếu học sinh đang gõ trong ô Input, sẽ bỏ qua phím tắt chữ 'p' và mũi tên
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+            if (key === "enter") {
+                const submitBtn = document.getElementById("submitBtn");
+                if (submitBtn) submitBtn.click();
+            }
+            return; 
+        }
+
+        if (key === "arrowright" || key === "pagedown") nextPage();
+        if (key === "arrowleft" || key === "pageup") prevPage();
+        if (key === "enter") {
+            const submitBtn = document.getElementById("submitBtn");
+            if (submitBtn) submitBtn.click();
+        }
+        if (key === "p") togglePen();
+    });
+
+    document.addEventListener("contextmenu", function(e) {
+      e.preventDefault();
+
+      const text = e.target.innerText?.trim();
+
+      if (text && translations[text]) {
+        const popup = document.getElementById("dictionaryPopup");
+
+        document.getElementById("dictWord").textContent = text;
+        document.getElementById("dictPhonetic").textContent = "";
+        document.getElementById("dictType").textContent = "Translation";
+        document.getElementById("dictMeaning").textContent = translations[text];
+
+        popup.style.display = "block";
+      }
+    });
+
+    const translations = {
+      // ===== QUESTIONS =====
+      "1. Where does the woman live?": "Người phụ nữ sống ở đâu?",
+      "2. What does she take to work?": "Cô ấy bắt chuyến gì để đi làm? (Cô ấy đi làm bằng gì?)",
+      "3. Where does the man live?": "Người đàn ông sống ở đâu?",
+      "4. How does the man go to work?": "Người đàn ông đi làm bằng cách nào?",
+      "5. What kind of car does the man have?": "Người đàn ông có loại xe hơi nào?"
+    };
+  </script>
+</body>
+</html>
