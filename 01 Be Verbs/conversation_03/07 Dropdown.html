@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dropdown Exercise – First Day & Teachers</title>
+
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM-Avo.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f0e2cd;
+      padding-bottom: 100px;
+    }
+
+    header {
+      background-color: #f3dbc1;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      flex-wrap: wrap;
+      transition: transform 0.3s ease;
+    }
+
+    header.hidden { transform: translateY(-100%); }
+
+    header a {
+      font-size: 18px;
+      padding: 10px 20px;
+      border: 1px solid #c9a77b;
+      background: #fff3e0;
+      border-radius: 10px;
+      text-decoration: none;
+      color: black;
+      margin: 5px 0;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #f3dbc1;
+      border-top: 2px solid #d4bfa6;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1001;
+    }
+
+    .footer-btn {
+      padding: 10px 20px;
+      font-size: 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background-color: #8b5e3c;
+      color: white;
+      transition: 0.2s;
+    }
+
+    .footer-btn:active { transform: scale(0.95); }
+    .btn-replay { background-color: #4CAF50; }
+    .btn-pen.active { background-color: #ff4757; }
+
+    #drawingCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    #drawingCanvas.active {
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #f3dbc1;
+      padding: 15px 10px;
+      position: fixed;
+      top: 80px; bottom: 80px;
+      border: 2px solid #d4bfa6;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 997;
+    }
+    .sidebar.left { left: 0; transform: translateX(-100%); }
+    .sidebar.right { right: 0; transform: translateX(100%); }
+    .sidebar.visible { transform: translateX(0); }
+
+    .sidebar button {
+      display: block; width: 100%;
+      background-color: #fff;
+      border: 1px solid #d4bfa6;
+      margin-bottom: 8px; padding: 12px;
+      border-radius: 10px; cursor: pointer;
+      font-size: 15px; color: #8b5e3c;
+      text-align: left;
+    }
+
+    .sidebar button.active {
+      background-color: #d35400;
+      color: #fff;
+      border: 2px solid #a04000;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      z-index: 1020;
+      padding: 10px 20px;
+      background: #8d6e63;
+      border: none;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 25px;
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .toggle-left { left: 10px; }
+    .toggle-right { right: 10px; }
+
+    .content {
+      margin-top: 10px;
+      padding: 10px;
+      margin-left: 70px;
+      margin-right: 70px;
+    }
+/* Style cho tất cả nút trong header */
+header button {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: normal; /* Bình thường không đậm */
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+/* Style dành riêng cho nút đang hoạt động (Active) */
+header button.active-nav {
+  font-weight: bold; /* Làm đậm chữ */
+  background-color: #e6ccb2; /* Đổi màu nền nhẹ để phân biệt */
+  border-color: #8b5e3c;     /* Viền đậm hơn */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+    h2 { text-align: center; margin-bottom: 20px; font-size: 30px; color: #2a3b8f; }
+    
+    .dialogue-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      width: 100%;
+      line-height: 1.8;
+      font-size: 28px;
+    }
+
+    .line { margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
+    .result { font-weight: bold; margin-left: 20px; font-size: 22px; }
+    .correct { color: green; }
+    .wrong { color: red; }
+
+    select { font-size: 26px; padding: 2px 6px; margin: 0 6px; border-radius: 6px; border: 2px solid #9aa5f9; background: #f0f4ff; }
+    .word { cursor: pointer; transition: color 0.2s; }
+    .word:hover { color: #3c5ee0; text-decoration: underline; }
+
+    #dictionaryPopup {
+      display: none;
+      position: fixed;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 3px solid #8b5e3c;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      font-size: 24px;
+      z-index: 9999;
+      width: 90%;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+
+<header id="mainHeader">
+  <nav>
+      <button onclick="window.location.href='../conversation_01/conversation_01.html'">
+    Conversation 01
+  </button>
+  
+  <button  onclick="window.location.href='../conversation_02/conversation_02.html'">
+    Conversation 02
+  </button>
+  
+  <button class="active-nav" onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  
+  <button onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+
+  </nav>
+</header>
+
+<button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu</button>
+<button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu</button>
+
+<div class="sidebar left">
+  <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button class="active" onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</div>
+
+<div class="sidebar right">
+  <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>Story</b></button>
+</div>
+
+<div class="content">
+  <h2>First Day at School – Be Verbs</h2>
+  <div class="dialogue-box" id="dialogueBox">
+
+  <div class="line" data-index="1">
+    <span class="word">Man</span>: 
+    <span class="word">What</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">your</span> <span class="word">favorite</span> <span class="word">class</span>?
+    <span class="result"></span>
+  </div>
+
+  <div class="line" data-index="2">
+    <span class="word">Woman</span>: 
+    <span class="word">Spanish</span>. 
+    <span class="word">I</span> <span class="word">love</span> <span class="word">it</span>. 
+    <span class="word">My</span> <span class="word">Spanish</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">not</span> <span class="word">very</span> <span class="word">good</span>, 
+    <span class="word">though</span>. 
+    <span class="word">I</span>
+    <select data-answer="am"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">just</span> <span class="word">a</span> <span class="word">beginner</span>.
+    <span class="result"></span>
+  </div>
+
+  <div class="line" data-index="3">
+    <span class="word">Man</span>: 
+    <span class="word">Well</span>, 
+    <span class="word">Spanish</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">my</span> <span class="word">first</span> <span class="word">language</span>. 
+    <span class="word">My</span> <span class="word">name</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">Tony</span>, 
+    <span class="word">short</span> <span class="word">for</span> <span class="word">Antonio</span>.
+    <span class="result"></span>
+  </div>
+
+  <div class="line" data-index="4">
+    <span class="word">Woman</span>: 
+    <span class="word">Really</span>! 
+    <span class="word">That</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">so</span> <span class="word">cool</span>.
+    <span class="result"></span>
+  </div>
+
+  <div class="line" data-index="5">
+    <span class="word">Man</span>: 
+    <span class="word">Yeah</span>, 
+    <span class="word">my</span> <span class="word">dad</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">from</span> <span class="word">Mexico</span>, 
+    <span class="word">and</span> 
+    <span class="word">my</span> <span class="word">mom</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">from</span> <span class="word">Costa</span> <span class="word">Rica</span>.
+    <span class="result"></span>
+  </div>
+
+  <div class="line" data-index="6">
+    <span class="word">Woman</span>: 
+    <span class="word">Wow</span>! 
+    <span class="word">You</span>
+    <select data-answer="are"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">so</span> <span class="word">lucky</span>.
+    <span class="result"></span>
+  </div>
+
+  <div class="line" data-index="7">
+    <span class="word">Man</span>: 
+    <span class="word">Yeah</span>, 
+    <span class="word">Spanish</span>
+    <select data-answer="is"><option>--</option><option>am</option><option>is</option><option>are</option></select>
+    <span class="word">easy</span> <span class="word">for</span> <span class="word">me</span>, 
+    <span class="word">so</span> 
+    <span class="word">I</span> <span class="word">can</span> 
+    <span class="word">help</span> <span class="word">you</span> 
+    <span class="word">if</span> <span class="word">you</span> 
+    <span class="word">like</span>.
+    <span class="result"></span>
+  </div>
+
+  <div class="line" data-index="8">
+    <span class="word">Woman</span>: 
+    <span class="word">I’d</span> <span class="word">like</span> 
+    <span class="word">that</span>. 
+    <span class="word">Thank</span> <span class="word">you</span>!
+    <span class="result"></span>
+  </div>
+
+</div>
+
+<footer>
+  <button class="footer-btn btn-header" onclick="toggleHeader()">Hide Header</button>
+  <button class="footer-btn btn-pen" id="penBtn" onclick="togglePen()">Pen: OFF</button>
+  <button class="footer-btn" onclick="clearCanvas()">Clear Pen</button>
+  <button class="footer-btn btn-replay" onclick="resetAll()">↺ Replay</button>
+</footer>
+
+<div id="dictionaryPopup">
+  <div id="dictWord" style="font-weight: bold; font-size: 28px; color: #8b5e3c;"></div>
+  <div id="dictPhonetic" style="font-style: italic; color: #555;"></div>
+  <div id="dictMeaning" style="margin: 10px 0; border-top: 1px solid #eee; padding-top: 10px;"></div>
+  <button onclick="speakWord()" style="padding: 10px 20px; font-size: 20px; margin-right: 10px; cursor: pointer;"> 🔊 Speak </button>
+  <button onclick="closeDict()" style="padding: 10px 20px; font-size: 20px; cursor: pointer;"> ❌ Close </button>
+</div>
+
+<audio id="audioPlayer"></audio>
+
+<script>
+  function toggleSidebar(side) {
+    document.querySelector(`.sidebar.${side}`).classList.toggle('visible');
+  }
+
+  function toggleHeader() {
+    const header = document.getElementById('mainHeader');
+    const btn = document.querySelector('.btn-header');
+    header.classList.toggle('hidden');
+    btn.textContent = header.classList.contains('hidden') ? 'Show Header' : 'Hide Header';
+  }
+
+  const canvas = document.getElementById('drawingCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let penEnabled = false;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function togglePen() {
+    penEnabled = !penEnabled;
+    const btn = document.getElementById('penBtn');
+    if (penEnabled) {
+      canvas.classList.add('active');
+      btn.textContent = "Pen: ON";
+      btn.classList.add('active');
+    } else {
+      canvas.classList.remove('active');
+      btn.textContent = "Pen: OFF";
+      btn.classList.remove('active');
+    }
+  }
+
+  function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+  function startDrawing(e) { if (!penEnabled) return; drawing = true; draw(e); }
+  function stopDrawing() { drawing = false; ctx.beginPath(); }
+  function draw(e) {
+    if (!drawing || !penEnabled) return;
+    e.preventDefault();
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#ff0000';
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  }
+
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('touchstart', startDrawing);
+  canvas.addEventListener('touchmove', draw);
+  canvas.addEventListener('touchend', stopDrawing);
+
+  function resetAll() {
+    document.querySelectorAll('.line').forEach(line => {
+      const selects = line.querySelectorAll('select');
+      const result = line.querySelector('.result');
+      selects.forEach(select => { select.disabled = false; select.value = "--"; });
+      if (result) { result.textContent = ""; result.className = "result"; }
+    });
+    closeDict();
+    clearCanvas();
+  }
+
+  const dictionary = {
+    "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "Pronoun" },
+    "favorite": { meaning: "yêu thích nhất", phonetic: "/ˈfeɪvərɪt/", type: "Adjective" },
+    "class": { meaning: "lớp học / môn học", phonetic: "/klɑːs/", type: "Noun" },
+    "spanish": { meaning: "tiếng Tây Ban Nha", phonetic: "/ˈspænɪʃ/", type: "Noun/Adj" },
+    "love": { meaning: "yêu, thích", phonetic: "/lʌv/", type: "Verb" },
+    "very": { meaning: "rất", phonetic: "/ˈvɛri/", type: "Adverb" },
+    "good": { meaning: "tốt, giỏi", phonetic: "/ɡʊd/", type: "Adjective" },
+    "though": { meaning: "mặc dù vậy", phonetic: "/ðəʊ/", type: "Adverb/Conj" },
+    "just": { meaning: "chỉ là", phonetic: "/dʒʌst/", type: "Adverb" },
+    "beginner": { meaning: "người mới bắt đầu", phonetic: "/bɪˈɡɪnər/", type: "Noun" },
+    "well": { meaning: "chà / tốt", phonetic: "/wɛl/", type: "Interjection/Adv" },
+    "first": { meaning: "đầu tiên", phonetic: "/fɜːst/", type: "Adjective/Number" },
+    "language": { meaning: "ngôn ngữ", phonetic: "/ˈlæŋɡwɪdʒ/", type: "Noun" },
+    "name": { meaning: "tên", phonetic: "/neɪm/", type: "Noun" },
+    "short": { meaning: "ngắn / gọi tắt", phonetic: "/ʃɔːt/", type: "Adjective" },
+    "really": { meaning: "thật sự", phonetic: "/ˈrɪəli/", type: "Adverb" },
+    "cool": { meaning: "tuyệt, ngầu", phonetic: "/kuːl/", type: "Adjective" },
+    "yeah": { meaning: "vâng, ừ", phonetic: "/jeə/", type: "Interjection" },
+    "dad": { meaning: "bố, cha", phonetic: "/dæd/", type: "Noun" },
+    "from": { meaning: "từ (đâu đó)", phonetic: "/frɒm/", type: "Preposition" },
+    "mexico": { meaning: "nước Mê-hi-cô", phonetic: "/ˈmɛksɪˌkoʊ/", type: "Noun" },
+    "mom": { meaning: "mẹ", phonetic: "/mɒm/", type: "Noun" },
+    "costa": { meaning: "vùng Costa", phonetic: "/ˈkɒstə/", type: "Noun" },
+    "rica": { meaning: "vùng Rica", phonetic: "/ˈriːkə/", type: "Noun" },
+    "wow": { meaning: "ồ, chà", phonetic: "/waʊ/", type: "Interjection" },
+    "lucky": { meaning: "may mắn", phonetic: "/ˈlʌki/", type: "Adjective" },
+    "easy": { meaning: "dễ dàng", phonetic: "/ˈiːzi/", type: "Adjective" },
+    "help": { meaning: "giúp đỡ", phonetic: "/hɛlp/", type: "Verb/Noun" },
+    "like": { meaning: "thích / giống như", phonetic: "/laɪk/", type: "Verb/Prep" },
+    "thank": { meaning: "cảm ơn", phonetic: "/θæŋk/", type: "Verb" }, "i": { meaning: "tôi", phonetic: "/aɪ/", pos: "pronoun" },
+"you": { meaning: "bạn", phonetic: "/juː/", pos: "pronoun" },
+"he": { meaning: "anh ấy", phonetic: "/hiː/", pos: "pronoun" },
+"she": { meaning: "cô ấy", phonetic: "/ʃiː/", pos: "pronoun" },
+"my": { meaning: "của tôi", phonetic: "/maɪ/", pos: "possessive" },
+"your": { meaning: "của bạn", phonetic: "/jʊər/", pos: "possessive" }
+
+
+  };
+
+  document.querySelectorAll('.word').forEach(el => {
+    el.addEventListener('click', () => { if(!penEnabled) showDict(el.textContent); });
+  });
+
+  document.querySelectorAll('.line').forEach(line => {
+    const selects = line.querySelectorAll('select');
+    const result = line.querySelector('.result');
+    const index = line.getAttribute('data-index');
+
+    selects.forEach(select => {
+      select.addEventListener('change', () => {
+        const allFilled = [...selects].every(s => s.value !== "--");
+        if (!allFilled) return;
+        const allCorrect = [...selects].every(s => s.value === s.dataset.answer);
+        result.textContent = allCorrect ? "Correct!" : "Wrong!";
+        result.className = "result " + (allCorrect ? "correct" : "wrong");
+        if (allCorrect && index) playAudio(`sounds/sentence${index}.mp3`);
+        if (allCorrect) selects.forEach(s => s.disabled = true);
+      });
+    });
+  });
+
+  function showDict(word) {
+  const cleanWord = word.replace(/[.,!]/g, "").toLowerCase();
+
+  document.getElementById("dictWord").textContent = word;
+
+  if (dictionary[cleanWord]) {
+
+    document.getElementById("dictPhonetic").textContent =
+      dictionary[cleanWord].phonetic || "";
+
+    // 👉 lấy pos trước, nếu không có thì lấy type
+    const part = dictionary[cleanWord].pos || dictionary[cleanWord].type || "";
+
+    document.getElementById("dictMeaning").textContent =
+      (part ? "(" + part + ") " : "") + dictionary[cleanWord].meaning;
+
+  } else {
+    document.getElementById("dictPhonetic").textContent = "";
+    document.getElementById("dictMeaning").textContent = "(Chưa có trong từ điển)";
+  }
+
+  document.getElementById("dictionaryPopup").style.display = "block";
+  speakWord();
+}
+
+  function closeDict() { document.getElementById("dictionaryPopup").style.display = "none"; }
+  function speak(text) {
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "en-US";
+    speechSynthesis.speak(msg);
+  }
+  function speakWord() { speak(document.getElementById("dictWord").textContent); }
+  function playAudio(url) {
+    const audioPlayer = document.getElementById("audioPlayer");
+    audioPlayer.src = url;
+    audioPlayer.play();
+  }
+/* === REMOTE CONTROL FOR DROPDOWN === */
+
+let currentLine = 0;
+const lines = document.querySelectorAll(".line");
+
+function highlightLine(index) {
+  lines.forEach(l => l.style.background = "");
+  if (lines[index]) {
+    lines[index].style.background = "#fff3cd";
+    lines[index].scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+highlightLine(0);
+
+// NEXT / PREV LINE
+function nextLine() {
+  if (currentLine < lines.length - 1) {
+    currentLine++;
+    highlightLine(currentLine);
+  }
+}
+
+function prevLine() {
+  if (currentLine > 0) {
+    currentLine--;
+    highlightLine(currentLine);
+  }
+}
+
+// CHECK CURRENT LINE
+function checkCurrentLine() {
+  const line = lines[currentLine];
+  const selects = line.querySelectorAll("select");
+  const result = line.querySelector(".result");
+
+  if (!selects.length) return;
+
+  const allFilled = [...selects].every(s => s.value !== "--");
+  if (!allFilled) return;
+
+  const allCorrect = [...selects].every(s => s.value === s.dataset.answer);
+  result.textContent = allCorrect ? "Correct!" : "Wrong!";
+  result.className = "result " + (allCorrect ? "correct" : "wrong");
+
+  selects.forEach(s => s.disabled = true);
+}
+
+// KEY CONTROL
+document.addEventListener("keydown", function (e) {
+  console.log("KEY:", e.code);
+
+  // NEXT
+  if (e.code === "PageDown" || e.code === "ArrowRight") {
+    nextLine();
+  }
+
+  // PREV
+  if (e.code === "PageUp" || e.code === "ArrowLeft") {
+    prevLine();
+  }
+
+  // CHECK
+  if (e.code === "Enter" || e.code === "NumpadEnter") {
+    checkCurrentLine();
+  }
+
+  // TOGGLE PEN
+  if (e.code === "Space") {
+    togglePen();
+  }
+
+  // RESET
+  if (e.code === "Escape") {
+    resetAll();
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Conversation Quiz</title>
+  <style>
+    @font-face { font-family: 'UTM Avo'; src: url('fonts/UTM Avo.ttf') format('truetype'); }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'UTM Avo', Roboto, sans-serif; }
+    
+    body { background: #f0e2cd; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+/* Style cho tất cả nút trong header */
+header button {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: normal; /* Bình thường không đậm */
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+/* Style dành riêng cho nút đang hoạt động (Active) */
+header button.active-nav {
+  font-weight: bold; /* Làm đậm chữ */
+  background-color: #e6ccb2; /* Đổi màu nền nhẹ để phân biệt */
+  border-color: #8b5e3c;     /* Viền đậm hơn */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+    header { background-color: #f3dbc1; padding: 10px; display: flex; justify-content: center; gap: 10px; border-bottom: 2px solid #d4bfa6; z-index: 1000; height: 60px; }
+    footer { background-color: #fff3cd; border-top: 2px solid #ffeeba; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; height: 80px; }
+
+    #main-container { flex: 1; position: relative; overflow: hidden; }
+    #inkCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
+    #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+
+    .content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px 80px; z-index: 10; overflow-y: auto; text-align: center; }
+
+    /* CÂU HỎI SIÊU TO */
+    .content h3 {
+      font-size: 50px !important; 
+      margin-bottom: 30px;
+      color: #4e73df;
+      line-height: 1.3;
+    }
+
+    header a { font-size: 16px; padding: 8px 15px; border: 1px solid #c9a77b; background: #fff3e0; border-radius: 10px; text-decoration: none; color: black; }
+    .sidebar { width: 180px; background: #f3dbc1; padding: 15px; position: fixed; top: 60px; bottom: 80px; overflow-y: auto; z-index: 2000; transition: transform 0.3s ease; }
+    .sidebar.left { left: 0; transform: translateX(-100%); border-right: 2px solid #d4bfa6; }
+    .sidebar.right { right: 0; transform: translateX(100%); border-left: 2px solid #d4bfa6; }
+    .sidebar.visible { transform: translateX(0); }
+    .sidebar button { display: block; width: 100%; font-size: 14px; padding: 8px; background: #fff; border: 1px solid #d4bfa6; border-radius: 8px; cursor: pointer; margin-bottom: 5px; font-weight: bold; }
+/* Style dành riêng cho nút đang được kích hoạt trong sidebar */
+.sidebar button.active {
+  background-color: #d35400; /* Màu cam đậm giống nút Music/Pen */
+  color: #fff;               /* Chữ trắng cho dễ đọc */
+  border: 2px solid #a04000;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.sidebar button.active b {
+  color: #fff;
+}
+    .toggle-btn {
+      position: fixed;
+      top: 10px; /* Nằm ngay dưới header */
+      z-index: 1020;
+      padding: 10px 20px;
+      background: #8d6e63; /* Màu nâu sang trọng */
+      border: none;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 25px; /* Bo tròn thuốc */
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'UTM Avo', sans-serif;
+    }
+    .toggle-left { left: 0; border-radius: 0 8px 8px 0; }
+    .toggle-right { right: 0; border-radius: 8px 0 0 8px; }
+
+    .tool-btn { padding: 10px 18px; border-radius: 10px; border: 1px solid #8b5e3c; background: #fff; cursor: pointer; font-weight: bold; color: #8b5e3c; font-size: 16px; }
+    .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+    /* ĐÁP ÁN CÂN ĐỐI VỚI CÂU HỎI */
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+    .option-button { padding: 20px; font-size: 32px; background-color: #e0e0e0; border: 2px solid #ccc; border-radius: 10px; cursor: pointer; }
+    .correct { background-color: #8bc34a !important; color: white; border-color: #689f38; }
+    .incorrect { background-color: #f44336 !important; color: white; border-color: #d32f2f; }
+
+    .word { cursor: pointer; border-radius: 4px; padding: 0 2px; }
+    .word-type { color: #2d6a4f; font-style: italic; font-size: 18px; font-weight: bold; }
+    #dictPopup, #sentenceTranslation { position: absolute; background: #fffbe7; border: 2px solid #8b5e3c; padding: 15px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; min-width: 280px; }
+  </style>
+</head>
+<body>
+
+  <header>
+      <button onclick="window.location.href='../conversation_01/conversation_01.html'">
+    Conversation 01
+  </button>
+  
+  <button onclick="window.location.href='../conversation_02/conversation_02.html'">
+    Conversation 02
+  </button>
+  
+  <button   onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  
+  <button  class="active-nav" onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+
+
+  </header>
+
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu ☰</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu ☰</button>
+
+  <div class="sidebar left">
+   <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+
+
+
+  </div>
+  <div class="sidebar right">
+<button class="active" onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>Story</b></button>
+
+
+  </div>
+
+  <div id="main-container">
+    <canvas id="inkCanvas"></canvas>
+    <div class="content">
+        <div style="margin-bottom:20px;">
+          <audio id="mainAudio" controls style="height: 40px;">
+            <source src="sounds/A1-01-4-Be-Verbs-Lab.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        <div id="game-container"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="display: flex; gap: 10px;">
+      <button id="penBtn" class="tool-btn" onclick="toggleInk()">Pen: OFF</button>
+      <button class="tool-btn" onclick="clearInk()">Clear</button>
+    </div>
+    <div style="font-weight: bold; color: #8b5e3c; font-size: 24px;">
+      ✅: <span id="correctCount">0</span> | ❌: <span id="incorrectCount">0</span> | ⏱️: <span id="timer">0</span>s
+    </div>
+    <button class="tool-btn" style="background: #7dbd3e; color: white; border: none; font-size: 20px;" onclick="loadNextQuestion()">Next Question ↓</button>
+  </footer>
+
+  <div id="dictPopup"></div>
+  <div id="sentenceTranslation"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+  const dictionary = {
+  "where": { meaning: "ở đâu", phonetic: "/weər/", type: "question word" },
+  "is": { meaning: "là / ở", phonetic: "/ɪz/", type: "verb (to be)" },
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "computer": { meaning: "máy tính", phonetic: "/kəmˈpjuːtər/", type: "noun" },
+  "lab": { meaning: "phòng máy / phòng thí nghiệm", phonetic: "/læb/", type: "noun" },
+
+  "down": { meaning: "xuống / dọc theo", phonetic: "/daʊn/", type: "adverb" },
+  "hall": { meaning: "hành lang", phonetic: "/hɔːl/", type: "noun" },
+
+  "in": { meaning: "trong / ở", phonetic: "/ɪn/", type: "preposition" },
+  "library": { meaning: "thư viện", phonetic: "/ˈlaɪbreri/", type: "noun" },
+  "next": { meaning: "kế bên", phonetic: "/nekst/", type: "adjective" },
+  "to": { meaning: "đến / tới / để", phonetic: "/tuː/", type: "preposition" },
+  "office": { meaning: "văn phòng", phonetic: "/ˈɒfɪs/", type: "noun" },
+  "outside": { meaning: "bên ngoài", phonetic: "/ˌaʊtˈsaɪd/", type: "adverb" },
+
+  "when": { meaning: "khi nào", phonetic: "/wen/", type: "question word" },
+  "spanish": { meaning: "tiếng Tây Ban Nha", phonetic: "/ˈspænɪʃ/", type: "noun" },
+  "class": { meaning: "lớp học", phonetic: "/klæs/", type: "noun" },
+
+  "at": { meaning: "lúc / tại", phonetic: "/æt/", type: "preposition" },
+  "6": { meaning: "số 6", phonetic: "/sɪks/", type: "number" },
+  "5": { meaning: "số 5", phonetic: "/faɪv/", type: "number" },
+  "morning": { meaning: "buổi sáng", phonetic: "/ˈmɔːrnɪŋ/", type: "noun" },
+  "noon": { meaning: "buổi trưa", phonetic: "/nuːn/", type: "noun" },
+
+  "classroom": { meaning: "phòng học", phonetic: "/ˈklæsruːm/", type: "noun" },
+  "home": { meaning: "nhà", phonetic: "/hoʊm/", type: "noun" },
+  "online": { meaning: "trực tuyến", phonetic: "/ˈɒnlaɪn/", type: "adjective" },
+  "only": { meaning: "chỉ", phonetic: "/ˈoʊnli/", type: "adverb" },
+
+  "why": { meaning: "tại sao", phonetic: "/waɪ/", type: "question word" },
+  "isn’t": { meaning: "không phải là", phonetic: "/ˈɪzənt/", type: "contraction" },
+  "for": { meaning: "cho / đối với", phonetic: "/fɔːr/", type: "preposition" },
+  "woman": { meaning: "người phụ nữ", phonetic: "/ˈwʊmən/", type: "noun" },
+
+  "she": { meaning: "cô ấy", phonetic: "/ʃiː/", type: "pronoun" },
+  "doesn’t": { meaning: "không (does not)", phonetic: "/ˈdʌzənt/", type: "contraction" },
+  "like": { meaning: "thích", phonetic: "/laɪk/", type: "verb" },
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+  "has": { meaning: "có", phonetic: "/hæz/", type: "verb" },
+  "no": { meaning: "không", phonetic: "/noʊ/", type: "determiner" },
+  "internet": { meaning: "mạng internet", phonetic: "/ˈɪntərnet/", type: "noun" },
+  "busy": { meaning: "bận", phonetic: "/ˈbɪzi/", type: "adjective" },
+  "late": { meaning: "muộn", phonetic: "/leɪt/", type: "adjective" },
+
+  "actually": { meaning: "thực ra", phonetic: "/ˈækʧuəli/", type: "adverb" },
+  "yes": { meaning: "có", phonetic: "/jes/", type: "interjection" },
+  "no": { meaning: "không", phonetic: "/noʊ/", type: "interjection" },
+  "on": { meaning: "vào (ngày)", phonetic: "/ɒn/", type: "preposition" },
+  "weekends": { meaning: "cuối tuần", phonetic: "/ˈwiːkends/", type: "noun" },
+  "school": { meaning: "trường học", phonetic: "/skuːl/", type: "noun" },
+
+  "how": { meaning: "như thế nào", phonetic: "/haʊ/", type: "question word" },
+  "does": { meaning: "trợ động từ", phonetic: "/dʌz/", type: "auxiliary verb" },
+  "feel": { meaning: "cảm thấy", phonetic: "/fiːl/", type: "verb" },
+  "about": { meaning: "về", phonetic: "/əˈbaʊt/", type: "preposition" },
+
+  "bored": { meaning: "chán", phonetic: "/bɔːrd/", type: "adjective" },
+  "excited": { meaning: "hào hứng", phonetic: "/ɪkˈsaɪtɪd/", type: "adjective" },
+  "angry": { meaning: "tức giận", phonetic: "/ˈæŋɡri/", type: "adjective" },
+  "tired": { meaning: "mệt", phonetic: "/ˈtaɪərd/", type: "adjective" },
+
+  "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "question word" },
+  "think": { meaning: "nghĩ", phonetic: "/θɪŋk/", type: "verb" },
+  "they": { meaning: "họ / chúng", phonetic: "/ðeɪ/", type: "pronoun" },
+  "are": { meaning: "là", phonetic: "/ɑːr/", type: "verb" },
+  "boring": { meaning: "chán", phonetic: "/ˈbɔːrɪŋ/", type: "adjective" },
+  "fun": { meaning: "vui", phonetic: "/fʌn/", type: "adjective" },
+  "hard": { meaning: "khó", phonetic: "/hɑːrd/", type: "adjective" },
+  "bad": { meaning: "tệ", phonetic: "/bæd/", type: "adjective" },
+
+  "man": { meaning: "người đàn ông", phonetic: "/mæn/", type: "noun" },
+  "say": { meaning: "nói", phonetic: "/seɪ/", type: "verb" },
+  "end": { meaning: "kết thúc", phonetic: "/end/", type: "noun" },
+
+  "don’t": { meaning: "không (do not)", phonetic: "/doʊnt/", type: "contraction" },
+  "agree": { meaning: "đồng ý", phonetic: "/əˈɡriː/", type: "verb" },
+  "goodbye": { meaning: "tạm biệt", phonetic: "/ˌɡʊdˈbaɪ/", type: "interjection" },
+  "come": { meaning: "đến", phonetic: "/kʌm/", type: "verb" },
+  "later": { meaning: "sau", phonetic: "/ˈleɪtər/", type: "adverb" },
+
+  "i": { meaning: "tôi", phonetic: "/aɪ/", type: "pronoun" },
+  "so": { meaning: "cũng vậy", phonetic: "/soʊ/", type: "adverb" },
+  "too": { meaning: "cũng", phonetic: "/tuː/", type: "adverb" }
+};
+
+    const translations = {
+  "Where is the computer lab?": "Phòng máy tính ở đâu?",
+  "Down the hall": "Ở cuối hành lang",
+  "When is the Spanish class?": "Lớp tiếng Tây Ban Nha khi nào?",
+  "At 6": "Lúc 6 giờ",
+  "Where is the class?": "Lớp học ở đâu?",
+  "In the computer lab": "Ở phòng máy tính",
+  "Why isn’t the class online for the woman?": "Tại sao lớp học không online với cô ấy?",
+  "She has no internet at home": "Cô ấy không có internet ở nhà",
+  "Is the class actually online?": "Lớp học có online không?",
+  "Yes, it is": "Có",
+  "How does the woman feel about the class?": "Cô ấy cảm thấy thế nào về lớp học?",
+  "Excited": "Hào hứng",
+  "What does the woman think about online classes?": "Cô ấy nghĩ gì về lớp học online?",
+  "They are fun": "Chúng rất vui",
+  "What does the man say at the end?": "Người đàn ông nói gì cuối cùng?",
+  "I think so, too": "Tôi cũng nghĩ vậy"
+};
+
+    const miniGameData = [
+  { question: "Where is the computer lab?", options: ["Down the hall", "In the library", "Next to the office", "Outside"], correct: "Down the hall" },
+  
+  { question: "When is the Spanish class?", options: ["At 6", "At 5", "In the morning", "At noon"], correct: "At 6" },
+
+  { question: "Where is the class?", options: ["In the computer lab", "In the classroom", "At home", "Online only"], correct: "In the computer lab" },
+
+  { question: "Why isn’t the class online for the woman?", options: ["She doesn’t like it", "She has no internet at home", "She is busy", "She is late"], correct: "She has no internet at home" },
+
+  { question: "Is the class actually online?", options: ["Yes, it is", "No, it isn’t", "Only on weekends", "Only at school"], correct: "Yes, it is" },
+
+  { question: "How does the woman feel about the class?", options: ["Bored", "Excited", "Angry", "Tired"], correct: "Excited" },
+
+  { question: "What does the woman think about online classes?", options: ["They are boring", "They are fun", "They are hard", "They are bad"], correct: "They are fun" },
+
+  { question: "What does the man say at the end?", options: ["I don’t agree", "I think so, too", "Goodbye", "Come later"], correct: "I think so, too" }
+];
+
+    let currentIdx = -1, correct = 0, incorrect = 0, seconds = 0, timerInterval, inkCanvas, inkCtx, isDrawing = false;
+    const correctAudio = new Audio('sounds/firework.mp3');
+    const incorrectAudio = new Audio('sounds/incorrect.mp3');
+
+    document.addEventListener("keydown", (e) => {
+      const nextKeys = ["PageDown", "ArrowRight", "ArrowDown", "Enter", " "];
+      if (nextKeys.includes(e.key)) {
+        if (e.key === " " || e.key === "Enter") e.preventDefault();
+        loadNextQuestion(); 
+      }
+    });
+
+    function initInk() {
+      inkCanvas = document.getElementById("inkCanvas");
+      inkCtx = inkCanvas.getContext("2d");
+      const container = document.getElementById("main-container");
+      inkCanvas.width = container.offsetWidth;
+      inkCanvas.height = container.offsetHeight;
+
+      const getPos = (e) => {
+        const rect = inkCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      };
+
+      const start = (e) => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; const pos = getPos(e); inkCtx.beginPath(); inkCtx.moveTo(pos.x, pos.y); } };
+      const move = (e) => { if (isDrawing) { const pos = getPos(e); inkCtx.lineTo(pos.x, pos.y); inkCtx.strokeStyle = "#d35400"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round"; inkCtx.stroke(); } };
+      const stop = () => { isDrawing = false; };
+
+      inkCanvas.addEventListener("mousedown", start);
+      inkCanvas.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", stop);
+      inkCanvas.addEventListener("touchstart", (e) => { if(inkCanvas.classList.contains("drawing")) e.preventDefault(); start(e); }, {passive: false});
+      inkCanvas.addEventListener("touchmove", (e) => { if(inkCanvas.classList.contains("drawing")) e.preventDefault(); move(e); }, {passive: false});
+      inkCanvas.addEventListener("touchend", stop);
+    }
+
+    function toggleInk() {
+      const active = inkCanvas.classList.toggle("drawing");
+      document.getElementById("penBtn").textContent = active ? "Pen: ON" : "Pen: OFF";
+      document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    function speak(text) {
+      const u = new SpeechSynthesisUtterance(text);
+      const voices = speechSynthesis.getVoices();
+      u.voice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha")) || voices[0];
+      u.rate = 0.9;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function loadNextQuestion() {
+  speechSynthesis.cancel(); 
+
+  const mainAudio = document.getElementById("mainAudio");
+  if (mainAudio) {
+    mainAudio.pause();
+    mainAudio.currentTime = 0;
+  }
+
+  currentIdx++;
+
+  // ✅ RANDOM khi hết vòng
+  if (currentIdx >= miniGameData.length) {
+    shuffleArray(miniGameData);
+    currentIdx = 0;
+  }
+
+  if (!timerInterval) {
+    timerInterval = setInterval(() => { 
+      seconds++; 
+      document.getElementById("timer").textContent = seconds; 
+    }, 1000);
+  }
+
+  const container = document.getElementById("game-container");
+  container.style.opacity = 0;
+
+  setTimeout(() => {
+    render();
+    container.style.opacity = 1;
+    container.style.transition = "opacity 0.3s";
+  }, 100);
+}
+
+    function shuffleArray(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    function render() {
+      const q = miniGameData[currentIdx];
+      const shuffledOptions = shuffleArray([...q.options]); 
+      document.getElementById("game-container").innerHTML = `<h3>${wrapWords(q.question)}</h3><div class="options-grid">` + 
+        shuffledOptions.map(o => `<div class="option-button" onclick="check(this,'${o.replace(/'/g, "\\'")}','${q.correct.replace(/'/g, "\\'")}')">${wrapWords(o)}</div>`).join("") + `</div>`;
+      speak(q.question);
+      attachWordLogic();
+    }
+    function wrapWords(t) { return t.split(" ").map(w => `<span class="word" data-word="${w.toLowerCase().replace(/\W/g,'')}">${w}</span>`).join(" "); }
+
+    function attachWordLogic() {
+      document.querySelectorAll(".word").forEach(w => {
+        w.onclick = (e) => {
+          if (inkCanvas.classList.contains("drawing")) return;
+          e.stopPropagation();
+          const d = dictionary[w.dataset.word];
+          if (d) {
+            const p = document.getElementById("dictPopup");
+            p.innerHTML = `<strong>${w.textContent}</strong> <span class="word-type">(${d.type})</span><br>${d.phonetic}<br>${d.meaning}`;
+            p.style.display = "block"; p.style.top = (e.pageY + 10) + "px"; p.style.left = e.pageX + "px";
+            speak(w.textContent);
+          }
+        };
+      });
+      document.getElementById("game-container").oncontextmenu = (e) => {
+        e.preventDefault();
+        const txt = e.target.closest("h3, .option-button")?.innerText.trim();
+        if (txt && translations[txt]) {
+          const p = document.getElementById("sentenceTranslation");
+          p.innerHTML = translations[txt];
+          p.style.display = "block"; 
+          p.style.top = e.pageY + "px"; 
+          p.style.left = e.pageX + "px";
+        }
+      };
+    }
+
+    function check(btn, choice, ans) {
+      if (btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
+      const cleanChoice = choice.replace(/[\u2018\u2019]/g, "'").trim();
+      const cleanAns = ans.replace(/[\u2018\u2019]/g, "'").trim();
+      if (cleanChoice === cleanAns) { 
+        btn.classList.add("correct"); 
+        correct++; 
+        correctAudio.play();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+      } else { 
+        btn.classList.add("incorrect"); 
+        incorrect++; 
+        incorrectAudio.play();
+        speak("Wrong answer. Correct is " + ans); 
+      }
+      document.getElementById("correctCount").textContent = correct;
+      document.getElementById("incorrectCount").textContent = incorrect;
+    }
+    function toggleSidebar(side) {
+      const sb = document.querySelector('.sidebar.' + side);
+      if (sb) sb.classList.toggle('visible');
+    }
+
+    window.onload = () => { initInk(); loadNextQuestion(); };
+    document.addEventListener("click", () => { 
+      document.getElementById("dictPopup").style.display = "none"; 
+      document.getElementById("sentenceTranslation").style.display = "none"; 
+    });
+document.addEventListener("keydown", (e) => {
+  console.log("KEY:", e.code);
+
+  if (
+    e.code === "PageDown" ||
+    e.code === "ArrowRight" ||
+    e.code === "Enter"
+  ) {
+    loadNextQuestion();
+  }
+});
+  </script>
+</body>
+</html>

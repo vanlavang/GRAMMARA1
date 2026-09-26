@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>11 Speaking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', 'Quicksand', sans-serif;
+    }
+
+    body {
+      background-color: #f0e6d6;
+      background-image: radial-gradient(#d3c4a9 1px, transparent 1px);
+      background-size: 25px 25px; 
+      color: #333;
+      overflow: hidden; /* Ẩn hoàn toàn thanh cuộn */
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* === HEADER NATION === */
+    header {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 10px 15px; /* Đã thu nhỏ */
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      border-bottom: 2px solid #e6ccb2;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      height: 55px;
+    }
+
+    header nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    header button {
+      background-color: #ffffff;
+      border: 2px solid #e6ccb2;
+      padding: 6px 15px; /* Đã thu nhỏ */
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px; /* Đã thu nhỏ */
+      font-weight: 700;
+      color: #8a6542;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 0 #e6ccb2;
+    }
+
+    header button:hover {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #e6ccb2;
+      background-color: #faf5f0;
+    }
+
+    header button.active-nav {
+      background-color: #c36a2d;
+      color: #fff;
+      border-color: #c36a2d;
+      box-shadow: 0 3px 0 #a04000;
+    }
+
+    /* === SIDEBARS === */
+    .sidebar {
+      width: 220px; /* Giữ nguyên width ban đầu */
+      background: #ffffff;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: fixed;
+      top: 60px;
+      bottom: 60px; 
+      overflow-y: auto;
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.left {
+      left: 0;
+      transform: translateX(-100%);
+      border-right: 4px solid #c36a2d;
+      border-radius: 0 15px 15px 0;
+    }
+
+    .sidebar.right {
+      right: 0;
+      transform: translateX(100%);
+      border-left: 4px solid #c36a2d;
+      border-radius: 15px 0 0 15px;
+    }
+
+    .sidebar.visible {
+      transform: translateX(0);
+    }
+
+    .sidebar button {
+      font-size: 13px; /* Đã thu nhỏ */
+      padding: 10px;
+      background: #fdfbf9;
+      border: 2px solid #f0e6d6;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 700;
+      color: #555;
+      transition: all 0.2s;
+    }
+
+    .sidebar button:hover {
+      border-color: #c36a2d;
+      color: #c36a2d;
+    }
+
+    .sidebar button.active {
+      background-color: #c36a2d;
+      color: #fff;
+      border-color: #c36a2d;
+      box-shadow: 0 3px 0 #a04000;
+      transform: translateY(-2px);
+    }
+
+    /* === TOGGLE BUTTONS === */
+    .toggle-btn {
+      position: fixed;
+      top: 70px;
+      z-index: 20;
+      width: 35px;
+      height: 40px;
+      background: #c36a2d;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+    .toggle-btn:hover { background: #a04000; }
+
+    .toggle-left { left: 0; border-radius: 0 20px 20px 0; }
+    .toggle-right { right: 0; border-radius: 20px 0 0 20px; }
+
+    /* === MAIN CONTENT === */
+    .content {
+      margin-top: 65px; /* Canh lề vừa đủ dưới header */
+      margin-bottom: 65px; /* Canh lề vừa đủ trên footer */
+      padding: 20px; /* Đã thu nhỏ */
+      max-width: 1200px; /* Giữ nguyên width ban đầu */
+      height: calc(100vh - 130px); /* Vừa khít khoảng không giữa header và footer */
+      margin-left: auto;
+      margin-right: auto;
+      background: #ffffff;
+      border-radius: 25px;
+      border: 4px solid #fff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center; /* Căn giữa theo chiều dọc */
+      justify-content: center; /* Căn giữa theo chiều ngang */
+      width: 100%;
+    }
+
+    #gameContainer {
+      width: 100%;
+    }
+
+    #imageContainer {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px; /* Đã thu nhỏ khoảng cách */
+    }
+
+    /* Video Styling */
+    #videoPlayer {
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      border: 6px solid #f3dbc1;
+      width: 200px;
+      max-width: 100%;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      background: #000;
+    }
+    #videoPlayer:hover {
+      transform: scale(1.02);
+      border-color: #c36a2d;
+    }
+
+    /* Text Displays */
+    #wordDisplay {
+      font-size: 30px; /* Đã thu nhỏ từ 42px */
+      font-weight: 700;
+      color: #c36a2d;
+      background: #fff9f2;
+      padding: 10px 25px; /* Đã thu nhỏ */
+      border-radius: 15px;
+      border: 2px dashed #e6ccb2;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #wordDisplay:hover {
+      background: #ffecd6;
+      border-color: #c36a2d;
+      transform: scale(1.05);
+    }
+
+    #recognizedText {
+      margin-top: 15px; /* Đã thu nhỏ từ 30px */
+      font-size: 24px; /* Đã thu nhỏ từ 32px */
+      font-weight: 700;
+      color: #e74c3c;
+      background: #fdf2f0;
+      padding: 10px 25px; /* Đã thu nhỏ */
+      border-radius: 30px;
+      display: inline-block;
+      animation: pulseText 2s infinite;
+      text-align: center;
+      border: 2px solid #fadbd8;
+    }
+
+    @keyframes pulseText {
+      0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
+
+    /* Box Input */
+    #textInput {
+      margin-top: 15px; /* Đã thu nhỏ */
+      padding: 10px 15px; /* Đã thu nhỏ */
+      font-size: 16px; /* Đã thu nhỏ */
+      border-radius: 20px;
+      border: 2px solid #fadbd8;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    /* === POPUPS === */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%; 
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+      pointer-events: none;
+    }
+    .popup img {
+      width: 250px; /* Đã thu nhỏ */
+      filter: drop-shadow(0 15px 20px rgba(0,0,0,0.3));
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    #micPopup {
+      display: none;
+      position: fixed;
+      top: 70px;
+      right: 20px;
+      z-index: 1001;
+      background: white;
+      padding: 8px;
+      border-radius: 50%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    #micPopup img { width: 30px; } /* Đã thu nhỏ */
+
+    /* === FOOTER BAR === */
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 55px; /* Cố định chiều cao */
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 2px solid #e6ccb2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 20px;
+      z-index: 1000;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+    }
+
+    .footer-bar button {
+      font-size: 15px; /* Đã thu nhỏ */
+      font-weight: 700;
+      padding: 8px 20px; /* Đã thu nhỏ */
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .footer-bar button[onclick="startRecognition()"] {
+      background-color: #2ecc71;
+      color: white;
+      box-shadow: 0 3px 0 #27ae60;
+    }
+    .footer-bar button[onclick="startRecognition()"]:active {
+      transform: translateY(3px);
+      box-shadow: 0 0px 0 #27ae60;
+    }
+
+    .footer-bar button[onclick="skipWord()"] {
+      background-color: #f1c40f;
+      color: #8c7614;
+      box-shadow: 0 3px 0 #d4ac0d;
+    }
+    .footer-bar button[onclick="skipWord()"]:active {
+      transform: translateY(3px);
+      box-shadow: 0 0px 0 #d4ac0d;
+    }
+
+    #timeDisplay {
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background: #34495e;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    #scoreBoardFooter {
+      font-size: 14px;
+      font-weight: 700;
+      color: #555;
+      background: #f4ece1;
+      padding: 8px 15px;
+      border-radius: 12px;
+      border: 2px solid #e6ccb2;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <button class="active-nav" onclick="window.location.href='../conversation_01/conversation_01.html'">Conversation 01</button>
+      <button onclick="window.location.href='../conversation_02/conversation_02.html'">Conversation 02</button>
+      <button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+      <button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+    </nav>
+  </header>
+
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">▶</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">◀</button>
+
+  <div class="sidebar left">
+    <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+    <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+    <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+    <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+    <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+    <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+    <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+  </div>
+
+  <div class="sidebar right">
+    <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button class="active" onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+    <button onclick="location.href='story.html'"><b>Story</b></button>
+  </div>
+
+  <div class="content">
+    <div id="gameContainer">
+      <div id="centerPanel">
+        <!-- Đã xóa các div rỗng thừa thãi ở vị trí này -->
+        <div id="imageContainer">
+          <video id="videoPlayer" controls onclick="playSound()"></video>
+          <div id="wordDisplay" onclick="playSound()"></div>
+        </div>
+        
+        <div style="text-align: center;">
+            <div id="recognizedText">
+                <img src="images/mic on.gif" style="height:30px; vertical-align:middle;"> You said: ...
+            </div>
+            
+            <div>
+                <input type="text" id="textInput" placeholder="text..." onfocus="this.style.borderColor='#e74c3c'" onblur="this.style.borderColor='#fadbd8'">
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup" id="winPopup"><img src="images/win.gif" alt="win"></div>
+  <div class="popup" id="failPopup"><img src="images/wrong.gif" alt="fail"></div>
+  <div id="micPopup"><img src="images/mic on.gif" alt="mic on"></div>
+
+  <audio id="micSound" src="sounds/mic-on.mp3"></audio>
+  <audio id="winSound" src="sounds/win.mp3"></audio>
+  <audio id="wrongSound" src="sounds/wrong.mp3"></audio>
+
+  <div class="footer-bar">
+    <button onclick="startRecognition()">🎙 Start Speaking</button>
+    <button onclick="skipWord()">⏭ Skip</button>
+    <div id="timeDisplay">00:00</div>
+    <div id="scoreBoardFooter">✅ Correct: 0 | ❌ Wrong: 0 | ⏭ Skipped: 0</div>
+  </div>
+
+  <script>
+  speechSynthesis.onvoiceschanged = () => {}; 
+
+  const words = [
+    { word: 'Hello! Are you a new student?', video: 'sentence1.mp4' },
+    { word: 'Yes, I am. Today is my first day.', video: 'sentence2.mp4' },
+    { word: 'Well, welcome. My name is Tony.', video: 'sentence3.mp4' },
+    { word: 'Hi, Tony. I’m Beth.', video: 'sentence4.mp4' },
+    { word: 'Are you new in town?', video: 'sentence5.mp4' },
+    { word: 'Yes, I’m from New York.', video: 'sentence6.mp4' },
+    { word: 'Wow! The Big City!', video: 'sentence7.mp4' },
+    { word: 'Are you from around here?', video: 'sentence8.mp4' },
+    { word: 'Yes, I am.', video: 'sentence9.mp4' },
+    { word: 'That is so cool. Well, it is nice to meet you.', video: 'sentence10.mp4' },
+    { word: 'Nice to meet you, too.', video: 'sentence11.mp4' }
+  ];
+  let currentIndex = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+  let skipCount = 0;
+  let recognition = null;
+  let recognizing = false;
+
+  function normalize(text) {
+    return text
+      .toLowerCase()
+      .replace(/[.,!?'"“”‘’\-]/g, '') 
+      .replace(/\s+/g, ' ')           
+      .trim();
+  }
+
+  function playSound() {
+    const video = document.getElementById("videoPlayer");
+    video.currentTime = 0;
+    video.play();
+  }
+
+  function loadWord(index) {
+    const current = words[index];
+    const video = document.getElementById("videoPlayer");
+
+    video.src = 'videos/' + current.video;
+    video.load();
+    video.onloadeddata = () => video.play();
+
+    document.getElementById('wordDisplay').textContent = current.word;
+    document.getElementById('recognizedText').innerHTML =
+      '<img src="images/mic on.gif" style="height:30px; vertical-align:middle;"> You said: ...';
+      
+    document.getElementById('textInput').value = '';
+  }
+
+  function updateScore() {
+    document.getElementById('scoreBoardFooter').textContent =
+      `✅ Correct: ${correctCount} | ❌ Wrong: ${wrongCount} | ⏭ Skipped: ${skipCount}`;
+  }
+
+  function startRecognition() {
+    if (recognizing) return;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Trình duyệt không hỗ trợ Speech Recognition');
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      recognizing = true;
+      document.getElementById('micPopup').style.display = 'block';
+      document.getElementById('recognizedText').innerHTML =
+        `<img src="images/mic on.gif" style="height:30px; vertical-align:middle;"> Listening...`;
+    };
+
+    recognition.onresult = (event) => {
+      recognizing = false;
+      document.getElementById('micPopup').style.display = 'none';
+
+      const transcriptRaw = event.results[0][0].transcript;
+      const transcript = normalize(transcriptRaw);
+      const correct = normalize(words[currentIndex].word);
+
+      document.getElementById('recognizedText').innerHTML =
+        `<img src="images/mic on.gif" style="height:30px; vertical-align:middle;"> ${transcriptRaw}`;
+
+      if (transcript === correct) {
+        document.getElementById('winPopup').style.display = 'block';
+        document.getElementById('winSound').play();
+        correctCount++;
+        updateScore();
+        setTimeout(() => {
+          document.getElementById('winPopup').style.display = 'none';
+          currentIndex = (currentIndex + 1) % words.length;
+          loadWord(currentIndex);
+        }, 1500);
+      } else {
+        document.getElementById('failPopup').style.display = 'block';
+        wrongCount++;
+        updateScore();
+        document.getElementById('wrongSound').play();
+        setTimeout(() => {
+          document.getElementById('failPopup').style.display = 'none';
+        }, 1500);
+      }
+    };
+
+    recognition.onerror = (event) => {
+      recognizing = false;
+      document.getElementById('micPopup').style.display = 'none';
+    };
+
+    recognition.onend = () => {
+      recognizing = false;
+      document.getElementById('micPopup').style.display = 'none';
+    };
+
+    recognition.start();
+  }
+
+  function skipWord() {
+    skipCount++;
+    updateScore();
+    currentIndex = (currentIndex + 1) % words.length;
+    loadWord(currentIndex);
+  }
+
+  function flashBtn(type) {
+      let btn;
+      if (type === "skip") btn = document.querySelector('button[onclick="skipWord()"]');
+      if (type === "mic") btn = document.querySelector('button[onclick="startRecognition()"]');
+      if (!btn) return;
+      btn.style.transform = "scale(1.1)";
+      btn.style.boxShadow = "0 0 15px rgba(255, 152, 0, 0.8)";
+      setTimeout(() => {
+          btn.style.transform = "";
+          btn.style.boxShadow = "";
+      }, 200);
+  }
+
+  function flashWord() {
+      const word = document.getElementById("wordDisplay");
+      word.style.color = "#e74c3c";
+      word.style.transform = "scale(1.1)";
+      setTimeout(() => {
+          word.style.color = "#c36a2d";
+          word.style.transform = "";
+      }, 300);
+  }
+
+  function toggleSidebar(side) {
+    const sidebar = document.querySelector(`.sidebar.${side}`);
+    const button = document.querySelector(`.toggle-${side}`);
+    sidebar.classList.toggle('visible');
+    button.textContent = sidebar.classList.contains('visible')
+      ? (side === 'left' ? '◀' : '▶')
+      : (side === 'left' ? '▶' : '◀');
+  }
+
+  window.onload = () => {
+    loadWord(currentIndex);
+    updateScore();
+  };
+  
+  // Sự kiện cho hộp nhập liệu
+  document.getElementById('textInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+          const typedText = this.value;
+          if (!typedText.trim()) return; 
+          
+          const transcript = normalize(typedText);
+          const correct = normalize(words[currentIndex].word);
+
+          document.getElementById('recognizedText').innerHTML =
+              `<img src="images/mic on.gif" style="height:30px; vertical-align:middle;"> You typed: ${typedText}`;
+
+          if (transcript === correct) {
+              document.getElementById('winPopup').style.display = 'block';
+              document.getElementById('winSound').play();
+              correctCount++;
+              updateScore();
+              setTimeout(() => {
+                  document.getElementById('winPopup').style.display = 'none';
+                  currentIndex = (currentIndex + 1) % words.length;
+                  loadWord(currentIndex);
+              }, 1500);
+          } else {
+              document.getElementById('failPopup').style.display = 'block';
+              wrongCount++;
+              updateScore();
+              document.getElementById('wrongSound').play();
+              setTimeout(() => {
+                  document.getElementById('failPopup').style.display = 'none';
+              }, 1500);
+          }
+      }
+  });
+
+  // Sự kiện phím tắt điều khiển
+  document.addEventListener("keydown", function(e) {
+      if (document.activeElement.id === 'textInput') return; 
+      
+      const key = e.key.toLowerCase();
+      if (key === "arrowright" || key === "pagedown" || key === "arrowdown") {
+          flashBtn("skip");
+          skipWord();
+      }
+      if (key === "arrowleft" || key === "pageup" || key === "arrowup") {
+          flashWord();
+          playSound();
+      }
+      if (key === "enter") {
+          flashBtn("mic");
+          startRecognition();
+      }
+  });
+  </script>
+
+</body>
+</html>

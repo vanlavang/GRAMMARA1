@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning To Be</title>
+<style>
+    * { 
+        box-sizing: border-box; 
+        margin: 0; 
+        padding: 0;
+        -webkit-tap-highlight-color: transparent; 
+    }
+
+    /* Đảm bảo nội dung nằm trọn trong màn hình, không có thanh cuộn */
+    html, body {
+        width: 100%;
+        height: 100%;
+        font-family: "UTM Avo", "Trebuchet MS", Arial, sans-serif;
+        background: #1a1a2e; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; 
+    }
+
+    /* Giữ đúng tỷ lệ ảnh 16:9, tự động co giãn theo kích thước màn hình */
+    .app-container {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        max-width: calc(100vh * (16 / 9)); 
+        width: 100vw;
+        max-height: 100vh;
+        
+        /* Liên kết file ảnh cục bộ (Không dùng Base64) */
+        background: url("conversation_01/images/learning_to_be_background.png") center center / cover no-repeat;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
+    }
+
+    /* VÙNG BẤM KHỔNG LỒ: To gấp đôi để dễ click từ xa bằng bút Logitech */
+    .play {
+        position: absolute;
+        width: 18%;       /* Tăng gấp đôi từ 9% */
+        height: 32%;      /* Tăng gấp đôi từ 16% */
+        border-radius: 50%;
+        cursor: pointer;
+        display: block;
+        transition: all 0.3s ease;
+        
+        /* Trạng thái mặc định: Hoàn toàn tàng hình */
+        background: transparent; 
+        border: none;
+    }
+
+    /* Hiệu ứng siêu mờ khi lướt qua để lấp lỗi chênh lệch */
+    .play:hover, .play:focus-visible {
+        background: rgba(255, 255, 255, 0.08); /* Chỉ sáng mờ nhẹ 8% */
+        backdrop-filter: blur(1px); /* Hơi mờ nền phía sau một chút xíu */
+        transform: scale(1.02); /* Phóng to cực nhẹ */
+    }
+    
+    .play:active {
+        transform: scale(0.98);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* TỌA ĐỘ MỚI: Đã tính toán bù trừ lại vị trí (left/top) 
+       để tâm của hình tròn to vẫn nằm đúng giữa nút Play gốc */
+    .p1 { left: 10.0%; top: 67.5%; }
+    .p2 { left: 30.5%; top: 67.5%; }
+    .p3 { left: 51.0%; top: 67.5%; }
+    .p4 { left: 71.5%; top: 67.5%; }
+
+    /* NÚT HOME VỀ TRANG CHỦ */
+    .home-btn {
+        position: absolute;
+        top: 3%;
+        left: 2%;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 60px;
+        color: white;
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+        z-index: 10;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .home-btn:hover {
+        background: rgba(255, 255, 255, 0.4);
+        transform: scale(1.1);
+        border-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .home-btn:active {
+        transform: scale(0.95);
+    }
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Nút Home -->
+    <a href="../indexA1.html" class="home-btn" title="Về màn hình chính">🏠</a>
+
+    <!-- Các nút bài học -->
+    <a class="play p1" href="conversation_01/conversation_01.html" aria-label="Conversation 01"></a>
+    <a class="play p2" href="conversation_02/conversation_02.html" aria-label="Conversation 02"></a>
+    <a class="play p3" href="conversation_03/conversation_03.html" aria-label="Conversation 03"></a>
+    <a class="play p4" href="conversation_04/conversation_04.html" aria-label="Conversation 04"></a>
+</div>
+
+</body>
+</html>

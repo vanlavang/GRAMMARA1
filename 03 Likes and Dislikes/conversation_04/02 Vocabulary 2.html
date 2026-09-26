@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>02 Vocabulary 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', Roboto, sans-serif;
+    }
+
+    body {
+      background: #f0e2cd;
+      text-align: center;
+      padding-top: 120px;
+      padding-bottom: 100px;
+      overflow-x: hidden;
+    }
+
+    /* Canvas Layer cho tính năng Pen */
+    #penCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 500;
+      pointer-events: none; /* Mặc định để click được bài tập */
+    }
+    #penCanvas.active {
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    header {
+      background-color: #f3dbc1;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+    }
+
+    header button {
+      background-color: #fff;
+      border: 2px solid #d4bfa6;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: normal;
+      color: #8b5e3c;
+    }
+
+    #topInfoBar {
+      background-color: #fff9f0;
+      padding: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #8b5e3c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 60px; left: 0; right: 0;
+      z-index: 998;
+    }
+
+    /* Nút công cụ mới */
+    .tool-btn {
+      padding: 5px 12px;
+      border-radius: 10px;
+      border: 1px solid #8b5e3c;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      color: #8b5e3c;
+    }
+    .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+    .sidebar {
+      width: 220px;
+      background-color: #f3dbc1;
+      padding: 15px 10px;
+      position: fixed;
+      top: 100px; bottom: 0;
+      border: 2px solid #d4bfa6;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 997;
+    }
+    .sidebar.left { left: 0; transform: translateX(-100%); }
+    .sidebar.right { right: 0; transform: translateX(100%); }
+    .sidebar.visible { transform: translateX(0); }
+
+    .sidebar button {
+      display: block; width: 100%;
+      background-color: #fff;
+      border: 1px solid #d4bfa6;
+      margin-bottom: 8px; padding: 12px;
+      border-radius: 10px; cursor: pointer;
+      font-size: 15px; color: #8b5e3c;
+      text-align: left;
+    }
+/* Style dành riêng cho nút đang được kích hoạt trong sidebar */
+.sidebar button.active {
+  background-color: #d35400; /* Màu cam đậm giống nút Music/Pen */
+  color: #fff;               /* Chữ trắng cho dễ đọc */
+  border: 2px solid #a04000;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.sidebar button.active b {
+  color: #fff;
+} 
+    .toggle-btn {
+      position: fixed;
+      top: 10px; /* Nằm ngay dưới header */
+      z-index: 1020;
+      padding: 10px 20px;
+      background: #8d6e63; /* Màu nâu sang trọng */
+      border: none;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 25px; /* Bo tròn thuốc */
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'UTM Avo', sans-serif;
+    }
+    .toggle-left { left: 10px; }
+    .toggle-right { right: 10px; }
+
+    .content {
+      max-width: 90%; 
+      margin: 40px auto;
+      background: #fff;
+      padding: 60px 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+/* Style cho tất cả nút trong header */
+header button {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: normal; /* Bình thường không đậm */
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+/* Style dành riêng cho nút đang hoạt động (Active) */
+header button.active-nav {
+  font-weight: bold; /* Làm đậm chữ */
+  background-color: #e6ccb2; /* Đổi màu nền nhẹ để phân biệt */
+  border-color: #8b5e3c;     /* Viền đậm hơn */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+    #questionText {
+      font-size: 60px;
+      color: #2c3e50;
+      margin-bottom: 40px;
+      cursor: pointer;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    #choicesContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .choice {
+      background-color: #f3dbc1;
+      padding: 25px 50px;
+      border-radius: 40px;
+      font-size: 36px;
+      color: #8b5e3c;
+      cursor: pointer;
+      border: 4px solid transparent;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+
+    .choice.correct-flash { background-color: #27ae60 !important; color: white !important; }
+    .choice.wrong-flash { background-color: #e74c3c !important; color: white !important; animation: shake 0.4s; }
+    .choice.disabled { pointer-events: none; opacity: 0.5; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    #bottomNotice {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 25px;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="penCanvas"></canvas>
+
+  <header>
+   <button onclick="window.location.href='../conversation_01/conversation_01.html'">
+   Conversation 01
+  </button>
+  
+  <button  onclick="window.location.href='../conversation_02/conversation_02.html'">
+    Conversation 02
+  </button>
+  
+  <button  onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  
+  <button class="active-nav" onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+
+  </header>
+
+  <div id="topInfoBar">
+    <span id="timer">Time: 0s</span>
+    <span id="correctCount">Correct: 0</span>
+    <span id="wrongCount">Wrong: 0</span>
+    
+    <button id="musicBtn" class="tool-btn" onclick="toggleMusic()">Music: OFF</button>
+    <button id="penBtn" class="tool-btn" onclick="togglePen()">Pen: OFF</button>
+    <button class="tool-btn" onclick="clearCanvas()">Clear Pen</button>
+  </div>
+
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu ☰</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu ☰</button>
+
+  <nav class="sidebar left">
+  <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+ <button class="active" onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+
+  </nav>
+
+  <main class="content">
+    <div id="questionText">Loading...</div>
+    <div id="choicesContainer"></div>
+  </main>
+
+  <nav class="sidebar right">
+   <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>story</b></button>
+
+
+  </nav>
+
+  <div id="bottomNotice"></div>
+  <audio id="bgMusic" loop><source src="sounds/background_music.mp3" type="audio/mpeg"></audio>
+
+  <script>
+const words = [
+  { name: "hungry", vi: "đói", phonetic: "/ˈhʌŋɡri/", type: "adjective" },
+  { name: "pizza", vi: "bánh pizza", phonetic: "/ˈpiːtsə/", type: "noun" },
+  { name: "shop", vi: "cửa hàng", phonetic: "/ʃɒp/", type: "noun" },
+  { name: "open", vi: "mở cửa", phonetic: "/ˈəʊpən/", type: "adjective" },
+  { name: "time", vi: "thời gian", phonetic: "/taɪm/", type: "noun" },
+  { name: "happy", vi: "vui", phonetic: "/ˈhæpi/", type: "adjective" },
+  { name: "relieved", vi: "nhẹ nhõm", phonetic: "/rɪˈliːvd/", type: "adjective" },
+  { name: "suggest", vi: "đề nghị", phonetic: "/səˈdʒest/", type: "verb" },
+  { name: "agree", vi: "đồng ý", phonetic: "/əˈɡriː/", type: "verb" },
+  { name: "leave", vi: "rời đi", phonetic: "/liːv/", type: "verb" },
+  { name: "toppings", vi: "đồ phủ trên pizza", phonetic: "/ˈtɒpɪŋz/", type: "noun" },
+  { name: "pepperoni", vi: "xúc xích pepperoni", phonetic: "/ˌpepəˈrəʊni/", type: "noun" },
+  { name: "cheese", vi: "phô mai", phonetic: "/tʃiːz/", type: "noun" },
+  { name: "order", vi: "gọi món", phonetic: "/ˈɔːdə(r)/", type: "verb" },
+  { name: "large", vi: "lớn", phonetic: "/lɑːdʒ/", type: "adjective" },
+  { name: "food", vi: "đồ ăn", phonetic: "/fuːd/", type: "noun" },
+  { name: "wait", vi: "chờ", phonetic: "/weɪt/", type: "verb" },
+  { name: "start", vi: "bắt đầu", phonetic: "/stɑːt/", type: "verb" },
+  { name: "favorite", vi: "yêu thích", phonetic: "/ˈfeɪvərɪt/", type: "adjective" },
+  { name: "eight", vi: "số 8", phonetic: "/eɪt/", type: "number" },
+  { name: "ten", vi: "số 10", phonetic: "/ten/", type: "number" }
+];
+    let wordQueue = [...words];
+    let currentWord = null;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let seconds = 0;
+    let canClick = true;
+
+    // --- Pen & Music Logic ---
+    const bgMusic = document.getElementById('bgMusic');
+    const penCanvas = document.getElementById('penCanvas');
+    const ctx = penCanvas.getContext('2d');
+    let isPenActive = false;
+    let isDrawing = false;
+
+    function resizeCanvas() {
+      penCanvas.width = window.innerWidth;
+      penCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function toggleMusic() {
+      const btn = document.getElementById('musicBtn');
+      if (bgMusic.paused) { bgMusic.play(); btn.textContent = "Music: ON"; btn.classList.add('active'); }
+      else { bgMusic.pause(); btn.textContent = "Music: OFF"; btn.classList.remove('active'); }
+    }
+
+    function togglePen() {
+      isPenActive = !isPenActive;
+      const btn = document.getElementById('penBtn');
+      if (isPenActive) { penCanvas.classList.add('active'); btn.textContent = "Pen: ON"; btn.classList.add('active'); }
+      else { penCanvas.classList.remove('active'); btn.textContent = "Pen: OFF"; btn.classList.remove('active'); }
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, penCanvas.width, penCanvas.height); }
+
+    function startDrawing(e) { if (!isPenActive) return; isDrawing = true; draw(e); }
+    function stopDrawing() { isDrawing = false; ctx.beginPath(); }
+    function draw(e) {
+      if (!isDrawing || !isPenActive) return;
+      ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#d35400';
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const y = e.clientY || (e.touches && e.touches[0].clientY);
+      ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
+    }
+
+    penCanvas.addEventListener('mousedown', startDrawing);
+    penCanvas.addEventListener('mousemove', draw);
+    window.addEventListener('mouseup', stopDrawing);
+    penCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+    penCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+    penCanvas.addEventListener('touchend', stopDrawing);
+
+    // --- Game Logic ---
+    setInterval(() => { seconds++; document.getElementById("timer").textContent = `Time: ${seconds}s`; }, 1000);
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = speechSynthesis.getVoices();
+        let selectedVoice = voices.find(voice => (voice.name.includes("Google") && voice.lang === "en-US") || (voice.lang === "en-US" && voice.name.includes("Female")));
+        if (selectedVoice) utterance.voice = selectedVoice;
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    function nextQuestion() {
+      document.getElementById("bottomNotice").style.display = "none";
+      canClick = true;
+      if (wordQueue.length === 0) wordQueue = [...words];
+      wordQueue.sort(() => Math.random() - 0.5);
+      currentWord = wordQueue.shift();
+      document.getElementById("questionText").textContent = currentWord.vi;
+      const others = words.filter(w => w.name !== currentWord.name).sort(() => Math.random() - 0.5).slice(0, 2);
+      const choices = [currentWord, ...others].sort(() => Math.random() - 0.5);
+      const container = document.getElementById("choicesContainer");
+      container.innerHTML = "";
+      choices.forEach(choice => {
+        const div = document.createElement("div");
+        div.classList.add("choice");
+        div.textContent = choice.name;
+        div.onclick = () => { speak(choice.name); checkAnswer(div, choice.name); };
+        container.appendChild(div);
+      });
+    }
+
+    function checkAnswer(element, selectedName) {
+      if (!canClick) return;
+      if (selectedName === currentWord.name) {
+        canClick = false;
+        element.classList.add('correct-flash');
+        document.querySelectorAll('.choice').forEach(c => { if(c !== element) c.classList.add('disabled'); });
+        correctCount++;
+        document.getElementById("correctCount").textContent = `Correct: ${correctCount}`;
+        showNotice("Correct! Excellent Work 🌟", "#27ae60", "sounds/correct01.mp3");
+        setTimeout(nextQuestion, 2000);
+      } else {
+        element.classList.add('wrong-flash');
+        wrongCount++;
+        document.getElementById("wrongCount").textContent = `Wrong: ${wrongCount}`;
+        showNotice("Not Correct! Try Again 😢", "#e74c3c", "sounds/wrong01.mp3");
+        setTimeout(() => { element.classList.remove('wrong-flash'); document.getElementById("bottomNotice").style.display = "none"; }, 1200);
+      }
+    }
+
+    function showNotice(text, bgColor, soundPath) {
+      const notice = document.getElementById("bottomNotice");
+      notice.textContent = text; notice.style.backgroundColor = bgColor; notice.style.display = "flex";
+      new Audio(soundPath).play();
+    }
+
+    function toggleSidebar(side) { document.querySelector(`.sidebar.${side}`).classList.toggle('visible'); }
+    document.getElementById("questionText").addEventListener("click", () => speak(currentWord.name));
+    nextQuestion();
+  </script>
+</body>
+</html>

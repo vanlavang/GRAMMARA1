@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>03 Vocabulary Memory Matching</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', Roboto, sans-serif;
+    }
+/* Style cho tất cả nút trong header */
+header button {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: normal; /* Bình thường không đậm */
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+/* Style dành riêng cho nút đang hoạt động (Active) */
+header button.active-nav {
+  font-weight: bold; /* Làm đậm chữ */
+  background-color: #e6ccb2; /* Đổi màu nền nhẹ để phân biệt */
+  border-color: #8b5e3c;     /* Viền đậm hơn */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+    body {
+      background: #f0e2cd;
+      text-align: center;
+      padding-top: 120px;
+      padding-bottom: 100px;
+      overflow-x: hidden;
+    }
+
+    /* Canvas Layer cho tính năng Pen */
+    #penCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 500;
+      pointer-events: none;
+    }
+    #penCanvas.active {
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    header {
+      background-color: #f3dbc1;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+    }
+
+    header button {
+      background-color: #fff;
+      border: 2px solid #d4bfa6;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: normal;
+      color: #8b5e3c;
+    }
+
+    #topInfoBar {
+      background-color: #fff9f0;
+      padding: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #8b5e3c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 60px; left: 0; right: 0;
+      z-index: 998;
+    }
+
+    .tool-btn {
+      padding: 5px 12px;
+      border-radius: 10px;
+      border: 1px solid #8b5e3c;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      color: #8b5e3c;
+    }
+    .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+    /* Sidebars */
+    .sidebar {
+      width: 180px;
+      background-color: #f3dbc1;
+      padding: 15px 10px;
+      position: fixed;
+      top: 100px; bottom: 0;
+      border: 2px solid #d4bfa6;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 997;
+    }
+    .sidebar.left { left: 0; transform: translateX(-100%); }
+    .sidebar.right { right: 0; transform: translateX(100%); }
+    .sidebar.visible { transform: translateX(0); }
+
+    .sidebar button {
+      display: block; width: 100%;
+      background-color: #fff;
+      border: 1px solid #d4bfa6;
+      margin-bottom: 8px; padding: 12px;
+      border-radius: 10px; cursor: pointer;
+      font-size: 15px; color: #8b5e3c;
+      text-align: left;
+    }
+    .sidebar button:hover { background-color: #e6ccb2; }
+/* Style dành riêng cho nút đang được kích hoạt trong sidebar */
+.sidebar button.active {
+  background-color: #d35400; /* Màu cam đậm giống nút Music/Pen */
+  color: #fff;               /* Chữ trắng cho dễ đọc */
+  border: 2px solid #a04000;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.sidebar button.active b {
+  color: #fff;
+}    .toggle-btn {
+      position: fixed;
+      top: 10px; /* Nằm ngay dưới header */
+      z-index: 1020;
+      padding: 10px 20px;
+      background: #8d6e63; /* Màu nâu sang trọng */
+      border: none;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 25px; /* Bo tròn thuốc */
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'UTM Avo', sans-serif;
+    }
+
+    .toggle-left { left: 10px; }
+    .toggle-right { right: 10px; }
+
+    .content {
+      max-width: 90%; 
+      margin: 40px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+
+    .part-selector {
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .part-btn {
+      padding: 10px 30px;
+      font-size: 20px;
+      border-radius: 25px;
+      border: 2px solid #8b5e3c;
+      background: #fff;
+      cursor: pointer;
+      font-weight: bold;
+      color: #8b5e3c;
+    }
+    .part-btn.active { background: #8b5e3c; color: #fff; }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      height: 100px;
+      background-color: #f3dbc1;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 4px solid transparent;
+      transition: all 0.2s ease;
+      padding: 10px;
+    }
+
+    .card:hover { transform: translateY(-3px); background-color: #e6ccb2; }
+    .card.selected { border-color: #d35400; background-color: #ffe4e1; }
+    .card.correct { opacity: 0; pointer-events: none; transform: scale(0.8); transition: 0.6s; }
+    .card.en { color: #2980b9; }
+    .card.vi { color: #27ae60; }
+
+    #bottomNotice {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 25px;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <canvas id="penCanvas"></canvas>
+
+  <header>
+     <button onclick="window.location.href='../conversation_01/conversation_01.html'">
+    Conversation 01
+  </button>
+  
+  <button onclick="window.location.href='../conversation_02/conversation_02.html'">
+    Conversation 02
+  </button>
+  
+  <button  onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  
+  <button class="active-nav" onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+
+  </header>
+
+  <div id="topInfoBar">
+    <span id="score">Matched: 0 / 10</span>
+    <span id="timer">Time: 0s</span>
+    <button id="musicBtn" class="tool-btn" onclick="toggleMusic()">Music: OFF</button>
+    <button id="penBtn" class="tool-btn" onclick="togglePen()">Pen: OFF</button>
+    <button class="tool-btn" onclick="clearCanvas()">Clear Pen</button>
+  </div>
+
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu ☰</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu ☰</button>
+
+ <nav class="sidebar left">
+  <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+ <button class="active" onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+
+  </nav>
+
+
+  <main class="content">
+    <div class="part-selector">
+      <button class="part-btn active" id="btnPart1" onclick="loadPart(1)">Part 1</button>
+      <button class="part-btn" id="btnPart2" onclick="loadPart(2)">Part 2</button>
+    </div>
+    <div class="game-board" id="board"></div>
+  </main>
+
+  <nav class="sidebar right">
+     <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='conversation_01.html'"><b>Conversation</b></button>
+
+
+  </nav>
+
+  <div id="bottomNotice"></div>
+  <audio id="bgMusic" loop><source src="sounds/background_music.mp3" type="audio/mpeg"></audio>
+
+  <script>
+    const allPairs = [
+  // Part 1
+  { en: "computer lab", vi: "phòng máy tính" },
+  { en: "down the hall", vi: "ở cuối hành lang" },
+  { en: "Spanish class", vi: "lớp tiếng Tây Ban Nha" },
+  { en: "tomorrow", vi: "ngày mai" },
+  { en: "when", vi: "khi nào" },
+  { en: "at 6", vi: "lúc 6 giờ" },
+  { en: "after school", vi: "sau giờ học" },
+  { en: "why", vi: "tại sao" },
+  { en: "online", vi: "trực tuyến" },
+  { en: "still", vi: "vẫn còn" },
+
+  // Part 2
+  { en: "new in town", vi: "mới đến thị trấn" },
+  { en: "internet", vi: "mạng internet" },
+  { en: "at home", vi: "ở nhà" },
+  { en: "yet", vi: "chưa" },
+  { en: "I see", vi: "tôi hiểu rồi" },
+  { en: "good luck", vi: "chúc may mắn" },
+  { en: "thanks", vi: "cảm ơn" },
+  { en: "excited", vi: "háo hức" },
+  { en: "online classes", vi: "lớp học trực tuyến" },
+  { en: "fun", vi: "vui" }
+];
+
+    let currentPartPairs = [];
+    let selected = [];
+    let matched = 0;
+    let seconds = 0;
+    let timerInterval = null;
+
+    // --- Pen & Music Logic ---
+    const bgMusic = document.getElementById('bgMusic');
+    const penCanvas = document.getElementById('penCanvas');
+    const ctx = penCanvas.getContext('2d');
+    let isPenActive = false;
+    let isDrawing = false;
+
+    function resizeCanvas() {
+      penCanvas.width = window.innerWidth;
+      penCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function toggleMusic() {
+      const btn = document.getElementById('musicBtn');
+      if (bgMusic.paused) { bgMusic.play(); btn.textContent = "Music: ON"; btn.classList.add('active'); }
+      else { bgMusic.pause(); btn.textContent = "Music: OFF"; btn.classList.remove('active'); }
+    }
+
+    function togglePen() {
+      isPenActive = !isPenActive;
+      const btn = document.getElementById('penBtn');
+      if (isPenActive) { penCanvas.classList.add('active'); btn.textContent = "Pen: ON"; btn.classList.add('active'); }
+      else { penCanvas.classList.remove('active'); btn.textContent = "Pen: OFF"; btn.classList.remove('active'); }
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, penCanvas.width, penCanvas.height); }
+
+    function startDrawing(e) { if (!isPenActive) return; isDrawing = true; draw(e); }
+    function stopDrawing() { isDrawing = false; ctx.beginPath(); }
+    function draw(e) {
+      if (!isDrawing || !isPenActive) return;
+      ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#d35400';
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const y = e.clientY || (e.touches && e.touches[0].clientY);
+      ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
+    }
+
+    penCanvas.addEventListener('mousedown', startDrawing);
+    penCanvas.addEventListener('mousemove', draw);
+    window.addEventListener('mouseup', stopDrawing);
+    penCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+    penCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+    penCanvas.addEventListener('touchend', stopDrawing);
+
+    // --- Memory Game Logic ---
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = speechSynthesis.getVoices();
+        let selectedVoice = voices.find(voice => (voice.name.includes("Google") && voice.lang === "en-US") || (voice.lang === "en-US" && voice.name.includes("Female")));
+        if (selectedVoice) utterance.voice = selectedVoice;
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    function loadPart(partNum) {
+      clearInterval(timerInterval);
+      seconds = 0; timerInterval = null; matched = 0; selected = [];
+      document.getElementById("timer").textContent = `Time: 0s`;
+      document.querySelectorAll('.part-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btnPart${partNum}`).classList.add('active');
+      const start = (partNum - 1) * 10;
+      currentPartPairs = allPairs.slice(start, start + 10);
+      document.getElementById("score").textContent = `Matched: 0 / ${currentPartPairs.length}`;
+      renderBoard();
+    }
+
+    function renderBoard() {
+      const board = document.getElementById("board");
+      board.innerHTML = "";
+      let cardsData = [];
+      currentPartPairs.forEach((p, i) => {
+        cardsData.push({ id: i, lang: 'en', text: p.en });
+        cardsData.push({ id: i, lang: 'vi', text: p.vi });
+      });
+      cardsData = cardsData.sort(() => Math.random() - 0.5);
+      cardsData.forEach(data => {
+        const card = document.createElement("div");
+        card.className = `card ${data.lang}`;
+        card.textContent = data.text;
+        card.dataset.id = data.id;
+        card.dataset.lang = data.lang;
+        card.onclick = () => { if (data.lang === 'en') speak(data.text); selectCard(card); };
+        board.appendChild(card);
+      });
+    }
+
+    function selectCard(card) {
+      if (selected.length === 2 || card.classList.contains('selected') || card.classList.contains('correct')) return;
+      if (!timerInterval) { timerInterval = setInterval(() => { seconds++; document.getElementById("timer").textContent = `Time: ${seconds}s`; }, 1000); }
+      card.classList.add('selected');
+      selected.push(card);
+      if (selected.length === 2) {
+        const [c1, c2] = selected;
+        if (c1.dataset.id === c2.dataset.id && c1.dataset.lang !== c2.dataset.lang) {
+          matched++;
+          document.getElementById("score").textContent = `Matched: ${matched} / ${currentPartPairs.length}`;
+          showNotice("Excellent! 🌟", "#27ae60", "sounds/correct.mp3");
+          setTimeout(() => { c1.classList.add('correct'); c2.classList.add('correct'); selected = []; if (matched === currentPartPairs.length) { new Audio("sounds/win.mp3").play(); clearInterval(timerInterval); } }, 600);
+        } else {
+          showNotice("Try Again 😢", "#e74c3c", "sounds/incorrect.mp3");
+          setTimeout(() => { c1.classList.remove('selected'); c2.classList.remove('selected'); selected = []; }, 800);
+        }
+      }
+    }
+
+    function showNotice(text, bgColor, soundPath) {
+      const notice = document.getElementById("bottomNotice");
+      notice.textContent = text; notice.style.backgroundColor = bgColor; notice.style.display = "flex";
+      new Audio(soundPath).play();
+      setTimeout(() => notice.style.display = "none", 1000);
+    }
+
+    function toggleSidebar(side) { document.querySelector(`.sidebar.${side}`).classList.toggle('visible'); }
+    window.speechSynthesis.onvoiceschanged = () => {};
+    loadPart(1);
+  </script>
+</body>
+</html>

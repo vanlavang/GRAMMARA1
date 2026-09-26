@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dictation Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', Roboto, sans-serif;
+    }
+
+    body {
+      background: #fff3e0;
+      font-family: 'UTM Avo', Tahoma, Geneva, Verdana, sans-serif;
+      max-height: 80%;
+    }
+
+    /* HEADER */
+    .custom-header {
+      background-color: #f3dbc1;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      flex-wrap: wrap;
+    }
+
+    .custom-header a {
+      font-size: 16px;
+      padding: 10px 20px;
+      border: 1px solid #c9a77b;
+      background: #fff3e0;
+      border-radius: 25px;
+      cursor: pointer;
+      text-decoration: none;
+      color: black;
+      margin: 5px;
+    }
+
+    /* SIDEBARS */
+    .sidebar {
+      width: 160px;
+      background: #f3dbc1;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: fixed;
+      top: 50px;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 10;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.left {
+      left: 0;
+      transform: translateX(-100%);
+    }
+
+    .sidebar.right {
+      right: 0;
+      transform: translateX(100%);
+    }
+
+    .sidebar.visible {
+      transform: translateX(0);
+    }
+
+    .sidebar button {
+      font-size: 14px;
+      padding: 12px 15px;
+      background: #ffffff;
+      border: none;
+      border-radius: 25px; /* Bo tròn góc nút giống hình minh họa */
+      cursor: pointer;
+      text-align: left;
+      color: black;
+      width: 100%; /* Đảm bảo nút chiếm hết chiều rộng sidebar */
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Đổ bóng nhẹ cho nút */
+      margin-bottom: 5px;
+      font-family: 'UTM Avo', sans-serif;
+    }
+
+    .sidebar button b {
+      font-weight: 500;
+      font-size: 14px; /* Làm chữ đậm to hơn một chút để nổi bật */
+    }
+/* Style dành riêng cho nút đang được kích hoạt trong sidebar */
+.sidebar button.active {
+  background-color: #d35400; /* Màu cam đậm giống nút Music/Pen */
+  color: #fff;               /* Chữ trắng cho dễ đọc */
+  border: 2px solid #a04000;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.sidebar button.active b {
+  color: #fff;
+}
+    .toggle-btn {
+      position: fixed;
+      top: 10px; /* Nằm ngay dưới header */
+      z-index: 1020;
+      padding: 5px 20px;
+      background: #8d6e63; /* Màu nâu sang trọng */
+      border: none;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 25px; /* Bo tròn thuốc */
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'UTM Avo', sans-serif;
+    }
+
+    /* Vị trí nút bên trái */
+    .toggle-left {
+      left: 15px;
+    }
+
+    /* Vị trí nút bên phải */
+    .toggle-right {
+      right: 15px;
+    }
+
+    /* Hiệu ứng khi di chuột vào */
+    .toggle-btn:hover {
+      background: #795548;
+      transform: translateY(-2px);
+    }
+
+    /* Icon 3 gạch (Hamburger menu) */
+    .toggle-btn::after {
+      content: " ☰"; /* Thêm ký hiệu menu sau chữ */
+      margin-left: 10px;
+      font-size: 20px;
+    }
+<button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu</button>
+
+    /* DICTATION GAME STYLES */
+    .controls button,
+    .bottom-controls button {
+      background-color: #bae6fd;
+      color: #1e3a8a;
+      font-weight: bold;
+      padding: 0.4rem 1.2rem;
+      border-radius: 25px;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .controls button:hover,
+    .bottom-controls button:hover {
+      background-color: #7dd3fc;
+    }
+
+    .container {
+      max-width: 95%;
+      margin: 50px;
+      background: white;
+      border-radius: 25px;
+ padding: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    video {
+  width: 20%;
+  height: auto;
+  border-radius: 0.375rem;
+  outline: none;
+  box-shadow: 0 1px 6px rgb(37 99 235 / 0.6);
+}
+
+
+    textarea#inputText {
+      width: 95%;
+      height: 260px;
+      border: 2px solid #93c5fd;
+      border-radius: 25px;
+      padding: 20px;
+      font-size: 50px;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+      box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.05);
+    }
+
+    textarea#inputText:focus {
+      border-color: #2563eb;
+      outline: none;
+      box-shadow: 0 0 8px #2563ebaa;
+      background: #f0f9ff;
+    }
+
+    .buttons-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+     
+      padding: 0.55rem 1.5rem;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.25s ease, transform 0.15s ease;
+      box-shadow: 0 4px 10px rgb(37 99 235 / 0.3);
+      user-select: none;
+    }
+
+    button:hover:not(:disabled) {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    #nextButton {
+      background: #6b7280;
+    }
+
+    #playAgainButton {
+      background: #16a34a;
+    }
+
+    #showAnswer {
+      background: #ef4444;
+    }
+
+    #answerModal {
+      display: none;
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #answerModalContent {
+      background: white;
+      padding: 2rem;
+      border-radius: 25px;
+      max-width: 500px;
+      max-height: 60vh;
+      overflow-y: auto;
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    #feedbackPopup {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 50%;
+      top: 25%;
+      transform: translateX(-50%);
+      padding: 1.2rem 2.5rem;
+      border-radius: 25px;
+      font-size: 2rem;
+      font-weight: 900;
+      color: white;
+      pointer-events: none;
+    }
+
+    #feedbackPopup.correct {
+      background-color: #22c55e;
+    }
+
+    #feedbackPopup.incorrect {
+      background-color: #ef4444;
+    }
+
+    #scoreDisplay, #timerDisplay {
+      text-align: center;
+      font-weight: 700;
+    }
+.active-nav {
+  background-color: brown !important;
+  color: white !important;
+  font-weight: bold;
+}
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="custom-header">
+    <nav>
+      <a href="../conversation_01/conversation_01.html">Conversation 01</a>
+      <a href="../conversation_02/conversation_02.html">Conversation 02</a>
+      <a href="../conversation_03/conversation_03.html"class="active-nav"
+><b>Conversation 03</b></a>
+      <a href="../conversation_04/conversation_04.html">Conversation 04</a>
+    </nav>
+  </header>
+
+  <!-- SIDEBAR TRÁI -->
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu</button>
+  <div class="sidebar left">
+ <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+
+
+ </div>
+
+  <!-- SIDEBAR PHẢI -->
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu</button>
+  <div class="sidebar right">
+  
+  <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+<button class="active" onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>Story</b></button>
+
+
+  </div>
+
+  <!-- MAIN GAME -->
+  <div class="container">
+    <h1 class="bg-teal-400 p-4 text-center text-black font-bold text-2xl"></h1>
+    <div class="p-6 flex flex-col gap-[140px]">
+      <div class="flex justify-between items-center mb-4">
+<video id="videoPlayer" controls width="320"></video>
+      </div>
+
+      <textarea id="inputText" placeholder="Type what you hear..."></textarea>
+
+      <div class="buttons-row">
+        <button id="checkButton">Check</button>
+        <button id="hintButton">Hint</button>
+        <button id="showAnswer">Show Answer</button>
+        <button id="nextButton" class="hidden">Next</button>
+        <button id="playAgainButton" class="hidden">Play Again</button>
+      </div>
+
+      <div id="scoreDisplay" style="display: flex; justify-content: center; gap: 20px;">
+  <span id="sentenceCount"></span>
+  <span id="correctCount" style="color: #16a34a;">0 Correct</span>
+</div>
+      <div id="timerDisplay"></div>
+    </div>
+  </div>
+
+  <!-- MODAL & FEEDBACK -->
+  <div id="answerModal" class="flex">
+    <div id="answerModalContent">
+      <p id="answerText"></p>
+      <button onclick="document.getElementById('answerModal').style.display='none'">Close</button>
+    </div>
+  </div>
+
+  <div id="feedbackPopup"></div>
+
+<script>
+const originalSentences = [
+  { audio: "videos/sentence1.mp4", text: "I like your shoes. Are they new?" },
+
+  { audio: "videos/sentence2.mp4", text: "Yes, they are." },
+
+  { audio: "videos/sentence3.mp4", text: "Are they expensive?" },
+
+  { audio: "videos/sentence4.mp4", text: "No, they are very cheap." },
+
+  { audio: "videos/sentence5.mp4", text: "Are they comfortable?" },
+
+  { audio: "videos/sentence6.mp4", text: "Yes, they are very comfortable." },
+
+  { audio: "videos/sentence7.mp4", text: "Are they from the discount shoe shop?" },
+
+  { audio: "videos/sentence8.mp4", text: "Yes! How did you guess?" }
+];
+    function toggleSidebar(side) {
+      const sidebar = document.querySelector(`.sidebar.${side}`);
+      const button = document.querySelector(`.toggle-${side}`);
+      sidebar.classList.toggle('visible');
+      button.textContent = sidebar.classList.contains('visible')
+        ? (side === 'left' ? 'Menu' : 'Menu')
+        : (side === 'left' ? 'Menu' : 'Menu');
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    let sentences = shuffle([...originalSentences]);
+    let currentIndex = 0;
+    let score = 0, totalTime = 0;
+    const input = document.getElementById("inputText");
+const video = document.getElementById("videoPlayer");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const timerDisplay = document.getElementById("timerDisplay");
+
+    function normalize(text) {
+  return text
+    .trim()                    // Xóa khoảng trắng 2 đầu
+    .toLowerCase()             // Chuyển về chữ thường
+    .replace(/[^\w\s]|_/g, "") // Xóa TẤT CẢ các dấu câu và ký tự đặc biệt
+    .replace(/\s+/g, " ");     // Chuyển nhiều khoảng trắng liên tiếp thành 1 khoảng trắng
+}
+
+   function loadSentence(index) {
+  if (index >= sentences.length) return showFinalScore();
+  const s = sentences[index];
+  video.src = s.audio;
+  video.load();
+  input.value = "";
+  
+  // Cập nhật số thứ tự câu
+  document.getElementById("sentenceCount").textContent = `Sentence ${index + 1} of ${sentences.length}`;
+  
+  timerDisplay.textContent = "";
+  startTime = Date.now();
+}
+
+    function checkAnswer() {
+  const userInput = normalize(input.value);
+  const expected = normalize(sentences[currentIndex].text);
+  const timeTaken = Date.now() - startTime;
+  totalTime += timeTaken;
+
+  if (userInput === expected) {
+    showFeedback("Correct!", "correct");
+    score++;
+    
+    // --- BẮT ĐẦU HIỆU ỨNG PHÁO HOA ---
+    var duration = 3 * 1000;
+    var animationEnd = Date.now() + duration;
+    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    var interval = setInterval(function() {
+      var timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      var particleCount = 50 * (timeLeft / duration);
+      // Bắn pháo hoa từ 2 góc màn hình
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+    }, 250);
+    // --- KẾT THÚC HIỆU ỨNG PHÁO HOA ---
+
+    document.getElementById("correctCount").textContent = `${score} Correct`;
+    timerDisplay.textContent = `⏱️ Time: ${Math.floor(timeTaken / 1000)}s`;
+    document.getElementById("nextButton").classList.remove("hidden");
+  } else {
+    showFeedback("Incorrect!", "incorrect");
+  }
+}
+
+    function showFeedback(msg, type) {
+      const popup = document.getElementById("feedbackPopup");
+      popup.textContent = msg;
+      popup.className = type;
+      popup.style.display = "block";
+      setTimeout(() => popup.style.display = "none", 1500);
+    }
+
+    document.getElementById("checkButton").onclick = checkAnswer;
+    document.getElementById("hintButton").onclick = () => {
+      const next = sentences[currentIndex].text[input.value.length];
+      if (next) input.value += next;
+    };
+    document.getElementById("showAnswer").onclick = () => {
+      document.getElementById("answerText").textContent = sentences[currentIndex].text;
+      document.getElementById("answerModal").style.display = "flex";
+    };
+    document.getElementById("nextButton").onclick = () => {
+      currentIndex++;
+      loadSentence(currentIndex);
+      document.getElementById("nextButton").classList.add("hidden");
+    };
+    document.getElementById("playAgainButton").onclick = () => location.reload();
+
+    loadSentence(currentIndex);
+// --- ĐOẠN CODE ĐIỀU KHIỂN BÚT TRÌNH CHIẾU (CLICKER) ---
+window.addEventListener('keydown', function(event) {
+const video = document.getElementById("videoPlayer");
+const nextBtn = document.getElementById("nextButton");
+const checkBtn = document.getElementById("checkButton");
+
+// 1. Phím Next (Nút Xuống/Tiến trên bút - thường là PageDown hoặc ArrowRight)
+if (event.key === 'PageDown' || event.key === 'ArrowRight') {
+event.preventDefault(); // Chống cuộn trang
+
+// Nếu nút "Next" đang hiển thị (đã làm đúng) thì bấm Next câu
+if (nextBtn && !nextBtn.classList.contains("hidden")) {
+  nextBtn.click();
+} 
+// Nếu chưa xong bài thì bấm nút "Check"
+else if (checkBtn) {
+  checkBtn.click();
+}
+
+
+}
+
+// 2. Phím Back (Nút Lên/Lùi trên bút - thường là PageUp hoặc ArrowLeft)
+if (event.key === 'PageUp' || event.key === 'ArrowLeft') {
+event.preventDefault(); // Chống cuộn trang
+
+// Điều khiển Video: Nếu đang phát thì dừng, đang dừng thì phát
+if (video) {
+  if (video.paused) {
+    // Sử dụng try-catch để tránh lỗi Autoplay của trình duyệt
+    video.play().catch(e => console.log("Cần tương tác trước khi phát"));
+  } else {
+    video.pause();
+  }
+}
+
+
+}
+});
+  </script>
+</body>
+</html>

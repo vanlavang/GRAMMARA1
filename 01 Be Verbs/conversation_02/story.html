@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conversation – Modern Learning</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: stretch; 
+  gap: 20px; 
+  max-width: 900px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:550px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 300px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 15px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.quiz-option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 40px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+  transition: background 0.2s;
+}
+
+.word:hover {
+  background: #fdf5e6;
+  border-radius: 5px;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+  <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+      <a href="../conversation_01/conversation_01.html">Conversation 01</a>
+      <a href="../conversation_02/conversation_02.html" class="active-link">Conversation 02</a>
+      <a href="../conversation_03/conversation_03.html">Conversation 03</a>
+      <a href="../conversation_04/conversation_04.html">Conversation 04</a>
+    </nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+    <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+      <source src="videos/story.mp4" type="video/mp4">
+    </video>
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = true;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// --- TỪ ĐIỂN ĐẦY ĐỦ (BAO GỒM SUB VÀ QUIZ) ---
+const dictionary = {
+  // Đại từ / Từ để hỏi / Cơ bản
+  "i": { type: "pronoun", meaning: "tôi, tớ", phonetic: "/aɪ/" },
+  "you": { type: "pronoun", meaning: "bạn", phonetic: "/juː/" },
+  "he": { type: "pronoun", meaning: "cậu ấy, anh ấy", phonetic: "/hiː/" },
+  "it": { type: "pronoun", meaning: "nó", phonetic: "/ɪt/" },
+  "we": { type: "pronoun", meaning: "chúng ta, chúng tôi", phonetic: "/wiː/" },
+  "my": { type: "determiner", meaning: "của tôi", phonetic: "/maɪ/" },
+  "your": { type: "determiner", meaning: "của bạn", phonetic: "/jʊər/" },
+  "his": { type: "determiner", meaning: "của anh ấy", phonetic: "/hɪz/" },
+  "mine": { type: "pronoun", meaning: "của tôi (đại từ)", phonetic: "/maɪn/" },
+  "what": { type: "pronoun", meaning: "cái gì", phonetic: "/wɑːt/" },
+  "where": { type: "adverb", meaning: "ở đâu", phonetic: "/wer/" },
+  "why": { type: "adverb", meaning: "tại sao", phonetic: "/waɪ/" },
+  "how": { type: "adverb", meaning: "như thế nào", phonetic: "/haʊ/" },
+
+  // Danh từ
+  "room": { type: "noun", meaning: "phòng", phonetic: "/ruːm/" },
+  "game": { type: "noun", meaning: "trò chơi", phonetic: "/ɡeɪm/" },
+  "controller": { type: "noun", meaning: "tay cầm điều khiển", phonetic: "/kənˈtroʊlər/" },
+  "toy": { type: "noun", meaning: "đồ chơi", phonetic: "/tɔɪ/" },
+  "toys": { type: "noun", meaning: "những món đồ chơi", phonetic: "/tɔɪz/" },
+  "home": { type: "noun", meaning: "nhà", phonetic: "/hoʊm/" },
+  "mom": { type: "noun", meaning: "mẹ", phonetic: "/mɑːm/" },
+  "thief": { type: "noun", meaning: "kẻ trộm", phonetic: "/θiːf/" },
+  "friends": { type: "noun", meaning: "bạn bè", phonetic: "/frendz/" },
+  "cable": { type: "noun", meaning: "dây cáp", phonetic: "/ˈkeɪbl/" },
+  "port": { type: "noun", meaning: "cổng cắm", phonetic: "/pɔːrt/" },
+  "fault": { type: "noun", meaning: "lỗi lầm", phonetic: "/fɔːlt/" },
+  "truth": { type: "noun", meaning: "sự thật", phonetic: "/truːθ/" },
+  "feelings": { type: "noun", meaning: "cảm xúc", phonetic: "/ˈfiːlɪŋz/" },
+  "shoe": { type: "noun", meaning: "chiếc giày", phonetic: "/ʃuː/" },
+  "hours": { type: "noun", meaning: "hàng giờ đồng hồ", phonetic: "/aʊərz/" },
+  "brother": { type: "noun", meaning: "anh/em trai", phonetic: "/ˈbrʌðər/" },
+  "trouble": { type: "noun", meaning: "rắc rối, phiền phức", phonetic: "/ˈtrʌbl/" },
+  "candy": { type: "noun", meaning: "kẹo", phonetic: "/ˈkændi/" },
+  "store": { type: "noun", meaning: "cửa hàng", phonetic: "/stɔːr/" },
+  "park": { type: "noun", meaning: "công viên", phonetic: "/pɑːrk/" },
+
+  // Động từ
+  "am": { type: "verb", meaning: "là, ở", phonetic: "/æm/" },
+  "is": { type: "verb", meaning: "là, ở", phonetic: "/ɪz/" },
+  "are": { type: "verb", meaning: "là, ở", phonetic: "/ɑːr/" },
+  "was": { type: "verb", meaning: "đã là, đã ở", phonetic: "/wɑːz/" },
+  "be": { type: "verb", meaning: "là, trở thành", phonetic: "/biː/" },
+  "see": { type: "verb", meaning: "nhìn thấy, gặp", phonetic: "/siː/" },
+  "holding": { type: "verb", meaning: "đang cầm, đang giữ", phonetic: "/ˈhoʊldɪŋ/" },
+  "play": { type: "verb", meaning: "chơi", phonetic: "/pleɪ/" },
+  "study": { type: "verb", meaning: "học", phonetic: "/ˈstʌdi/" },
+  "find": { type: "verb", meaning: "tìm kiếm", phonetic: "/faɪnd/" },
+  "found": { type: "verb", meaning: "đã tìm thấy", phonetic: "/faʊnd/" },
+  "went": { type: "verb", meaning: "đã đi", phonetic: "/went/" },
+  "speak": { type: "verb", meaning: "nói", phonetic: "/spiːk/" },
+  "know": { type: "verb", meaning: "biết", phonetic: "/noʊ/" },
+  "took": { type: "verb", meaning: "đã lấy", phonetic: "/tʊk/" },
+  "stole": { type: "verb", meaning: "đã lấy cắp", phonetic: "/stoʊl/" },
+  "talk": { type: "verb", meaning: "nói chuyện", phonetic: "/tɔːk/" },
+  "understand": { type: "verb", meaning: "hiểu", phonetic: "/ˌʌndərˈstænd/" },
+  "pretend": { type: "verb", meaning: "giả vờ", phonetic: "/prɪˈtend/" },
+  "give": { type: "verb", meaning: "đưa cho", phonetic: "/ɡɪv/" },
+  "listen": { type: "verb", meaning: "lắng nghe", phonetic: "/ˈlɪsn/" },
+  "trusted": { type: "verb", meaning: "đã tin tưởng", phonetic: "/trʌstɪd/" },
+  "care": { type: "verb", meaning: "quan tâm", phonetic: "/ker/" },
+  "check": { type: "verb", meaning: "kiểm tra", phonetic: "/tʃek/" },
+  "blamed": { type: "verb", meaning: "đã đổ lỗi", phonetic: "/bleɪmd/" },
+  "hope": { type: "verb", meaning: "hy vọng", phonetic: "/hoʊp/" },
+  "answer": { type: "verb", meaning: "trả lời", phonetic: "/ˈænsər/" },
+  "hurt": { type: "verb", meaning: "làm tổn thương", phonetic: "/hɜːrt/" },
+  "learned": { type: "verb", meaning: "đã học, đã biết được", phonetic: "/lɜːrnd/" },
+  "happened": { type: "verb", meaning: "đã xảy ra", phonetic: "/ˈhæpənd/" },
+  "waiting": { type: "verb", meaning: "đang đợi", phonetic: "/ˈweɪtɪŋ/" },
+  "belonged": { type: "verb", meaning: "đã thuộc về", phonetic: "/bɪˈlɔːŋd/" },
+  "helping": { type: "verb", meaning: "đang giúp đỡ", phonetic: "/ˈhelpɪŋ/" },
+  "forgive": { type: "verb", meaning: "tha thứ", phonetic: "/fərˈɡɪv/" },
+  "discover": { type: "verb", meaning: "phát hiện ra", phonetic: "/dɪˈskʌvər/" },
+  "broke": { type: "verb", meaning: "đã làm vỡ, làm hỏng", phonetic: "/broʊk/" },
+  "return": { type: "verb", meaning: "trả lại", phonetic: "/rɪˈtɜːrn/" },
+
+  // Tính từ / Trạng từ / Khác
+  "happy": { type: "adjective", meaning: "vui vẻ", phonetic: "/ˈhæpi/" },
+  "nice": { type: "adjective", meaning: "tốt, đẹp, tuyệt", phonetic: "/naɪs/" },
+  "new": { type: "adjective", meaning: "mới", phonetic: "/nuː/" },
+  "back": { type: "adverb", meaning: "trở lại", phonetic: "/bæk/" },
+  "anywhere": { type: "adverb", meaning: "bất cứ đâu", phonetic: "/ˈeniwer/" },
+  "calmly": { type: "adverb", meaning: "một cách bình tĩnh", phonetic: "/ˈkɑːmli/" },
+  "angry": { type: "adjective", meaning: "tức giận", phonetic: "/ˈæŋɡri/" },
+  "maybe": { type: "adverb", meaning: "có lẽ", phonetic: "/ˈmeɪbi/" },
+  "sure": { type: "adjective", meaning: "chắc chắn", phonetic: "/ʃʊr/" },
+  "nothing": { type: "pronoun", meaning: "không gì cả", phonetic: "/ˈnʌθɪŋ/" },
+  "wrong": { type: "adjective", meaning: "sai, nhầm", phonetic: "/rɔːŋ/" },
+  "safe": { type: "adjective", meaning: "an toàn", phonetic: "/seɪf/" },
+  "real": { type: "adjective", meaning: "thật sự", phonetic: "/riːl/" },
+  "only": { type: "adverb", meaning: "chỉ là", phonetic: "/ˈoʊnli/" },
+  "initially": { type: "adverb", meaning: "ban đầu", phonetic: "/ɪˈnɪʃəli/" },
+  "later": { type: "adverb", meaning: "sau đó", phonetic: "/ˈleɪtər/" },
+  "actually": { type: "adverb", meaning: "thực sự", phonetic: "/ˈæktʃuəli/" },
+  "late": { type: "adjective", meaning: "muộn, trễ", phonetic: "/leɪt/" }
+};
+
+// --- HỆ THỐNG QUIZ CHO CÂU CHUYỆN ---
+const quizData = [
+  { q: "Why was Bob angry at Tom initially?", opts: ["Tom took his game controller", "Tom broke his toy", "Tom was late"], ans: 0 },
+  { q: "What did Bob discover about the controller later?", opts: ["It was a real controller", "It was only a toy", "It belonged to his mom"], ans: 1 },
+  { q: "Where did Tom actually go to look for Bob's game controller?", opts: ["To the store", "To the park", "He waited for hours to return it"], ans: 2 }
+];
+let currentQIndex = 0;
+
+// Hàm biến các chuỗi text trong Quiz thành các từ có thể click
+function makeClickable(text) {
+  return text.split(/\s+/).map(w => {
+    const clean = w.replace(/[.,!?]/g,"").toLowerCase();
+    // Bắt sự kiện click ngay trên từng từ trong quiz
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+}
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = "<h4 style='text-align:center; color: #28a745; margin-top:20px;'>🎉 You finished the quiz!</h4><button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>Play Again</button>";
+    return;
+  }
+  const q = quizData[currentQIndex];
+  
+  // Áp dụng makeClickable cho câu hỏi
+  let html = `<div style="text-align: left;">
+    <div style="font-weight: bold; margin-bottom: 15px; font-size: 16px;">Question ${currentQIndex + 1}: ${makeClickable(q.q)}</div>
+  `;
+  
+  // Áp dụng makeClickable cho từng đáp án
+  q.opts.forEach((opt, idx) => {
+    // bọc chữ trong div hoặc span để click từ không kích hoạt click button đáp án
+    html += `<button class="quiz-option" onclick="checkAns(this, ${idx === q.ans})">
+               ${makeClickable(opt)}
+             </button>`;
+  });
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  if (isCorrect) {
+    btn.classList.add('correct');
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 1000);
+  } else {
+    btn.classList.add('wrong');
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+
+// --- DỮ LIỆU PHỤ ĐỀ (SUB) TỪNG CÂU ---
+const sentences = [
+  { text: "I am happy to be back in my room.", start: 0, end: 6, translation: "Tôi rất vui khi được trở lại phòng của mình." },
+  { text: "Tom, it is nice to see you again.", start: 7, end: 10, translation: "Tom, rất vui được gặp lại bạn." },
+  { text: "Nice to see you too, Bob.", start: 10, end: 13, translation: "Mình cũng rất vui được gặp bạn, Bob." },
+  { text: "Why are you holding my new game controller?", start: 13, end: 17, translation: "Tại sao bạn lại cầm tay cầm trò chơi mới của mình?" },
+  { text: "Oh, do not.", start: 17, end: 19, translation: "Ồ, đừng mà." },
+  { text: "My new game controller.", start: 19, end: 26, translation: "Tay cầm trò chơi mới của tôi." },
+  { text: "You can play with these toys.", start: 26, end: 33, translation: "Bạn có thể chơi với những món đồ chơi này." },
+  { text: "I need to study now.", start: 33, end: 41, translation: "Bây giờ tôi cần học bài." },
+  { text: "Tom, where are you?", start: 41, end: 45, translation: "Tom, bạn ở đâu vậy?" },
+  { text: "I cannot find Tom.", start: 45, end: 53, translation: "Tôi không thể tìm thấy Tom." },
+  { text: "Mom, where is Tom?", start: 53, end: 60, translation: "Mẹ ơi, Tom đâu rồi?" },
+  { text: "Tom went home a while ago, now it is time to play my new game controller.", start: 60, end: 69, translation: "Tom đã về nhà lúc nãy rồi, giờ là lúc chơi tay cầm mới của mẹ." },
+  { text: "My game controller is not here.", start: 69, end: 77, translation: "Tay cầm trò chơi của tôi không có ở đây." },
+  { text: "I cannot find it here.", start: 77, end: 79, translation: "Tôi không tìm thấy nó ở đây." },
+  { text: "I cannot find it anywhere.", start: 79, end: 83, translation: "Tôi không thể tìm thấy nó ở bất cứ đâu." },
+  { text: "Where is my game controller?", start: 83, end: 90, translation: "Tay cầm trò chơi của tôi đâu rồi?" },
+  { text: "Mom, where is my game controller?", start: 90, end: 94, translation: "Mẹ ơi, tay cầm trò chơi của con đâu rồi?" },
+  { text: "I do not know where it is.", start: 94, end: 98, translation: "Mẹ không biết nó ở đâu cả." },
+  { text: "You should speak calmly, Bob.", start: 98, end: 103, translation: "Con nên nói chuyện bình tĩnh, Bob." },
+  { text: "I am very angry right now.", start: 103, end: 108, translation: "Bây giờ tôi đang rất tức giận." },
+  { text: "Tom was holding my game controller.", start: 108, end: 112, translation: "Tom đã cầm tay cầm trò chơi của tôi." },
+  { text: "Maybe Tom took my game controller.", start: 112, end: 118, translation: "Có lẽ Tom đã lấy tay cầm của tôi." },
+  { text: "I am sure Tom stole it.", start: 118, end: 120, translation: "Tôi chắc chắn Tom đã ăn cắp nó." },
+  { text: "I need to find Tom now.", start: 120, end: 126, translation: "Tôi cần phải tìm Tom ngay bây giờ." },
+  { text: "There is, Tom.", start: 126, end: 129, translation: "Kìa, Tom đây rồi." },
+  { text: "Oh, I need to talk to you.", start: 129, end: 132, translation: "Ồ, tôi cần nói chuyện với bạn." },
+  { text: "You are a thief.", start: 132, end: 136, translation: "Bạn là một tên trộm." },
+  { text: "I do not understand.", start: 136, end: 138, translation: "Tôi không hiểu gì cả." },
+  { text: "Do not pretend that you know nothing.", start: 138, end: 142, translation: "Đừng giả vờ như không biết gì." },
+  { text: "That game controller looks like mine.", start: 142, end: 151, translation: "Cái tay cầm đó trông giống của tôi." },
+  { text: "Give my game controller back.", start: 151, end: 154, translation: "Trả lại tay cầm trò chơi cho tôi." },
+  { text: "See this is my game controller.", start: 154, end: 158, translation: "Nhìn này, đây là tay cầm của tôi." },
+  { text: "You took my game controller?", start: 158, end: 160, translation: "Bạn đã lấy tay cầm của tôi phải không?" },
+  { text: "What is this then?", start: 160, end: 162, translation: "Vậy cái này là gì?" },
+  { text: "We will never be friends again.", start: 162, end: 166, translation: "Chúng ta sẽ không bao giờ làm bạn nữa." },
+  { text: "You are a thief.", start: 166, end: 171, translation: "Bạn là một tên trộm." },
+  { text: "I did not take your game controller.", start: 171, end: 174, translation: "Tôi không hề lấy tay cầm của bạn." },
+  { text: "I only wanted to play with you, Bob.", start: 174, end: 181, translation: "Tôi chỉ muốn chơi với bạn thôi, Bob." },
+  { text: "I do not want to listen to you.", start: 181, end: 188, translation: "Tôi không muốn nghe bạn nói nữa." },
+  { text: "I trusted Tom, but he is a thief.", start: 188, end: 190, translation: "Tôi đã tin tưởng Tom, nhưng cậu ta là một tên trộm." },
+  { text: "Oh, I do not care.", start: 190, end: 192, translation: "Ồ, tôi không quan tâm." },
+  { text: "It is time to play my game.", start: 192, end: 195, translation: "Đã đến lúc chơi trò chơi của tôi rồi." },
+  { text: "Where is the cable port?", start: 195, end: 196, translation: "Cổng cắm cáp đâu rồi?" },
+  { text: "I cannot find it anywhere.", start: 196, end: 200, translation: "Tôi không thể tìm thấy nó ở đâu cả." },
+  { text: "Why does this game controller have no cable port?", start: 200, end: 205, translation: "Tại sao cái tay cầm này lại không có cổng cáp?" },
+  { text: "Something is not right.", start: 205, end: 207, translation: "Có gì đó không đúng." },
+  { text: "Let me check it again.", start: 207, end: 211, translation: "Để tôi kiểm tra lại lần nữa." },
+  { text: "Oh no, this is only a toy.", start: 211, end: 216, translation: "Ồ không, đây chỉ là một món đồ chơi." },
+  { text: "This is not my game controller.", start: 216, end: 219, translation: "Đây không phải là tay cầm của tôi." },
+  { text: "I blamed Tom for nothing.", start: 219, end: 222, translation: "Tôi đã oan uổng đổ lỗi cho Tom." },
+  { text: "Oh, Oh no, I was wrong.", start: 222, end: 225, translation: "Ồ không, tôi đã sai rồi." },
+  { text: "I need to find Tom right now.", start: 225, end: 230, translation: "Tôi cần phải tìm Tom ngay bây giờ." },
+  { text: "Tom, are you still here?", start: 230, end: 232, translation: "Tom, bạn còn ở đây không?" },
+  { text: "Tom is not here.", start: 232, end: 241, translation: "Tom không có ở đây." },
+  { text: "I hope Tom is at home.", start: 241, end: 243, translation: "Tôi hy vọng Tom đang ở nhà." },
+  { text: "Tom, are you home?", start: 243, end: 250, translation: "Tom, bạn có ở nhà không?" },
+  { text: "Uh-huh.", start: 250, end: 251, translation: "Ừm." },
+  { text: "It's Tom.", start: 251, end: 252, translation: "Là Tom đây." },
+  { text: "Not with you.", start: 252, end: 255, translation: "Không ở cùng với bạn." },
+  { text: "Tom is not here.", start: 255, end: 258, translation: "Tom không có ở đây." },
+  { text: "Tom said he wanted to find your game controller.", start: 258, end: 262, translation: "Tom nói cậu ấy muốn tìm tay cầm trò chơi cho bạn." },
+  { text: "No, Tom did not come back to my house.", start: 262, end: 271, translation: "Không, Tom không về nhà tôi." },
+  { text: "Where is my son?", start: 271, end: 276, translation: "Con trai tôi đâu rồi?" },
+  { text: "This is all my fault.", start: 276, end: 279, translation: "Tất cả là lỗi tại tôi." },
+  { text: "We need to find Tom now.", start: 279, end: 284, translation: "Chúng ta cần phải tìm Tom ngay." },
+  { text: "Yes, we need to find him.", start: 284, end: 287, translation: "Vâng, chúng ta cần tìm thằng bé." },
+  { text: "Tom, where are you?", start: 287, end: 294, translation: "Tom, em ở đâu?" },
+  { text: "Tom answer me.", start: 294, end: 296, translation: "Tom hãy trả lời anh đi." },
+  { text: "Hey, Tom, where are you?", start: 296, end: 299, translation: "Này Tom, em ở đâu?" },
+  { text: "Mom, where are you?", start: 299, end: 303, translation: "Mẹ ơi, mẹ ở đâu?" },
+  { text: "I still cannot find Tom.", start: 303, end: 306, translation: "Tôi vẫn không thể tìm thấy Tom." },
+  { text: "Where are you, Tom?", start: 306, end: 309, translation: "Em ở đâu vậy, Tom?" },
+  { text: "I was too angry.", start: 309, end: 312, translation: "Tôi đã quá tức giận." },
+  { text: "Tom was telling the truth.", start: 312, end: 313, translation: "Tom đã nói sự thật." },
+  { text: "I did not listen to Tom and I hurt his feelings.", start: 313, end: 320, translation: "Tôi đã không nghe Tom và làm tổn thương cảm xúc của cậu ấy." },
+  { text: "I am so sorry, Tom.", start: 320, end: 324, translation: "Tôi rất xin lỗi, Tom." },
+  { text: "I should have trusted Tom and learned the truth first.", start: 324, end: 328, translation: "Lẽ ra tôi nên tin tưởng Tom và tìm hiểu sự thật trước." },
+  { text: "Everything happened because of me.", start: 328, end: 332, translation: "Mọi chuyện xảy ra đều là vì tôi." },
+  { text: "I hope Tom is safe.", start: 332, end: 334, translation: "Tôi hy vọng Tom được an toàn." },
+  { text: "I should not have blamed Tom.", start: 334, end: 338, translation: "Lẽ ra tôi không nên đổ lỗi cho Tom." },
+  { text: "Where are you now, Tom?", start: 338, end: 346, translation: "Bây giờ em ở đâu, Tom?" },
+  { text: "That game controller looks like mine.", start: 346, end: 352, translation: "Cái tay cầm trò chơi đó trông giống của tôi." },
+  { text: "Wait, I know that shoe.", start: 352, end: 354, translation: "Khoan đã, tôi biết chiếc giày đó." },
+  { text: "That is Tom's shoe.", start: 354, end: 357, translation: "Đó là giày của Tom." },
+  { text: "Tom.", start: 357, end: 362, translation: "Tom." },
+  { text: "Tom is here.", start: 362, end: 364, translation: "Tom ở đây rồi." },
+  { text: "Tom, are you okay?", start: 364, end: 368, translation: "Tom, em có sao không?" },
+  { text: "Bob, why are you here?", start: 368, end: 371, translation: "Bob, tại sao anh lại ở đây?" },
+  { text: "Bob, I found your game controller.", start: 371, end: 374, translation: "Bob, em đã tìm thấy tay cầm trò chơi của anh rồi." },
+  { text: "It is over there.", start: 374, end: 376, translation: "Nó ở đằng kia kìa." },
+  { text: "What are you talking about?", start: 376, end: 385, translation: "Em đang nói gì vậy?" },
+  { text: "Are you this boy's brother?", start: 385, end: 390, translation: "Cháu có phải là anh của cậu bé này không?" },
+  { text: "Yes, I am.", start: 390, end: 392, translation: "Vâng, đúng vậy ạ." },
+  { text: "This boy has been waiting here for hours.", start: 392, end: 395, translation: "Cậu bé này đã đợi ở đây hàng giờ liền." },
+  { text: "He wanted to take that game controller home.", start: 395, end: 398, translation: "Thằng bé muốn mang cái tay cầm đó về nhà." },
+  { text: "He said it belonged to his brother.", start: 398, end: 400, translation: "Nó nói rằng món đồ đó thuộc về anh trai mình." },
+  { text: "I am sorry for the trouble.", start: 400, end: 403, translation: "Tôi xin lỗi vì đã gây phiền phức." },
+  { text: "Thank you for helping him.", start: 403, end: 406, translation: "Cảm ơn bác đã giúp đỡ em ấy." },
+  { text: "Tom, that is not my game controller.", start: 406, end: 409, translation: "Tom, đó không phải là tay cầm của anh." },
+  { text: "So I did not find it.", start: 409, end: 413, translation: "Nên em đã không tìm thấy nó." },
+  { text: "I wanted to help you.", start: 413, end: 415, translation: "Em chỉ muốn giúp anh thôi." },
+  { text: "I am not a thief.", start: 415, end: 420, translation: "Em không phải là kẻ trộm." },
+  { text: "I did not take your game controller.", start: 420, end: 425, translation: "Em không hề lấy tay cầm của anh." },
+  { text: "I know that now.", start: 425, end: 427, translation: "Bây giờ anh biết điều đó rồi." },
+  { text: "I was wrong.", start: 427, end: 429, translation: "Anh đã sai." },
+  { text: "I am sorry for blaming you.", start: 429, end: 432, translation: "Anh xin lỗi vì đã đổ lỗi cho em." },
+  { text: "This was my fault.", start: 432, end: 434, translation: "Đây là lỗi của anh." },
+  { text: "Can you forgive me?", start: 434, end: 437, translation: "Em có thể tha thứ cho anh không?" },
+  { text: "Yes, Bob.", start: 437, end: 439, translation: "Vâng, Bob." },
+  { text: "Thank you, Tom.", start: 439, end: 444, translation: "Cảm ơn em, Tom." },
+  { text: "Let us go home, Mom.", start: 444, end: 446, translation: "Mình về nhà thôi mẹ." },
+  { text: "This candy is very good.", start: 446, end: 449, translation: "Kẹo này ngon lắm." },
+  { text: "I know.", start: 449, end: 450, translation: "Con biết chứ." }
+];
+
+function renderSentence(s){
+  const words = s.text.split(/\s+/);
+  bubble.innerHTML = words.map((w)=>{
+    const clean = w.replace(/[.,!?]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart = s.start;
+}
+
+// Tính năng click chuột phải dịch tiếng Việt toàn câu
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+// Tính năng click từ tra từ điển popup (Áp dụng cho cả Sub và Quiz)
+function handleWordClick(event, word) {
+  event.stopPropagation(); // Ngăn sự kiện click kích hoạt chọn đáp án của Quiz
+
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+  } else {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b><br>
+      <p style="margin-top: 5px; color: #666;">Chưa có trong dữ liệu</p>
+    `;
+  }
+  
+  dictPopup.style.left = event.clientX + "px";
+  dictPopup.style.top = (event.clientY - 130) + "px";
+  dictPopup.style.display = "block";
+
+  clearTimeout(window.dictTimeout);
+  window.dictTimeout = setTimeout(() => {
+    dictPopup.style.display = "none";
+  }, 3000);
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing = true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); 
+  video.currentTime = 0; 
+  isSyncing = false;
+  bubble.innerText = "Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused ? playConversation() : pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+</script>
+
+</body>
+</html>
