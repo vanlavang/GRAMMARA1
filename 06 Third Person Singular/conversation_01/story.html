@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conversation – Modern Learning</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'UTM Avo', 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+/* Bọc Video và Quiz */
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: left; 
+  gap: 20px; 
+  max-width: 1200px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:500px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* Giao diện Quiz */
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 500px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 24px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+
+/* Thêm animation rung lắc khi trả lời sai */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.quiz-option.wrong { 
+  background: #f8d7da; border-color: #dc3545; color: #721c24; 
+  animation: shake 0.4s ease-in-out;
+}
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 35px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+  <a href="../conversation_01/conversation_01.html" class="active-link">Conversation 01</a>
+  <a href="../conversation_02/conversation_02.html">Conversation 02</a>
+  <a href="../conversation_03/conversation_03.html" >Conversation 03</a>
+  <a href="../conversation_04/conversation_04.html" >Conversation 04</a>
+</nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+    <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+<source src="./videos/story.mp4" type="video/mp4">    </video>
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// ================= LỚP ÂM THANH & HIỆU ỨNG =================
+let audioCtx;
+
+function playSound(type) {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  if (type === 'correct') {
+    // Âm thanh Ting Ting vui tai (Hợp âm C trưởng)
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      const now = audioCtx.currentTime;
+      osc.start(now + i * 0.1);
+      gain.gain.setValueAtTime(0, now + i * 0.1);
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.5);
+      osc.stop(now + i * 0.1 + 0.5);
+    });
+
+    // Âm thanh nổ pháo bông lách tách (Noise burst)
+    setTimeout(() => {
+      const bufferSize = audioCtx.sampleRate * 0.5;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+      
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.value = 1000;
+      const noiseGain = audioCtx.createGain();
+      
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+      
+      const now = audioCtx.currentTime;
+      noiseGain.gain.setValueAtTime(0.8, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      noise.start(now);
+    }, 300);
+
+  } else {
+    // Âm thanh Buzz báo sai
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 120;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    osc.start(now);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    osc.stop(now + 0.4);
+  }
+}
+
+function shootFireworks() {
+  var duration = 2000; // Pháo bông nổ trong 2 giây
+  var animationEnd = Date.now() + duration;
+  var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  var interval = setInterval(function() {
+    var timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    var particleCount = 50 * (timeLeft / duration);
+    // Bắn từ 2 bên mép màn hình vào
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+  }, 250);
+}
+// ==========================================================
+
+// --- LOGIC QUIZ ---
+const quizData = [
+
+  {
+    question: "What time is it in the morning?",
+    options: ["7 in the morning", "8 in the morning", "6 in the morning", "9 in the morning"],
+    correct: "7 in the morning"
+  },
+
+  {
+    question: "How does the air smell?",
+    options: ["Fresh", "Dirty", "Hot", "Cold"],
+    correct: "Fresh"
+  },
+
+  {
+    question: "What color is the sky?",
+    options: ["Dark", "Gray", "Soft blue", "Red"],
+    correct: "Soft blue"
+  },
+
+  {
+    question: "What are people carrying?",
+    options: ["Books", "Coffee cups", "Bags", "Phones"],
+    correct: "Coffee cups"
+  },
+
+  {
+    question: "Who is Ava?",
+    options: ["A teacher", "A friend", "A colleague", "A doctor"],
+    correct: "A colleague"
+  },
+
+  {
+    question: "How does Ava look?",
+    options: ["Sleepy", "Perfect", "Sad", "Angry"],
+    correct: "Perfect"
+  },
+
+  {
+    question: "What does Ava hate?",
+    options: ["Coffee", "People", "Traffic", "Mornings"],
+    correct: "Mornings"
+  },
+
+  {
+    question: "What does Emma say about the city?",
+    options: [
+      "The city is noisy",
+      "The city is lazy",
+      "The city is just waking up",
+      "The city is dangerous"
+    ],
+    correct: "The city is just waking up"
+  },
+
+  {
+    question: "Who do they help?",
+    options: ["An old man", "A poor boy", "A teacher", "A stranger woman"],
+    correct: "A poor boy"
+  },
+
+  {
+    question: "What drink do they order?",
+    options: ["Tea", "Milk", "Orange juice", "Cappuccino"],
+    correct: "Cappuccino"
+  },
+
+  {
+    question: "What does Ava think about kindness?",
+    options: [
+      "It changes the world",
+      "It pays bills",
+      "It wastes time",
+      "It makes life easy"
+    ],
+    correct: "It wastes time"
+  },
+
+  {
+    question: "What does Emma believe about kindness?",
+    options: [
+      "It makes her better",
+      "It is useless",
+      "It is expensive",
+      "It is dangerous"
+    ],
+    correct: "It makes her better"
+  },
+
+  {
+    question: "What does Emma say begins with a smile?",
+    options: ["Friendship", "Love", "Kindness", "Success"],
+    correct: "Kindness"
+  },
+
+  {
+    question: "How does Emma feel when helping people?",
+    options: ["Calm", "Angry", "Tired", "Lonely"],
+    correct: "Calm"
+  },
+
+  {
+    question: "What happens at the end?",
+    options: [
+      "They go home",
+      "They miss the bus",
+      "They walk back to the office",
+      "They stop working"
+    ],
+    correct: "They walk back to the office"
+  }
+
+];
+let currentQIndex = 0;
+
+function wrapWordsForDict(text) {
+  return text.split(/\s+/).map(w => {
+    // Regex tinh chỉnh lại để xóa cả ngoặc kép khỏi từ điển tra cứu
+    const clean = w.replace(/[.,!?"“”]/g, "").toLowerCase();
+    const cleanEscaped = clean.replace(/'/g, "\\'");
+    return `<span class="word" onclick="handleWordClick(event, '${cleanEscaped}')">${w}</span>`;
+  }).join(" ");
+}
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = `
+      <h4 style='text-align:center; color:#28a745; margin-top:20px;'>
+        🎉 You finished the quiz!
+      </h4>
+      <button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>
+        Play Again
+      </button>`;
+    // Thưởng pháo bông rực rỡ khi hoàn thành
+    shootFireworks();
+    return;
+  }
+
+  const q = quizData[currentQIndex];
+
+  let html = `
+    <div>
+      <div style="font-weight:bold; margin-bottom:15px; font-size:24px;">
+        Question ${currentQIndex + 1}: ${wrapWordsForDict(q.question)}
+      </div>
+  `;
+
+  q.options.forEach(opt => {
+const isCorrect = (opt === q.correct);
+  html += `
+    <button class="quiz-option"
+      onclick="checkAns(this, ${isCorrect})">
+      ${wrapWordsForDict(opt)}
+    </button>`;
+});
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  if (isCorrect) {
+    btn.classList.add('correct');
+    // GỌI HIỆU ỨNG ÂM THANH & PHÁO BÔNG
+    playSound('correct');
+    shootFireworks();
+    
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 2500); // Tăng thời gian chờ lên 2.5s để học sinh xem hết pháo bông
+  } else {
+    btn.classList.add('wrong');
+    // GỌI ÂM THANH BÁO LỖI
+    playSound('wrong');
+    
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+// --------------------------
+
+// --- DICTIONARY ---
+const dictionary = {
+
+  "what": { meaning: "gì", phonetic: "/wʌt/", type: "question word" },
+  "time": { meaning: "thời gian", phonetic: "/taɪm/", type: "noun" },
+  "is": { meaning: "là", phonetic: "/ɪz/", type: "verb" },
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "morning": { meaning: "buổi sáng", phonetic: "/ˈmɔːrnɪŋ/", type: "noun" },
+
+  "7": { meaning: "số 7", phonetic: "/ˈsevən/", type: "number" },
+  "8": { meaning: "số 8", phonetic: "/eɪt/", type: "number" },
+  "6": { meaning: "số 6", phonetic: "/sɪks/", type: "number" },
+  "9": { meaning: "số 9", phonetic: "/naɪn/", type: "number" },
+
+  "how": { meaning: "như thế nào", phonetic: "/haʊ/", type: "question word" },
+  "does": { meaning: "trợ động từ", phonetic: "/dʌz/", type: "auxiliary verb" },
+  "air": { meaning: "không khí", phonetic: "/er/", type: "noun" },
+  "smell": { meaning: "mùi", phonetic: "/smel/", type: "noun" },
+  "fresh": { meaning: "trong lành", phonetic: "/freʃ/", type: "adjective" },
+  "dirty": { meaning: "bẩn", phonetic: "/ˈdɜːrti/", type: "adjective" },
+  "hot": { meaning: "nóng", phonetic: "/hɑːt/", type: "adjective" },
+  "cold": { meaning: "lạnh", phonetic: "/koʊld/", type: "adjective" },
+
+  "color": { meaning: "màu sắc", phonetic: "/ˈkʌlər/", type: "noun" },
+  "sky": { meaning: "bầu trời", phonetic: "/skaɪ/", type: "noun" },
+  "dark": { meaning: "tối", phonetic: "/dɑːrk/", type: "adjective" },
+  "gray": { meaning: "xám", phonetic: "/ɡreɪ/", type: "adjective" },
+  "soft": { meaning: "dịu", phonetic: "/sɔːft/", type: "adjective" },
+  "blue": { meaning: "xanh dương", phonetic: "/bluː/", type: "adjective" },
+  "red": { meaning: "đỏ", phonetic: "/red/", type: "adjective" },
+
+  "are": { meaning: "là", phonetic: "/ɑːr/", type: "verb" },
+  "people": { meaning: "mọi người", phonetic: "/ˈpiːpl/", type: "noun" },
+  "carrying": { meaning: "mang theo", phonetic: "/ˈkæriɪŋ/", type: "verb" },
+  "books": { meaning: "sách", phonetic: "/bʊks/", type: "noun" },
+  "coffee": { meaning: "cà phê", phonetic: "/ˈkɔːfi/", type: "noun" },
+  "cups": { meaning: "cốc", phonetic: "/kʌps/", type: "noun" },
+  "bags": { meaning: "túi", phonetic: "/bæɡz/", type: "noun" },
+  "phones": { meaning: "điện thoại", phonetic: "/foʊnz/", type: "noun" },
+
+  "who": { meaning: "ai", phonetic: "/huː/", type: "question word" },
+  "ava": { meaning: "Ava", phonetic: "/ˈeɪvə/", type: "proper noun" },
+  "a": { meaning: "một", phonetic: "/ə/", type: "article" },
+  "teacher": { meaning: "giáo viên", phonetic: "/ˈtiːtʃər/", type: "noun" },
+  "friend": { meaning: "bạn", phonetic: "/frend/", type: "noun" },
+  "colleague": { meaning: "đồng nghiệp", phonetic: "/ˈkɑːliːɡ/", type: "noun" },
+  "doctor": { meaning: "bác sĩ", phonetic: "/ˈdɑːktər/", type: "noun" },
+
+  "look": { meaning: "trông", phonetic: "/lʊk/", type: "verb" },
+  "sleepy": { meaning: "ngái ngủ", phonetic: "/ˈsliːpi/", type: "adjective" },
+  "perfect": { meaning: "hoàn hảo", phonetic: "/ˈpɜːrfɪkt/", type: "adjective" },
+  "sad": { meaning: "buồn", phonetic: "/sæd/", type: "adjective" },
+  "angry": { meaning: "tức giận", phonetic: "/ˈæŋɡri/", type: "adjective" },
+
+  "hate": { meaning: "ghét", phonetic: "/heɪt/", type: "verb" },
+  "traffic": { meaning: "giao thông", phonetic: "/ˈtræfɪk/", type: "noun" },
+  "mornings": { meaning: "buổi sáng", phonetic: "/ˈmɔːrnɪŋz/", type: "noun" },
+
+  "emma": { meaning: "Emma", phonetic: "/ˈemə/", type: "proper noun" },
+  "say": { meaning: "nói", phonetic: "/seɪ/", type: "verb" },
+  "about": { meaning: "về", phonetic: "/əˈbaʊt/", type: "preposition" },
+  "city": { meaning: "thành phố", phonetic: "/ˈsɪti/", type: "noun" },
+  "noisy": { meaning: "ồn ào", phonetic: "/ˈnɔɪzi/", type: "adjective" },
+  "lazy": { meaning: "lười biếng", phonetic: "/ˈleɪzi/", type: "adjective" },
+  "just": { meaning: "chỉ", phonetic: "/dʒʌst/", type: "adverb" },
+  "waking": { meaning: "thức dậy", phonetic: "/ˈweɪkɪŋ/", type: "verb" },
+  "up": { meaning: "lên", phonetic: "/ʌp/", type: "adverb" },
+  "dangerous": { meaning: "nguy hiểm", phonetic: "/ˈdeɪndʒərəs/", type: "adjective" },
+
+  "do": { meaning: "làm", phonetic: "/duː/", type: "verb" },
+  "they": { meaning: "họ", phonetic: "/ðeɪ/", type: "pronoun" },
+  "help": { meaning: "giúp đỡ", phonetic: "/help/", type: "verb" },
+  "an": { meaning: "một", phonetic: "/æn/", type: "article" },
+  "old": { meaning: "già", phonetic: "/oʊld/", type: "adjective" },
+  "man": { meaning: "người đàn ông", phonetic: "/mæn/", type: "noun" },
+  "poor": { meaning: "tội nghiệp", phonetic: "/pʊr/", type: "adjective" },
+  "boy": { meaning: "cậu bé", phonetic: "/bɔɪ/", type: "noun" },
+  "stranger": { meaning: "người lạ", phonetic: "/ˈstreɪndʒər/", type: "noun" },
+  "woman": { meaning: "người phụ nữ", phonetic: "/ˈwʊmən/", type: "noun" },
+
+  "drink": { meaning: "đồ uống", phonetic: "/drɪŋk/", type: "noun" },
+  "order": { meaning: "gọi", phonetic: "/ˈɔːrdər/", type: "verb" },
+  "tea": { meaning: "trà", phonetic: "/tiː/", type: "noun" },
+  "milk": { meaning: "sữa", phonetic: "/mɪlk/", type: "noun" },
+  "orange": { meaning: "cam", phonetic: "/ˈɔːrɪndʒ/", type: "noun" },
+  "juice": { meaning: "nước ép", phonetic: "/dʒuːs/", type: "noun" },
+  "cappuccino": { meaning: "cappuccino", phonetic: "/ˌkæpəˈtʃiːnoʊ/", type: "noun" },
+
+  "think": { meaning: "nghĩ", phonetic: "/θɪŋk/", type: "verb" },
+  "kindness": { meaning: "sự tử tế", phonetic: "/ˈkaɪndnəs/", type: "noun" },
+  "changes": { meaning: "thay đổi", phonetic: "/ˈtʃeɪndʒɪz/", type: "verb" },
+  "world": { meaning: "thế giới", phonetic: "/wɜːrld/", type: "noun" },
+  "pays": { meaning: "trả", phonetic: "/peɪz/", type: "verb" },
+  "bills": { meaning: "hóa đơn", phonetic: "/bɪlz/", type: "noun" },
+  "wastes": { meaning: "lãng phí", phonetic: "/weɪsts/", type: "verb" },
+  "life": { meaning: "cuộc sống", phonetic: "/laɪf/", type: "noun" },
+  "easy": { meaning: "dễ dàng", phonetic: "/ˈiːzi/", type: "adjective" },
+
+  "believe": { meaning: "tin", phonetic: "/bɪˈliːv/", type: "verb" },
+  "makes": { meaning: "làm cho", phonetic: "/meɪks/", type: "verb" },
+  "her": { meaning: "cô ấy", phonetic: "/hɜːr/", type: "pronoun" },
+  "better": { meaning: "tốt hơn", phonetic: "/ˈbetər/", type: "adjective" },
+  "useless": { meaning: "vô ích", phonetic: "/ˈjuːsləs/", type: "adjective" },
+  "expensive": { meaning: "đắt", phonetic: "/ɪkˈspensɪv/", type: "adjective" },
+
+  "begins": { meaning: "bắt đầu", phonetic: "/bɪˈɡɪnz/", type: "verb" },
+  "with": { meaning: "với", phonetic: "/wɪð/", type: "preposition" },
+  "smile": { meaning: "nụ cười", phonetic: "/smaɪl/", type: "noun" },
+  "friendship": { meaning: "tình bạn", phonetic: "/ˈfrendʃɪp/", type: "noun" },
+  "love": { meaning: "tình yêu", phonetic: "/lʌv/", type: "noun" },
+  "success": { meaning: "thành công", phonetic: "/səkˈses/", type: "noun" },
+
+  "feel": { meaning: "cảm thấy", phonetic: "/fiːl/", type: "verb" },
+  "when": { meaning: "khi", phonetic: "/wen/", type: "conjunction" },
+  "helping": { meaning: "giúp đỡ", phonetic: "/ˈhelpɪŋ/", type: "verb" },
+  "calm": { meaning: "bình tĩnh", phonetic: "/kɑːm/", type: "adjective" },
+  "tired": { meaning: "mệt", phonetic: "/ˈtaɪərd/", type: "adjective" },
+  "lonely": { meaning: "cô đơn", phonetic: "/ˈloʊnli/", type: "adjective" },
+
+  "happens": { meaning: "xảy ra", phonetic: "/ˈhæpənz/", type: "verb" },
+  "at": { meaning: "tại", phonetic: "/æt/", type: "preposition" },
+  "end": { meaning: "kết thúc", phonetic: "/end/", type: "noun" },
+  "go": { meaning: "đi", phonetic: "/ɡoʊ/", type: "verb" },
+  "home": { meaning: "nhà", phonetic: "/hoʊm/", type: "noun" },
+  "miss": { meaning: "lỡ", phonetic: "/mɪs/", type: "verb" },
+  "bus": { meaning: "xe buýt", phonetic: "/bʌs/", type: "noun" },
+  "walk": { meaning: "đi bộ", phonetic: "/wɔːk/", type: "verb" },
+  "back": { meaning: "trở lại", phonetic: "/bæk/", type: "adverb" },
+  "to": { meaning: "đến", phonetic: "/tuː/", type: "preposition" },
+  "office": { meaning: "văn phòng", phonetic: "/ˈɔːfɪs/", type: "noun" },
+  "stop": { meaning: "dừng", phonetic: "/stɑːp/", type: "verb" },
+  "working": { meaning: "làm việc", phonetic: "/ˈwɜːrkɪŋ/", type: "verb" },
+
+  // ===== QUESTION WORDS =====
+  "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "question word" },
+  "who": { meaning: "ai", phonetic: "/huː/", type: "question word" },
+  "how": { meaning: "như thế nào", phonetic: "/haʊ/", type: "question word" },
+
+  // ===== ARTICLES / DETERMINERS =====
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "a": { meaning: "một", phonetic: "/ə/", type: "article" },
+  "an": { meaning: "một", phonetic: "/æn/", type: "article" },
+  "her": { meaning: "của cô ấy", phonetic: "/hɜːr/", type: "possessive adjective" },
+
+  // ===== PRONOUNS =====
+  "she": { meaning: "cô ấy", phonetic: "/ʃiː/", type: "pronoun" },
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+
+  // ===== VERBS =====
+  "is": { meaning: "là", phonetic: "/ɪz/", type: "verb" },
+  "walking": { meaning: "đang đi bộ", phonetic: "/ˈwɔːkɪŋ/", type: "verb" },
+  "think": { meaning: "nghĩ", phonetic: "/θɪŋk/", type: "verb" },
+  "happens": { meaning: "xảy ra", phonetic: "/ˈhæpənz/", type: "verb" },
+  "loses": { meaning: "làm mất", phonetic: "/ˈluːzɪz/", type: "verb" },
+  "steals": { meaning: "đánh cắp", phonetic: "/stiːlz/", type: "verb" },
+  "opens": { meaning: "mở ra", phonetic: "/ˈəʊpənz/", type: "verb" },
+  "drops": { meaning: "làm rơi", phonetic: "/drɒps/", type: "verb" },
+  "leaves": { meaning: "để lại", phonetic: "/liːvz/", type: "verb" },
+  "describe": { meaning: "mô tả", phonetic: "/dɪˈskraɪb/", type: "verb" },
+  "helping": { meaning: "giúp đỡ", phonetic: "/ˈhelpɪŋ/", type: "verb" },
+  "wait": { meaning: "chờ", phonetic: "/weɪt/", type: "verb" },
+  "make": { meaning: "làm cho", phonetic: "/meɪk/", type: "verb" },
+  "go": { meaning: "đi", phonetic: "/ɡəʊ/", type: "verb" },
+  "shares": { meaning: "chia sẻ", phonetic: "/ʃeəz/", type: "verb" },
+  "works": { meaning: "hoạt động", phonetic: "/wɜːrks/", type: "verb" },
+  "changes": { meaning: "thay đổi", phonetic: "/ˈtʃeɪndʒɪz/", type: "verb" },
+
+  // ===== NOUNS =====
+  "time": { meaning: "thời gian", phonetic: "/taɪm/", type: "noun" },
+  "morning": { meaning: "buổi sáng", phonetic: "/ˈmɔːrnɪŋ/", type: "noun" },
+  "emma": { meaning: "Emma (tên riêng)", phonetic: "/ˈemə/", type: "proper noun" },
+  "ava": { meaning: "Ava (tên riêng)", phonetic: "/ˈeɪvə/", type: "proper noun" },
+  "city": { meaning: "thành phố", phonetic: "/ˈsɪti/", type: "noun" },
+  "bag": { meaning: "cái túi", phonetic: "/bæɡ/", type: "noun" },
+  "things": { meaning: "đồ vật", phonetic: "/θɪŋz/", type: "noun" },
+  "strangers": { meaning: "người lạ", phonetic: "/ˈstreɪndʒərz/", type: "noun" },
+  "waste": { meaning: "sự lãng phí", phonetic: "/weɪst/", type: "noun" },
+  "job": { meaning: "công việc", phonetic: "/dʒɒb/", type: "noun" },
+  "game": { meaning: "trò chơi", phonetic: "/ɡeɪm/", type: "noun" },
+  "kindness": { meaning: "lòng tốt", phonetic: "/ˈkaɪndnəs/", type: "noun" },
+  "money": { meaning: "tiền", phonetic: "/ˈmʌni/", type: "noun" },
+  "permission": { meaning: "sự cho phép", phonetic: "/pəˈmɪʃn/", type: "noun" },
+  "anger": { meaning: "sự tức giận", phonetic: "/ˈæŋɡər/", type: "noun" },
+  "coffee": { meaning: "cà phê", phonetic: "/ˈkɒfi/", type: "noun" },
+  "message": { meaning: "thông điệp", phonetic: "/ˈmesɪdʒ/", type: "noun" },
+
+  // ===== ADJECTIVES =====
+  "lazy": { meaning: "lười biếng", phonetic: "/ˈleɪzi/", type: "adjective" },
+  "energetic": { meaning: "tràn đầy năng lượng", phonetic: "/ˌenəˈdʒetɪk/", type: "adjective" },
+  "friendly": { meaning: "thân thiện", phonetic: "/ˈfrendli/", type: "adjective" },
+  "loud": { meaning: "ồn ào", phonetic: "/laʊd/", type: "adjective" },
+  "good": { meaning: "tốt", phonetic: "/ɡʊd/", type: "adjective" },
+  "hard": { meaning: "khó", phonetic: "/hɑːrd/", type: "adjective" },
+  "fun": { meaning: "vui", phonetic: "/fʌn/", type: "adjective" },
+  "tired": { meaning: "mệt", phonetic: "/ˈtaɪərd/", type: "adjective" },
+  "main": { meaning: "chính", phonetic: "/meɪn/", type: "adjective" },
+
+  // ===== ADVERBS =====
+  "initially": { meaning: "ban đầu", phonetic: "/ɪˈnɪʃəli/", type: "adverb" },
+  "away": { meaning: "biến mất / đi xa", phonetic: "/əˈweɪ/", type: "adverb" },
+
+  // ===== PREPOSITIONS =====
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "with": { meaning: "với", phonetic: "/wɪð/", type: "preposition" },
+  "for": { meaning: "cho", phonetic: "/fɔːr/", type: "preposition" },
+  "to": { meaning: "đến", phonetic: "/tuː/", type: "preposition" },
+  "by": { meaning: "bằng cách", phonetic: "/baɪ/", type: "preposition" },
+
+  // ===== CONJUNCTIONS =====
+  "and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+
+  // ===== EXPRESSIONS =====
+  "7": { meaning: "bảy", phonetic: "/ˈsevən/", type: "number" },
+  "8": { meaning: "tám", phonetic: "/eɪt/", type: "number" },
+  "6": { meaning: "sáu", phonetic: "/sɪks/", type: "number" },
+  "9": { meaning: "chín", phonetic: "/naɪn/", type: "number" },
+
+  "in the morning": { meaning: "vào buổi sáng", phonetic: "/ɪn ðə ˈmɔːrnɪŋ/", type: "phrase" },
+  "far away": { meaning: "rất xa", phonetic: "/fɑːr əˈweɪ/", type: "phrase" },
+  "a waste of time": { meaning: "lãng phí thời gian", phonetic: "/ə weɪst əv taɪm/", type: "phrase" },
+  "a good deed": { meaning: "việc tốt", phonetic: "/ə ɡʊd diːd/", type: "phrase" },
+  "both ways": { meaning: "hai chiều", phonetic: "/bəʊθ weɪz/", type: "phrase" },
+  "thank you": { meaning: "cảm ơn", phonetic: "/θæŋk juː/", type: "phrase" },
+  // Old words preserved
+  "girl": { meaning: "cô gái, bé gái", phonetic: "/ɡɜːrl/", type: "noun" },
+  "ice": { meaning: "đá, băng", phonetic: "/aɪs/", type: "noun" },
+  "cream": { meaning: "kem", phonetic: "/kriːm/", type: "noun" },
+  "truck": { meaning: "xe tải", phonetic: "/trʌk/", type: "noun" },
+  "bedroom": { meaning: "phòng ngủ", phonetic: "/ˈbedruːm/", type: "noun" },
+  "window": { meaning: "cửa sổ", phonetic: "/ˈwɪndoʊ/", type: "noun" },
+  "street": { meaning: "con đường", phonetic: "/striːt/", type: "noun" },
+  "summer": { meaning: "mùa hè", phonetic: "/ˈsʌmər/", type: "noun" },
+  "picnic": { meaning: "chuyến dã ngoại", phonetic: "/ˈpɪknɪk/", type: "noun" },
+  "picnics": { meaning: "những chuyến dã ngoại", phonetic: "/ˈpɪknɪks/", type: "noun" },
+  "strawberry": { meaning: "quả dâu tây", phonetic: "/ˈstrɔːbəri/", type: "noun" },
+  "strawberries": { meaning: "những quả dâu tây", phonetic: "/ˈstrɔːbəriz/", type: "noun" },
+  "jacket": { meaning: "áo khoác", phonetic: "/ˈdʒækɪt/", type: "noun" },
+  "jackets": { meaning: "những chiếc áo khoác", phonetic: "/ˈdʒækɪts/", type: "noun" },
+  "glove": { meaning: "găng tay", phonetic: "/ɡlʌv/", type: "noun" },
+  "gloves": { meaning: "những chiếc găng tay", phonetic: "/ɡlʌvz/", type: "noun" },
+  "sky": { meaning: "bầu trời", phonetic: "/skaɪ/", type: "noun" },
+  "skies": { meaning: "bầu trời (số nhiều)", phonetic: "/skaɪz/", type: "noun" },
+  "snow": { meaning: "tuyết", phonetic: "/snoʊ/", type: "noun" },
+  "mother": { meaning: "mẹ", phonetic: "/ˈmʌðər/", type: "noun" },
+  "father": { meaning: "bố", phonetic: "/ˈfɑːðər/", type: "noun" },
+  "sign": { meaning: "dấu hiệu", phonetic: "/saɪn/", type: "noun" },
+  "closet": { meaning: "tủ quần áo", phonetic: "/ˈklɑːzɪt/", type: "noun" },
+  "suit": { meaning: "bộ đồ", phonetic: "/suːt/", type: "noun" },
+  "hat": { meaning: "chiếc mũ", phonetic: "/hæt/", type: "noun" },
+  "stair": { meaning: "bậc thang", phonetic: "/ster/", type: "noun" },
+  "stairs": { meaning: "cầu thang", phonetic: "/sterz/", type: "noun" },
+  "door": { meaning: "cánh cửa", phonetic: "/dɔːr/", type: "noun" },
+  "foot": { meaning: "bàn chân", phonetic: "/fʊt/", type: "noun" },
+  "feet": { meaning: "những bàn chân", phonetic: "/fiːt/", type: "noun" },
+  "grass": { meaning: "bãi cỏ", phonetic: "/ɡræs/", type: "noun" },
+  "corner": { meaning: "góc đường", phonetic: "/ˈkɔːrnər/", type: "noun" },
+  "auto": { meaning: "ô tô, tự động", phonetic: "/ˈɔːtoʊ/", type: "noun" },
+  "repair": { meaning: "sửa chữa", phonetic: "/rɪˈper/", type: "noun" },
+  "shop": { meaning: "cửa tiệm", phonetic: "/ʃɑːp/", type: "noun" },
+  "moral": { meaning: "bài học đạo đức", phonetic: "/ˈmɔːrəl/", type: "noun" },
+  "conclusion": { meaning: "kết luận", phonetic: "/kənˈkluːʒn/", type: "noun" },
+  "observation": { meaning: "sự quan sát", phonetic: "/ˌɑːbzərˈveɪʃn/", type: "noun" },
+  "sit": { meaning: "ngồi", phonetic: "/sɪt/", type: "verb" },
+  "sits": { meaning: "ngồi", phonetic: "/sɪts/", type: "verb" },
+  "look": { meaning: "nhìn", phonetic: "/lʊk/", type: "verb" },
+  "looking": { meaning: "đang nhìn", phonetic: "/ˈlʊkɪŋ/", type: "verb" },
+  "looks": { meaning: "nhìn", phonetic: "/lʊks/", type: "verb" },
+  "wait": { meaning: "chờ đợi", phonetic: "/weɪt/", type: "verb" },
+  "waiting": { meaning: "đang chờ", phonetic: "/ˈweɪtɪŋ/", type: "verb" },
+  "want": { meaning: "muốn", phonetic: "/wɑːnt/", type: "verb" },
+  "wants": { meaning: "muốn", phonetic: "/wɑːnts/", type: "verb" },
+  "eat": { meaning: "ăn", phonetic: "/iːt/", type: "verb" },
+  "go": { meaning: "đi", phonetic: "/ɡoʊ/", type: "verb" },
+  "swim": { meaning: "bơi", phonetic: "/swɪm/", type: "verb" },
+  "swimming": { meaning: "môn bơi lội", phonetic: "/ˈswɪmɪŋ/", type: "verb/noun" },
+  "is": { meaning: "là, thì, ở", phonetic: "/ɪz/", type: "verb" },
+  "say": { meaning: "nói", phonetic: "/seɪ/", type: "verb" },
+  "says": { meaning: "nói", phonetic: "/sez/", type: "verb" },
+  "come": { meaning: "đến", phonetic: "/kʌm/", type: "verb" },
+  "coming": { meaning: "đang đến", phonetic: "/ˈkʌmɪŋ/", type: "verb" },
+  "arrive": { meaning: "đến nơi", phonetic: "/əˈraɪv/", type: "verb" },
+  "arrived": { meaning: "đã đến", phonetic: "/əˈraɪvd/", type: "verb" },
+  "see": { meaning: "nhìn thấy", phonetic: "/siː/", type: "verb" },
+  "sees": { meaning: "nhìn thấy", phonetic: "/siːz/", type: "verb" },
+  "saw": { meaning: "đã nhìn thấy", phonetic: "/sɔː/", type: "verb" },
+  "drive": { meaning: "lái xe", phonetic: "/draɪv/", type: "verb" },
+  "driving": { meaning: "đang lái xe", phonetic: "/ˈdraɪvɪŋ/", type: "verb" },
+  "mean": { meaning: "có nghĩa là", phonetic: "/miːn/", type: "verb" },
+  "squeal": { meaning: "ré lên", phonetic: "/skwiːl/", type: "verb" },
+  "squeals": { meaning: "ré lên", phonetic: "/skwiːlz/", type: "verb" },
+  "run": { meaning: "chạy", phonetic: "/rʌn/", type: "verb" },
+  "runs": { meaning: "chạy", phonetic: "/rʌnz/", type: "verb" },
+  "put": { meaning: "đặt, để, mặc", phonetic: "/pʊt/", type: "verb" },
+  "puts": { meaning: "đặt, để, mặc", phonetic: "/pʊts/", type: "verb" },
+  "turn": { meaning: "rẽ, quay", phonetic: "/tɜːrn/", type: "verb" },
+  "pull": { meaning: "kéo, tấp vào", phonetic: "/pʊl/", type: "verb" },
+  "draw": { meaning: "rút ra (kết luận), vẽ", phonetic: "/drɔː/", type: "verb" },
+  "make": { meaning: "làm, tạo ra", phonetic: "/meɪk/", type: "verb" },
+  "tired": { meaning: "mệt mỏi, chán ngấy", phonetic: "/ˈtaɪərd/", type: "adjective" },
+  "winter": { meaning: "thuộc mùa đông", phonetic: "/ˈwɪntər/", type: "adjective/noun" },
+  "grey": { meaning: "màu xám", phonetic: "/ɡreɪ/", type: "adjective" },
+  "far": { meaning: "xa", phonetic: "/fɑːr/", type: "adjective/adverb" },
+  "more": { meaning: "nhiều hơn", phonetic: "/mɔːr/", type: "adjective/adverb" },
+  "bare": { meaning: "trần, để trần", phonetic: "/ber/", type: "adjective" },
+  "icy": { meaning: "băng giá", phonetic: "/ˈaɪsi/", type: "adjective" },
+  "confused": { meaning: "bối rối", phonetic: "/kənˈfjuːzd/", type: "adjective" },
+  "single": { meaning: "đơn lẻ, duy nhất", phonetic: "/ˈsɪŋɡl/", type: "adjective" },
+  "down": { meaning: "xuống", phonetic: "/daʊn/", type: "adverb/preposition" },
+  "at": { meaning: "tại, ở", phonetic: "/æt/", type: "preposition" },
+  "for": { meaning: "cho, để", phonetic: "/fɔːr/", type: "preposition" },
+  "and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+  "of": { meaning: "của", phonetic: "/əv/", type: "preposition" },
+  "away": { meaning: "xa, đi xa", phonetic: "/əˈweɪ/", type: "adverb" },
+  "still": { meaning: "vẫn", phonetic: "/stɪl/", type: "adverb" },
+  "that": { meaning: "rằng, điều đó", phonetic: "/ðæt/", type: "conjunction/pronoun" },
+  "just": { meaning: "vừa mới, chỉ", phonetic: "/dʒʌst/", type: "adverb" },
+  "then": { meaning: "sau đó, lúc đó", phonetic: "/ðen/", type: "adverb" },
+  "now": { meaning: "bây giờ", phonetic: "/naʊ/", type: "adverb" },
+  "out": { meaning: "ra ngoài", phonetic: "/aʊt/", type: "adverb" },
+  "but": { meaning: "nhưng", phonetic: "/bʌt/", type: "conjunction" },
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "time": { meaning: "thời gian, lúc", phonetic: "/taɪm/", type: "noun" },
+  "into": { meaning: "vào trong", phonetic: "/ˈɪntu/", type: "preposition" },
+  "on": { meaning: "trên, dựa vào", phonetic: "/ɑːn/", type: "preposition" },
+  "not": { meaning: "không", phonetic: "/nɑːt/", type: "adverb" },
+  "she": { meaning: "cô ấy", phonetic: "/ʃiː/", type: "pronoun" },
+  "her": { meaning: "cô ấy (tân ngữ / sở hữu)", phonetic: "/hɜːr/", type: "pronoun" },
+  "hers": { meaning: "của cô ấy", phonetic: "/hɜːrz/", type: "pronoun" },
+  "he": { meaning: "anh ấy", phonetic: "/hiː/", type: "pronoun" },
+  "him": { meaning: "anh ấy (tân ngữ)", phonetic: "/hɪm/", type: "pronoun" },
+  "his": { meaning: "của anh ấy", phonetic: "/hɪz/", type: "pronoun" },
+  "they": { meaning: "họ", phonetic: "/ðeɪ/", type: "pronoun" },
+  "them": { meaning: "họ (tân ngữ)", phonetic: "/ðem/", type: "pronoun" },
+  "their": { meaning: "của họ", phonetic: "/ðer/", type: "pronoun" },
+  "theirs": { meaning: "của họ", phonetic: "/ðerz/", type: "pronoun" },
+  "we": { meaning: "chúng tôi / chúng ta", phonetic: "/wiː/", type: "pronoun" },
+  "us": { meaning: "chúng tôi (tân ngữ)", phonetic: "/ʌs/", type: "pronoun" },
+  "our": { meaning: "của chúng tôi", phonetic: "/aʊər/", type: "pronoun" },
+  "ours": { meaning: "của chúng tôi", phonetic: "/aʊərz/", type: "pronoun" },
+  "i": { meaning: "tôi", phonetic: "/aɪ/", type: "pronoun" },
+  "me": { meaning: "tôi (tân ngữ)", phonetic: "/miː/", type: "pronoun" },
+  "my": { meaning: "của tôi", phonetic: "/maɪ/", type: "pronoun" },
+  "mine": { meaning: "của tôi", phonetic: "/maɪn/", type: "pronoun" },
+  "you": { meaning: "bạn / bạn (số nhiều)", phonetic: "/juː/", type: "pronoun" },
+  "your": { meaning: "của bạn", phonetic: "/jʊər/", type: "pronoun" },
+  "yours": { meaning: "của bạn", phonetic: "/jʊərz/", type: "pronoun" },
+
+  // New words added
+  "it's": { meaning: "nó là", phonetic: "/ɪts/", type: "contraction" },
+  "7": { meaning: "số 7", phonetic: "/ˈsevn/", type: "noun" },
+  "seven": { meaning: "số 7", phonetic: "/ˈsevn/", type: "noun" },
+  "6": { meaning: "số 6", phonetic: "/sɪks/", type: "noun" },
+  "8": { meaning: "số 8", phonetic: "/eɪt/", type: "noun" },
+  "9": { meaning: "số 9", phonetic: "/naɪn/", type: "noun" },
+  "morning": { meaning: "buổi sáng", phonetic: "/ˈmɔːrnɪŋ/", type: "noun" },
+  "mornings": { meaning: "những buổi sáng", phonetic: "/ˈmɔːrnɪŋz/", type: "noun" },
+  "air": { meaning: "không khí", phonetic: "/er/", type: "noun" },
+  "smell": { meaning: "ngửi, có mùi", phonetic: "/smel/", type: "verb" },
+  "smells": { meaning: "có mùi", phonetic: "/smelz/", type: "verb" },
+  "fresh": { meaning: "trong lành, tươi", phonetic: "/freʃ/", type: "adjective" },
+  "soft": { meaning: "mềm mại, dịu", phonetic: "/sɔːft/", type: "adjective" },
+  "blue": { meaning: "màu xanh dương", phonetic: "/bluː/", type: "adjective" },
+  "people": { meaning: "mọi người", phonetic: "/ˈpiːpl/", type: "noun" },
+  "hurry": { meaning: "vội vã", phonetic: "/ˈhɜːri/", type: "verb" },
+  "coffee": { meaning: "cà phê", phonetic: "/ˈkɔːfi/", type: "noun" },
+  "cup": { meaning: "cốc", phonetic: "/kʌp/", type: "noun" },
+  "cups": { meaning: "những cái cốc", phonetic: "/kʌps/", type: "noun" },
+  "sleepy": { meaning: "buồn ngủ", phonetic: "/ˈsliːpi/", type: "adjective" },
+  "face": { meaning: "khuôn mặt", phonetic: "/feɪs/", type: "noun" },
+  "faces": { meaning: "những khuôn mặt", phonetic: "/feɪsɪz/", type: "noun" },
+  "walk": { meaning: "đi bộ", phonetic: "/wɔːk/", type: "verb" },
+  "walking": { meaning: "đang đi bộ", phonetic: "/ˈwɔːkɪŋ/", type: "verb" },
+  "beside": { meaning: "bên cạnh", phonetic: "/bɪˈsaɪd/", type: "preposition" },
+  "ava": { meaning: "tên riêng (Ava)", phonetic: "/ˈeɪvə/", type: "noun" },
+  "emma": { meaning: "tên riêng (Emma)", phonetic: "/ˈemə/", type: "noun" },
+  "colleague": { meaning: "đồng nghiệp", phonetic: "/ˈkɑːliːɡ/", type: "noun" },
+  "perfect": { meaning: "hoàn hảo", phonetic: "/ˈpɜːrfɪkt/", type: "adjective" },
+  "shiny": { meaning: "bóng loáng", phonetic: "/ˈʃaɪni/", type: "adjective" },
+  "shoe": { meaning: "chiếc giày", phonetic: "/ʃuː/", type: "noun" },
+  "shoes": { meaning: "đôi giày", phonetic: "/ʃuːz/", type: "noun" },
+  "neat": { meaning: "gọn gàng", phonetic: "/niːt/", type: "adjective" },
+  "hair": { meaning: "mái tóc", phonetic: "/her/", type: "noun" },
+  "sharp": { meaning: "sắc sảo, nhọn", phonetic: "/ʃɑːrp/", type: "adjective" },
+  "eye": { meaning: "con mắt", phonetic: "/aɪ/", type: "noun" },
+  "eyes": { meaning: "đôi mắt", phonetic: "/aɪz/", type: "noun" },
+  "smile": { meaning: "nụ cười / mỉm cười", phonetic: "/smaɪl/", type: "noun/verb" },
+  "traffic": { meaning: "giao thông", phonetic: "/ˈtræfɪk/", type: "noun" },
+  "again": { meaning: "lại, một lần nữa", phonetic: "/əˈɡen/", type: "adverb" },
+  "hate": { meaning: "ghét", phonetic: "/heɪt/", type: "verb" },
+  "oh": { meaning: "ồ", phonetic: "/oʊ/", type: "exclamation" },
+  "maybe": { meaning: "có lẽ", phonetic: "/ˈmeɪbi/", type: "adverb" },
+  "city": { meaning: "thành phố", phonetic: "/ˈsɪti/", type: "noun" },
+  "wake": { meaning: "thức dậy", phonetic: "/weɪk/", type: "verb" },
+  "waking": { meaning: "đang thức dậy", phonetic: "/ˈweɪkɪŋ/", type: "verb" },
+  "up": { meaning: "lên", phonetic: "/ʌp/", type: "adverb/preposition" },
+  "too": { meaning: "cũng, quá", phonetic: "/tuː/", type: "adverb" },
+  "no": { meaning: "không", phonetic: "/noʊ/", type: "adverb" },
+  "lazy": { meaning: "lười biếng", phonetic: "/ˈleɪzi/", type: "adjective" },
+  "have": { meaning: "có", phonetic: "/hæv/", type: "verb" },
+  "meeting": { meaning: "cuộc họp", phonetic: "/ˈmiːtɪŋ/", type: "noun" },
+  "30": { meaning: "ba mươi", phonetic: "/ˈθɜːrti/", type: "number" },
+  "thirty": { meaning: "ba mươi", phonetic: "/ˈθɜːrti/", type: "number" },
+  "minute": { meaning: "phút", phonetic: "/ˈmɪnɪt/", type: "noun" },
+  "minutes": { meaning: "những phút", phonetic: "/ˈmɪnɪts/", type: "noun" },
+  "poor": { meaning: "tội nghiệp, nghèo", phonetic: "/pʊr/", type: "adjective" },
+  "boy": { meaning: "cậu bé", phonetic: "/bɔɪ/", type: "noun" },
+  "let's": { meaning: "chúng ta hãy", phonetic: "/lets/", type: "contraction" },
+  "help": { meaning: "giúp đỡ", phonetic: "/help/", type: "verb/noun" },
+  "helping": { meaning: "việc giúp đỡ", phonetic: "/ˈhelpɪŋ/", type: "verb" },
+  "helped": { meaning: "đã giúp đỡ", phonetic: "/helpt/", type: "verb" },
+  "seriously": { meaning: "thật á, một cách nghiêm túc", phonetic: "/ˈsɪriəsli/", type: "adverb" },
+  "problem": { meaning: "vấn đề", phonetic: "/ˈprɑːbləm/", type: "noun" },
+  "one": { meaning: "một", phonetic: "/wʌn/", type: "number/pronoun" },
+  "okay": { meaning: "ổn, được", phonetic: "/ˌoʊˈkeɪ/", type: "adjective/adverb" },
+  "thank": { meaning: "cảm ơn", phonetic: "/θæŋk/", type: "verb" },
+  "careful": { meaning: "cẩn thận", phonetic: "/ˈkerfl/", type: "adjective" },
+  "next": { meaning: "tiếp theo", phonetic: "/nekst/", type: "adjective/adverb" },
+  "waste": { meaning: "lãng phí", phonetic: "/weɪst/", type: "verb/noun" },
+  "wasted": { meaning: "bị lãng phí", phonetic: "/ˈweɪstɪd/", type: "adjective/verb" },
+  "stranger": { meaning: "người lạ", phonetic: "/ˈstreɪndʒər/", type: "noun" },
+  "strangers": { meaning: "những người lạ", phonetic: "/ˈstreɪndʒərz/", type: "noun" },
+  "use": { meaning: "sử dụng", phonetic: "/juːz/", type: "verb" },
+  "kindness": { meaning: "sự tử tế", phonetic: "/ˈkaɪndnəs/", type: "noun" },
+  "pay": { meaning: "trả tiền", phonetic: "/peɪ/", type: "verb" },
+  "bill": { meaning: "hóa đơn", phonetic: "/bɪl/", type: "noun" },
+  "bills": { meaning: "những hóa đơn", phonetic: "/bɪlz/", type: "noun" },
+  "cappuccino": { meaning: "cà phê cappuccino", phonetic: "/ˌkæpuˈtʃiːnoʊ/", type: "noun" },
+  "sugar": { meaning: "đường", phonetic: "/ˈʃʊɡər/", type: "noun" },
+  "good": { meaning: "tốt, chào", phonetic: "/ɡʊd/", type: "adjective" },
+  "how": { meaning: "như thế nào", phonetic: "/haʊ/", type: "adverb" },
+  "are": { meaning: "thì, là, ở", phonetic: "/ɑːr/", type: "verb" },
+  "today": { meaning: "hôm nay", phonetic: "/təˈdeɪ/", type: "noun/adverb" },
+  "even": { meaning: "thậm chí", phonetic: "/ˈiːvn/", type: "adverb" },
+  "talk": { meaning: "nói chuyện", phonetic: "/tɔːk/", type: "verb" },
+  "talking": { meaning: "đang nói chuyện", phonetic: "/ˈtɔːkɪŋ/", type: "verb" },
+  "feel": { meaning: "cảm thấy", phonetic: "/fiːl/", type: "verb" },
+  "feels": { meaning: "cảm thấy", phonetic: "/fiːlz/", type: "verb" },
+  "feeling": { meaning: "cảm giác", phonetic: "/ˈfiːlɪŋ/", type: "noun" },
+  "should": { meaning: "nên", phonetic: "/ʃʊd/", type: "modal verb" },
+  "try": { meaning: "thử, cố gắng", phonetic: "/traɪ/", type: "verb/noun" },
+  "fix": { meaning: "sửa chữa", phonetic: "/fɪks/", type: "verb" },
+  "day": { meaning: "ngày", phonetic: "/deɪ/", type: "noun" },
+  "take": { meaning: "lấy, nhận", phonetic: "/teɪk/", type: "verb" },
+  "advantage": { meaning: "lợi thế, lợi dụng", phonetic: "/ədˈvæntɪdʒ/", type: "noun" },
+  "care": { meaning: "quan tâm", phonetic: "/ker/", type: "verb/noun" },
+  "bless": { meaning: "ban phước", phonetic: "/bles/", type: "verb" },
+  "crazy": { meaning: "điên rồ", phonetic: "/ˈkreɪzi/", type: "adjective" },
+  "save": { meaning: "cứu, tiết kiệm", phonetic: "/seɪv/", type: "verb" },
+  "whole": { meaning: "toàn bộ", phonetic: "/hoʊl/", type: "adjective" },
+  "rate": { meaning: "tốc độ, mức", phonetic: "/reɪt/", type: "noun" },
+  "bad": { meaning: "tệ", phonetic: "/bæd/", type: "adjective" },
+  "really": { meaning: "thực sự", phonetic: "/ˈriːəli/", type: "adverb" },
+  "believe": { meaning: "tin tưởng", phonetic: "/bɪˈliːv/", type: "verb" },
+  "random": { meaning: "ngẫu nhiên", phonetic: "/ˈrændəm/", type: "adjective" },
+  "world": { meaning: "thế giới", phonetic: "/wɜːrld/", type: "noun" },
+  "better": { meaning: "tốt hơn", phonetic: "/ˈbetər/", type: "adjective" },
+  "girls": { meaning: "các cô gái", phonetic: "/ɡɜːrlz/", type: "noun" },
+  "welcome": { meaning: "được chào đón (you're welcome: không có chi)", phonetic: "/ˈwelkəm/", type: "adjective" },
+  "right": { meaning: "đúng", phonetic: "/raɪt/", type: "adjective" },
+  "don't": { meaning: "đừng, không", phonetic: "/doʊnt/", type: "contraction" },
+  "didn't": { meaning: "đã không", phonetic: "/ˈdɪdnt/", type: "contraction" },
+  "push": { meaning: "đẩy, ép", phonetic: "/pʊʃ/", type: "verb" },
+  "stare": { meaning: "nhìn chằm chằm", phonetic: "/ster/", type: "verb" },
+  "staring": { meaning: "đang nhìn chằm chằm", phonetic: "/ˈsterɪŋ/", type: "verb" },
+  "live": { meaning: "sống", phonetic: "/lɪv/", type: "verb" },
+  "calm": { meaning: "bình tĩnh", phonetic: "/kɑːm/", type: "adjective" },
+  "trust": { meaning: "tin tưởng", phonetic: "/trʌst/", type: "verb" },
+  "never": { meaning: "không bao giờ", phonetic: "/ˈnevər/", type: "adverb" },
+  "real": { meaning: "thật", phonetic: "/riːəl/", type: "adjective" },
+  "once": { meaning: "một khi", phonetic: "/wʌns/", type: "conjunction" },
+  "understand": { meaning: "hiểu", phonetic: "/ˌʌndərˈstænd/", type: "verb" },
+  "someone's": { meaning: "của ai đó", phonetic: "/ˈsʌmwʌnz/", type: "pronoun" },
+  "begin": { meaning: "bắt đầu", phonetic: "/bɪˈɡɪn/", type: "verb" },
+  "begins": { meaning: "bắt đầu", phonetic: "/bɪˈɡɪnz/", type: "verb" },
+  "with": { meaning: "với", phonetic: "/wɪð/", type: "preposition" },
+  "stick": { meaning: "cây gậy", phonetic: "/stɪk/", type: "noun" },
+  "laugh": { meaning: "tiếng cười", phonetic: "/læf/", type: "noun" },
+  "under": { meaning: "dưới", phonetic: "/ˈʌndər/", type: "preposition" },
+  "sun": { meaning: "mặt trời", phonetic: "/sʌn/", type: "noun" },
+  "climb": { meaning: "leo, nhô lên", phonetic: "/klaɪm/", type: "verb" },
+  "climbs": { meaning: "nhô lên", phonetic: "/klaɪmz/", type: "verb" },
+  "high": { meaning: "cao", phonetic: "/haɪ/", type: "adjective/adverb" },
+  "busier": { meaning: "bận rộn hơn", phonetic: "/ˈbɪziər/", type: "adjective" },
+  "finish": { meaning: "kết thúc, hoàn thành", phonetic: "/ˈfɪnɪʃ/", type: "verb" },
+  "start": { meaning: "bắt đầu", phonetic: "/stɑːrt/", type: "verb" },
+  "back": { meaning: "trở lại", phonetic: "/bæk/", type: "adverb" },
+  "toward": { meaning: "hướng về", phonetic: "/təˈwɔːrd/", type: "preposition" },
+  "office": { meaning: "văn phòng", phonetic: "/ˈɔːfɪs/", type: "noun" },
+  "noise": { meaning: "tiếng ồn", phonetic: "/nɔɪz/", type: "noun" },
+  "loud": { meaning: "ồn ào, to tiếng", phonetic: "/laʊd/", type: "adjective" },
+  "louder": { meaning: "ồn ào hơn", phonetic: "/ˈlaʊdər/", type: "adjective" },
+  "late": { meaning: "trễ", phonetic: "/leɪt/", type: "adjective" },
+  "boss": { meaning: "sếp", phonetic: "/bɔːs/", type: "noun" },
+  "scream": { meaning: "la hét", phonetic: "/skriːm/", type: "verb" },
+  "shortcut": { meaning: "đường tắt", phonetic: "/ˈʃɔːrtkʌt/", type: "noun" },
+  "card": { meaning: "thẻ", phonetic: "/kɑːrd/", type: "noun" },
+  "phone": { meaning: "điện thoại", phonetic: "/foʊn/", type: "noun" },
+  "bag": { meaning: "túi", phonetic: "/bæɡ/", type: "noun" },
+  "bag's": { meaning: "túi thì (bag is)", phonetic: "/bæɡz/", type: "noun+verb" },
+  "open": { meaning: "mở", phonetic: "/ˈoʊpən/", type: "adjective/verb" },
+  "someone": { meaning: "ai đó", phonetic: "/ˈsʌmwʌn/", type: "pronoun" },
+  "drop": { meaning: "đánh rơi", phonetic: "/drɑːp/", type: "verb" },
+  "dropped": { meaning: "đã đánh rơi", phonetic: "/drɑːpt/", type: "verb" },
+  "unbelievable": { meaning: "không thể tin được", phonetic: "/ˌʌnbɪˈliːvəbl/", type: "adjective" },
+  "let": { meaning: "để", phonetic: "/let/", type: "verb" },
+  "happen": { meaning: "xảy ra", phonetic: "/ˈhæpən/", type: "verb" },
+  "happens": { meaning: "xảy ra", phonetic: "/ˈhæpənz/", type: "verb" },
+  "everyone": { meaning: "mọi người", phonetic: "/ˈevriwʌn/", type: "pronoun" },
+  "strange": { meaning: "lạ, kỳ lạ", phonetic: "/streɪndʒ/", type: "adjective" },
+  "why": { meaning: "tại sao", phonetic: "/waɪ/", type: "adverb" },
+  "know": { meaning: "biết", phonetic: "/noʊ/", type: "verb" },
+  "ask": { meaning: "hỏi", phonetic: "/æsk/", type: "verb" },
+  "permission": { meaning: "sự cho phép", phonetic: "/pərˈmɪʃn/", type: "noun" },
+  "weird": { meaning: "kỳ cục", phonetic: "/wɪrd/", type: "adjective" },
+  "used": { meaning: "đã từng (used to)", phonetic: "/juːzd/", type: "verb" },
+  "themselves": { meaning: "chính họ", phonetic: "/ðəmˈselvz/", type: "pronoun" },
+  "always": { meaning: "luôn luôn", phonetic: "/ˈɔːlweɪz/", type: "adverb" },
+  "said": { meaning: "đã nói", phonetic: "/sed/", type: "verb" },
+  "protect": { meaning: "bảo vệ", phonetic: "/prəˈtekt/", type: "verb" },
+  "sure": { meaning: "chắc chắn", phonetic: "/ʃʊr/", type: "adjective" },
+  "seem": { meaning: "có vẻ", phonetic: "/siːm/", type: "verb" },
+  "like": { meaning: "như, giống như", phonetic: "/laɪk/", type: "preposition" },
+  "nothing": { meaning: "không có gì", phonetic: "/ˈnʌθɪŋ/", type: "pronoun" },
+  "angry": { meaning: "tức giận", phonetic: "/ˈæŋɡri/", type: "adjective" },
+  "learn": { meaning: "học", phonetic: "/lɜːrn/", type: "verb" },
+  "learned": { meaning: "đã học", phonetic: "/lɜːrnd/", type: "verb" },
+  "stop": { meaning: "dừng lại", phonetic: "/stɑːp/", type: "verb" },
+  "before": { meaning: "trước khi", phonetic: "/bɪˈfɔːr/", type: "preposition" },
+  "hurt": { meaning: "làm tổn thương", phonetic: "/hɜːrt/", type: "verb" },
+  "do": { meaning: "làm", phonetic: "/duː/", type: "verb" },
+  "something": { meaning: "điều gì đó", phonetic: "/ˈsʌmθɪŋ/", type: "pronoun" },
+  "small": { meaning: "nhỏ", phonetic: "/smɔːl/", type: "adjective" },
+  "change": { meaning: "thay đổi, sự thay đổi", phonetic: "/tʃeɪndʒ/", type: "verb/noun" },
+  "changes": { meaning: "những thay đổi, làm thay đổi", phonetic: "/ˈtʃeɪndʒɪz/", type: "noun/verb" },
+  "inside": { meaning: "bên trong", phonetic: "/ˌɪnˈsaɪd/", type: "preposition/adverb" },
+  "stay": { meaning: "ở lại", phonetic: "/steɪ/", type: "verb" },
+  "long": { meaning: "lâu, dài", phonetic: "/lɔːŋ/", type: "adjective/adverb" },
+  "wish": { meaning: "ước", phonetic: "/wɪʃ/", type: "verb" },
+  "could": { meaning: "có thể", phonetic: "/kʊd/", type: "modal verb" },
+  "can": { meaning: "có thể", phonetic: "/kæn/", type: "modal verb" },
+  "miss": { meaning: "cô gái, nhớ, lỡ", phonetic: "/mɪs/", type: "noun/verb" },
+  "hand": { meaning: "bàn tay", phonetic: "/hænd/", type: "noun" },
+  "hands": { meaning: "đôi bàn tay", phonetic: "/hændz/", type: "noun" },
+  "what": { meaning: "cái gì", phonetic: "/wʌt/", type: "pronoun" },
+  "pass": { meaning: "đi qua", phonetic: "/pæs/", type: "verb" },
+  "passing": { meaning: "đang đi qua", phonetic: "/ˈpæsɪŋ/", type: "verb" },
+  "by": { meaning: "bởi, đi ngang", phonetic: "/baɪ/", type: "preposition/adverb" },
+  "work": { meaning: "làm việc, hiệu quả", phonetic: "/wɜːrk/", type: "verb" },
+  "works": { meaning: "hoạt động, hiệu quả", phonetic: "/wɜːrks/", type: "verb" },
+  "both": { meaning: "cả hai", phonetic: "/boʊθ/", type: "pronoun" },
+  "way": { meaning: "cách, con đường", phonetic: "/weɪ/", type: "noun" },
+  "ways": { meaning: "những cách, phương hướng", phonetic: "/weɪz/", type: "noun" },
+  "give": { meaning: "cho đi", phonetic: "/ɡɪv/", type: "verb" },
+  "also": { meaning: "cũng", phonetic: "/ˈɔːlsoʊ/", type: "adverb" },
+  "receive": { meaning: "nhận", phonetic: "/rɪˈsiːv/", type: "verb" },
+  "new": { meaning: "mới", phonetic: "/nuː/", type: "adjective" },
+  "light": { meaning: "ánh sáng", phonetic: "/laɪt/", type: "noun" },
+  "all": { meaning: "tất cả", phonetic: "/ɔːl/", type: "pronoun" },
+  "slowly": { meaning: "một cách chậm rãi", phonetic: "/ˈsloʊli/", type: "adverb" },
+  "middle": { meaning: "ở giữa", phonetic: "/ˈmɪdl/", type: "noun" },
+  "ordinary": { meaning: "bình thường", phonetic: "/ˈɔːrdneri/", type: "adjective" },
+  "faster": { meaning: "nhanh hơn", phonetic: "/ˈfæstər/", type: "adverb" },
+  "forget": { meaning: "quên", phonetic: "/fərˈɡet/", type: "verb" },
+  "along": { meaning: "dọc theo", phonetic: "/əˈlɔːŋ/", type: "preposition" },
+  "hold": { meaning: "cầm, giữ", phonetic: "/hoʊld/", type: "verb" },
+  "tight": { meaning: "chặt", phonetic: "/taɪt/", type: "adjective/adverb" },
+  "keep": { meaning: "giữ", phonetic: "/kiːp/", type: "verb" },
+  "heart": { meaning: "trái tim", phonetic: "/hɑːrt/", type: "noun" },
+  "book": { meaning: "quyển sách", phonetic: "/bʊk/", type: "noun" },
+  "happy": { meaning: "vui vẻ", phonetic: "/ˈhæpi/", type: "adjective" },
+  "promise": { meaning: "lời hứa, hứa", phonetic: "/ˈprɑːmɪs/", type: "noun/verb" },
+  "promising": { meaning: "hứa hẹn", phonetic: "/ˈprɑːmɪsɪŋ/", type: "verb" },
+  "anything": { meaning: "bất cứ thứ gì", phonetic: "/ˈeniθɪŋ/", type: "pronoun" },
+  "need": { meaning: "cần", phonetic: "/niːd/", type: "verb" },
+  "needs": { meaning: "cần", phonetic: "/niːdz/", type: "verb" },
+  "starts": { meaning: "bắt đầu", phonetic: "/stɑːrts/", type: "verb" }
+};
+const sentences = [
+  { text: "It's 7:00 in the morning.", start: 0, end: 2, translation: "Bây giờ là 7 giờ sáng." },
+  { text: "The air smells fresh, the sky is soft blue.", start: 2, end: 6, translation: "Không khí thật trong lành, bầu trời có màu xanh dịu." },
+  { text: "People hurry down the street with coffee cups and sleepy faces.", start: 6, end: 11, translation: "Mọi người vội vã đi xuống phố với những cốc cà phê và khuôn mặt ngái ngủ." },
+  { text: "I walk beside Ava, my colleague.", start: 11, end: 14, translation: "Tôi đi bộ bên cạnh Ava, đồng nghiệp của tôi." },
+  { text: "She looks perfect.", start: 14, end: 16, translation: "Cô ấy trông thật hoàn hảo." },
+  { text: "Shiny shoes, neat hair, sharp eyes.", start: 16, end: 18, translation: "Giày bóng loáng, tóc gọn gàng, đôi mắt sắc sảo." },
+  { text: "But her face.", start: 18, end: 20, translation: "Nhưng khuôn mặt cô ấy." },
+  { text: "Shows no smile.", start: 20, end: 21, translation: "Không hề có nụ cười." },
+  { text: "Traffic again.", start: 21, end: 22, translation: "Lại kẹt xe nữa." },
+  { text: "I hate mornings.", start: 22, end: 23, translation: "Tôi ghét buổi sáng." },
+  { text: "Ohh come on, maybe the city is just waking up too.", start: 23, end: 28, translation: "Ồ thôi nào, có thể thành phố cũng chỉ đang thức dậy thôi." },
+  { text: "No Emma, the city is lazy.", start: 28, end: 30, translation: "Không đâu Emma, thành phố này thật lười biếng." },
+  { text: "I have a meeting in 30 minutes.", start: 30, end: 35, translation: "Tôi có một cuộc họp trong 30 phút nữa." },
+  { text: "Ohh, no, poor boy.", start: 35, end: 37, translation: "Ôi không, cậu bé tội nghiệp." },
+  { text: "Let's help him.", start: 37, end: 38, translation: "Hãy giúp cậu ấy nào." },
+  { text: "Seriously, it's not our problem.", start: 38, end: 40, translation: "Thật sao, đó không phải là vấn đề của chúng ta." },
+  { text: "Just one minute, OK?", start: 40, end: 44, translation: "Chỉ một phút thôi, được chứ?" },
+  { text: "Thank you.", start: 44, end: 45, translation: "Cảm ơn cô." },
+  { text: "It's OK.", start: 45, end: 46, translation: "Không sao đâu." },
+  { text: "Be careful next time.", start: 46, end: 48, translation: "Lần sau nhớ cẩn thận nhé." },
+  { text: "You waste time for strangers.", start: 48, end: 51, translation: "Cậu đang lãng phí thời gian cho người lạ." },
+  { text: "Maybe time isn't wasted when we use it for kindness.", start: 51, end: 56, translation: "Có lẽ thời gian không bị lãng phí khi chúng ta dùng nó cho sự tử tế." },
+  { text: "Kindness doesn't pay my bills.", start: 56, end: 59, translation: "Sự tử tế không giúp tôi trả hóa đơn." },
+  { text: "One cappuccino, no sugar.", start: 59, end: 61, translation: "Cho một cappuccino, không đường." },
+  { text: "Good morning.", start: 61, end: 62, translation: "Chào buổi sáng." },
+  { text: "How are you today?", start: 62, end: 64, translation: "Hôm nay bạn thế nào?" },
+  { text: "I'm good, thank you.", start: 64, end: 66, translation: "Tôi ổn, cảm ơn." },
+  { text: "You even talk to strangers now.", start: 66, end: 70, translation: "Giờ cậu còn nói chuyện với người lạ nữa à." },
+  { text: "It feels good to smile.", start: 70, end: 72, translation: "Mỉm cười mang lại cảm giác rất tốt." },
+  { text: "You should try.", start: 72, end: 74, translation: "Cậu nên thử đi." },
+  { text: "Smiling doesn't fix my day.", start: 74, end: 83, translation: "Nụ cười chẳng giúp gì được cho ngày của tôi." },
+  { text: "You're too soft, Emma.", start: 83, end: 85, translation: "Cậu mềm lòng quá rồi, Emma." },
+  { text: "People will take advantage of you.", start: 85, end: 88, translation: "Người ta sẽ lợi dụng cậu mất." },
+  { text: "Maybe.", start: 88, end: 88.5, translation: "Có thể." },
+  { text: "But maybe they just need someone to care.", start: 88.5, end: 92, translation: "Nhưng có thể họ chỉ cần ai đó quan tâm." },
+  { text: "Bless you.", start: 92, end: 106, translation: "Chúa phù hộ bạn." },
+  { text: "Are you OK?", start: 106, end: 108, translation: "Bạn có ổn không?" },
+  { text: "Yes.", start: 108, end: 108.5, translation: "Vâng." },
+  { text: "Thank you.", start: 108.5, end: 109, translation: "Cảm ơn." },
+  { text: "Emma, this is crazy.", start: 109, end: 111, translation: "Emma, chuyện này thật điên rồ." },
+  { text: "You'll save the whole city at this rate.", start: 111, end: 115, translation: "Cậu sẽ cứu cả thành phố với tốc độ này mất." },
+  { text: "Maybe that's not so bad.", start: 115, end: 117, translation: "Có lẽ điều đó cũng không tệ lắm." },
+  { text: "You really believe helping random people makes the world better?", start: 117, end: 122, translation: "Cậu thực sự tin rằng giúp đỡ những người ngẫu nhiên sẽ làm thế giới tốt đẹp hơn sao?" },
+  { text: "I believe it makes me better.", start: 122, end: 130, translation: "Tôi tin rằng nó làm tôi trở nên tốt hơn." },
+  { text: "Thank you girls.", start: 130, end: 131, translation: "Cảm ơn các cô gái." },
+  { text: "You're welcome.", start: 131, end: 133, translation: "Không có chi." },
+  { text: "See.", start: 133, end: 133.5, translation: "Thấy chưa." },
+  { text: "Not too bad, right?", start: 133.5, end: 135, translation: "Cũng không tệ lắm, đúng không?" },
+  { text: "Don't push it.", start: 135, end: 137, translation: "Đừng có ép." },
+  { text: "I just didn't want people staring.", start: 137, end: 142, translation: "Tôi chỉ không muốn mọi người nhìn chằm chằm thôi." },
+  { text: "You really live like this.", start: 142, end: 145, translation: "Cậu thực sự sống như thế này." },
+  { text: "Every day I try, it makes me calm.", start: 145, end: 149, translation: "Mỗi ngày tôi đều cố gắng, điều đó khiến tôi bình tĩnh." },
+  { text: "I don't get it.", start: 149, end: 151, translation: "Tôi không hiểu nổi." },
+  { text: "The world isn't kind to me.", start: 151, end: 154, translation: "Thế giới này chẳng hề tử tế với tôi." },
+  { text: "Then maybe it needs to see kindness through you.", start: 154, end: 159, translation: "Vậy thì có lẽ nó cần nhìn thấy sự tử tế thông qua cậu." },
+  { text: "Ava doesn't trust kindness.", start: 159, end: 162, translation: "Ava không tin vào sự tử tế." },
+  { text: "Maybe she never saw it for real, but I believe once she feels it, she'll understand.", start: 162, end: 178, translation: "Có lẽ cô ấy chưa bao giờ thực sự thấy điều đó, nhưng tôi tin một khi cô ấy cảm nhận được, cô ấy sẽ hiểu." },
+  { text: "See, you just made someone's day.", start: 178, end: 181, translation: "Thấy chưa, cậu vừa làm cho ai đó vui cả ngày." },
+  { text: "Sometimes kindness begins with a smile.", start: 181, end: 185, translation: "Đôi khi sự tử tế bắt đầu bằng một nụ cười." },
+  { text: "Sometimes it's just a stick and a laugh under the morning sun.", start: 185, end: 193, translation: "Đôi khi nó chỉ là một cây gậy và một tiếng cười dưới nắng mai." },
+  { text: "The sun climbs high.", start: 193, end: 194, translation: "Mặt trời lên cao." },
+  { text: "The street gets busier.", start: 194, end: 196, translation: "Đường phố trở nên bận rộn hơn." },
+  { text: "Ava and I finish our coffee and start walking back toward the office.", start: 196, end: 203, translation: "Ava và tôi uống xong cà phê và bắt đầu đi bộ trở lại văn phòng." }
+];
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?"“”]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  if(event) event.stopPropagation();
+
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+// Thêm sự kiện chuột (Mouse Events) để vẽ được trên máy tính
+canvas.addEventListener("mousedown", (e) => {
+  if(!canvas.classList.contains("pen-active")) return;
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if(!isDrawing) return;
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke();
+});
+
+canvas.addEventListener("mouseup", () => isDrawing = false);
+canvas.addEventListener("mouseleave", () => isDrawing = false);
+
+// Giữ nguyên sự kiện cảm ứng (Touch Events) cho Mobile/Tablet
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+
+</script>
+
+</body>
+</html>

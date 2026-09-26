@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Dropdown Exercise – Be Verbs (Full Features)</title>
+
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM-Avo.ttf') format('truetype');
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'UTM Avo', Roboto, sans-serif; touch-action: manipulation; }
+
+    body { background-color: #f0e2cd; padding-bottom: 100px; padding-top: 80px; overflow-x: hidden; }
+
+    /* HEADER */
+    header {
+      background-color: #f3dbc1; padding: 15px; display: flex; justify-content: center;
+      gap: 10px; border-bottom: 2px solid #d4bfa6; position: fixed;
+      top: 0; left: 0; right: 0; z-index: 1010; flex-wrap: wrap; transition: 0.3s;
+    }
+    header.hidden { transform: translateY(-100%); }
+    header button {
+      background-color: #fff; border: 2px solid #d4bfa6; padding: 8px 16px;
+      border-radius: 20px; cursor: pointer; color: #8b5e3c; transition: 0.3s;
+    }
+    header button.active-nav { font-weight: bold; background-color: #e6ccb2; border-color: #8b5e3c; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+
+    /* SIDEBARS */
+    .sidebar {
+      width: 220px; background-color: #f3dbc1; padding: 15px 10px;
+      position: fixed; top: 80px; bottom: 80px; border: 2px solid #d4bfa6;
+      overflow-y: auto; transition: transform 0.3s ease; z-index: 997;
+    }
+    .sidebar.left { left: 0; transform: translateX(-100%); }
+    .sidebar.right { right: 0; transform: translateX(100%); }
+    .sidebar.visible { transform: translateX(0); }
+    .sidebar button {
+      display: block; width: 100%; background-color: #fff; border: 1px solid #d4bfa6;
+      margin-bottom: 8px; padding: 12px; border-radius: 10px; cursor: pointer;
+      font-size: 15px; color: #8b5e3c; text-align: left;
+    }
+    .sidebar button.active { background-color: #d35400; color: #fff; border: 2px solid #a04000; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+
+    .toggle-btn {
+      position: fixed; top: 15px; z-index: 1020; padding: 8px 15px;
+      background: #8d6e63; color: white; border: none; cursor: pointer; border-radius: 20px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .toggle-left { left: 10px; } .toggle-right { right: 10px; }
+
+    /* GAME AREA */
+    .content { padding: 0px; max-width: 1200px; margin: 0 auto; }
+
+    .word-bank {
+      background: #fff; padding: 20px; font-size: 24px; border-radius: 15px; border: 2px dashed #8b5e3c;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 30px;
+    }
+    .choice {
+      padding: 10px 18px; border: 2px solid #d4bfa6; border-radius: 10px;
+      background: #fff; cursor: pointer; font-weight: bold; color: #8b5e3c; user-select: none;
+    }
+    .choice.active-choice { background: #ffeaa7; border-color: #d35400; }
+    .choice.used { visibility: hidden; pointer-events: none; }
+
+    .dialogue-box {
+      background: #fff; padding: 40px; border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1); font-size: 26px; line-height: 1.5;
+    }
+    .line { margin-bottom: 0px; padding: 0px; border-radius: 12px; position: relative; }
+    .line.correct-line { background-color: #e8f5e9; }
+    
+    .result-text { font-weight: bold; margin-left: 0px; font-size: 22px; display: none; }
+    .result-text.correct { color: green; display: inline-block; }
+    .result-text.wrong { color: red; display: inline-block; }
+
+    .blank {
+      display: inline-block; min-width: 110px; border-bottom: 3px solid #8b5e3c;
+      margin: 0 8px; text-align: center; cursor: pointer; font-weight: bold;
+      color: #d35400; min-height: 40px; vertical-align: bottom;
+    }
+    .blank.correct { color: #2e7d32; border-color: #2e7d32; }
+    .blank.wrong { color: #c62828; border-color: #c62828; }
+    .blank:empty::after { content: "_______"; color: #ccc; font-weight: normal; }
+
+    /* FOOTER */
+    footer {
+      position: fixed; bottom: 0; left: 0; right: 0; background-color: #f3dbc1;
+      border-top: 2px solid #d4bfa6; padding: 12px; display: flex;
+      justify-content: space-around; align-items: center; z-index: 1010;
+    }
+    .footer-btn { padding: 10px 18px; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; background-color: #8b5e3c; color: white; }
+    .btn-pen.active { background-color: #ff4757; }
+
+    #drawingCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1005; touch-action: none; }
+    #drawingCanvas.active { pointer-events: auto; }
+
+    /* CSS TỪ ĐIỂN TỪ FILE CỦA BẠN */
+    .word { cursor: pointer; }
+    #dictionaryPopup {
+      display: none;
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 2px solid #ccc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      font-size: 24px;
+      z-index: 9999;
+      max-width: 500px;
+      min-width: 300px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+
+<header id="mainHeader">
+  <nav>
+  <button class="active-nav" onclick="window.location.href='../conversation_01/conversation_01.html'">
+    <b>Conversation 01</b>
+  </button>
+  
+  <button onclick="window.location.href='../conversation_02/conversation_02.html'">
+    Conversation 02
+  </button>
+  
+  <button onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  
+  <button onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+
+  </nav>
+</header>
+
+<button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu</button>
+<button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu</button>
+
+<div class="sidebar left">
+ <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button class="active" onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</div>
+
+<div class="sidebar right">
+   <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>story</b></button>
+
+</div>
+
+<div class="content">
+  <div class="word-bank" id="wordBank"></div>
+
+  <div class="dialogue-box">
+
+  <div class="line" data-sentence="1">
+    <span class="word">Woman</span>: 
+    <span class="blank" data-answer="What does"></span> 
+    <span class="word">your</span> <span class="word">mom</span> <span class="word">do</span>?
+    <span class="result-text"></span>
+  </div>
+
+  <div class="line" data-sentence="2">
+    <span class="word">Man</span>: <span class="word">She</span> 
+    <span class="blank" data-answer="sells"></span> 
+    <span class="word">women's</span> <span class="word">clothing</span>.
+    <span class="result-text"></span>
+  </div>
+
+  <div class="line" data-sentence="3">
+    <span class="word">Woman</span>: <span class="word">Oh</span>, <span class="word">yeah</span>? 
+    <span class="blank" data-answer="Where does"></span> 
+    <span class="word">he</span> <span class="word">work</span>?
+    <span class="result-text"></span>
+  </div>
+
+  <div class="line" data-sentence="4">
+    <span class="word">Man</span>: <span class="word">She</span> <span class="word">has</span> <span class="word">a</span> 
+    <span class="blank" data-answer="small shop"></span> 
+    <span class="word">in</span> <span class="word">the</span> <span class="word">mall</span>.
+    <span class="result-text"></span>
+  </div>
+
+  <div class="line" data-sentence="5">
+    <span class="word">Woman</span>: <span class="word">Does</span> <span class="word">she</span> <span class="word">sell</span> <span class="word">clothing</span> 
+    <span class="blank" data-answer="for teens"></span>?
+    <span class="result-text"></span>
+  </div>
+
+  <div class="line" data-sentence="6">
+    <span class="word">Man</span>: <span class="word">No</span>, <span class="word">she</span> <span class="word">only</span> <span class="word">has</span> <span class="word">stuff</span> 
+    <span class="blank" data-answer="for adults"></span>.
+    <span class="result-text"></span>
+  </div>
+
+</div>
+</div>
+
+<div id="dictionaryPopup">
+  <div id="dictWord" style="font-weight: bold; font-size: 28px;"></div>
+  
+  <div id="dictType" style="color: #d35400; font-weight: bold; font-size: 18px; margin-bottom: 5px;"></div> 
+  
+  <div id="dictPhonetic" style="font-style: italic; color: #555;"></div>
+  <div id="dictMeaning" style="margin: 10px 0;"></div>
+  
+  <button onclick="speakWord()" style="padding: 6px 12px; font-size: 20px; margin-right: 10px;"> 🔊 </button>
+  <button onclick="closeDict()" style="padding: 6px 12px; font-size: 20px;"> ❌ </button>
+</div>
+<footer>
+  <button class="footer-btn" onclick="toggleHeader()">Hide Header</button>
+  <button class="footer-btn btn-pen" id="penBtn" onclick="togglePen()">Pen: OFF</button>
+  <button class="footer-btn" onclick="clearCanvas()">Clear Pen</button>
+  <button class="footer-btn" style="background:#4CAF50" onclick="resetAll()">↺ Replay</button>
+</footer>
+
+<audio id="sentenceAudio"></audio>
+
+<script>
+  // DỮ LIỆU TỪ ĐIỂN (Đã thêm từ vựng của bài Food)
+const dictionary = {
+
+  // ===== PEOPLE =====
+  "woman": { meaning: "người phụ nữ", phonetic: "/ˈwʊmən/", type: "noun" },
+  "man": { meaning: "người đàn ông", phonetic: "/mæn/", type: "noun" },
+  "mom": { meaning: "mẹ", phonetic: "/mɒm/", type: "noun" },
+  "she": { meaning: "cô ấy", phonetic: "/ʃiː/", type: "pronoun" },
+  "he": { meaning: "anh ấy", phonetic: "/hiː/", type: "pronoun" },
+
+  // ===== JOBS & ACTIONS =====
+  "do": { meaning: "làm", phonetic: "/duː/", type: "verb" },
+  "does": { meaning: "làm (ngôi thứ ba)", phonetic: "/dʌz/", type: "verb" },
+  "work": { meaning: "làm việc", phonetic: "/wɜːrk/", type: "verb" },
+  "works": { meaning: "làm việc", phonetic: "/wɜːrks/", type: "verb" },
+  "sell": { meaning: "bán", phonetic: "/sel/", type: "verb" },
+  "sells": { meaning: "bán", phonetic: "/selz/", type: "verb" },
+  "has": { meaning: "có", phonetic: "/hæz/", type: "verb" },
+
+  // ===== CLOTHING =====
+  "clothing": { meaning: "quần áo", phonetic: "/ˈkloʊðɪŋ/", type: "noun" },
+  "women's": { meaning: "của phụ nữ", phonetic: "/ˈwɪmɪnz/", type: "adjective" },
+  "teens": { meaning: "thanh thiếu niên", phonetic: "/tiːnz/", type: "noun" },
+  "adults": { meaning: "người lớn", phonetic: "/əˈdʌlts/", type: "noun" },
+  "stuff": { meaning: "đồ đạc, hàng hóa", phonetic: "/stʌf/", type: "noun" },
+
+  // ===== PLACES =====
+  "shop": { meaning: "cửa hàng", phonetic: "/ʃɒp/", type: "noun" },
+  "mall": { meaning: "trung tâm thương mại", phonetic: "/mɔːl/", type: "noun" },
+
+  // ===== SIZE & DESCRIPTION =====
+  "small": { meaning: "nhỏ", phonetic: "/smɔːl/", type: "adjective" },
+
+  // ===== FUNCTION WORDS =====
+  "what": { meaning: "cái gì", phonetic: "/wʌt/", type: "question word" },
+  "where": { meaning: "ở đâu", phonetic: "/weər/", type: "question word" },
+  "yeah": { meaning: "vâng, ừ", phonetic: "/jeə/", type: "interjection" },
+  "oh": { meaning: "ồ", phonetic: "/oʊ/", type: "interjection" },
+  "for": { meaning: "cho", phonetic: "/fɔːr/", type: "preposition" },
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "only": { meaning: "chỉ", phonetic: "/ˈoʊnli/", type: "adverb" },
+  "no": { meaning: "không", phonetic: "/noʊ/", type: "interjection" },
+
+  // ===== PHRASES =====
+  "what does your mom do": { meaning: "Mẹ bạn làm nghề gì?", phonetic: "", type: "sentence" },
+  "she sells women's clothing": { meaning: "Bà ấy bán quần áo phụ nữ.", phonetic: "", type: "sentence" },
+  "where does he work": { meaning: "Anh ấy làm việc ở đâu?", phonetic: "", type: "sentence" },
+  "she has a small shop in the mall": { meaning: "Bà ấy có một cửa hàng nhỏ trong trung tâm thương mại.", phonetic: "", type: "sentence" },
+  "does she sell clothing for teens": { meaning: "Bà ấy có bán quần áo cho thanh thiếu niên không?", phonetic: "", type: "sentence" },
+  "she only has stuff for adults": { meaning: "Bà ấy chỉ có hàng dành cho người lớn.", phonetic: "", type: "sentence" }
+
+};  // LOGIC TỪ ĐIỂN TỪ FILE CỦA BẠN
+  function showDict(word) {
+  const lower = word.toLowerCase();
+  if (dictionary[lower]) {
+    document.getElementById("dictWord").textContent = word;
+    
+    // Lấy type ra và bọc trong ngoặc tròn, ví dụ: (noun)
+    document.getElementById("dictType").textContent = dictionary[lower].type ? `(${dictionary[lower].type})` : "";
+    
+    document.getElementById("dictPhonetic").textContent = dictionary[lower].phonetic;
+    document.getElementById("dictMeaning").textContent = dictionary[lower].meaning;
+    document.getElementById("dictionaryPopup").style.display = "block";
+    speakWord();
+  } else {
+    document.getElementById("dictWord").textContent = word;
+    document.getElementById("dictType").textContent = ""; // Xóa trắng nếu không tìm thấy
+    document.getElementById("dictPhonetic").textContent = "";
+    document.getElementById("dictMeaning").textContent = "Chưa có dữ liệu...";
+    document.getElementById("dictionaryPopup").style.display = "block";
+  }
+}
+
+  function closeDict() {
+    document.getElementById("dictionaryPopup").style.display = "none";
+  }
+
+  function speak(text) {
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "en-US";
+    speechSynthesis.speak(msg);
+  }
+
+  function speakWord() {
+    const word = document.getElementById("dictWord").textContent;
+    if(word) speak(word);
+  }
+
+  // --- GAME LOGIC ---
+const wordListData = [
+  "What does",
+  "sells",
+  "Where does",
+  "small shop",
+  "for teens",
+  "for adults",
+  "your mom"
+];
+
+let selectedEl = null;
+
+  function initGame() {
+    const bank = document.getElementById('wordBank');
+    bank.innerHTML = '';
+    wordListData.forEach(txt => {
+      const s = document.createElement('span');
+      s.className = 'choice';
+      s.textContent = txt;
+      s.onclick = () => {
+        // Đã xóa lỗi bám dính event listener vào .dialogue-box tại đây
+        selectedEl = s;
+        // Xóa class active-choice khỏi tất cả thẻ khác trước khi highlight thẻ mới chọn
+        document.querySelectorAll('.choice').forEach(el => el.classList.remove('active-choice'));
+        s.classList.add('active-choice');
+      };
+      bank.appendChild(s);
+    });
+
+    document.querySelectorAll('.blank').forEach(blank => {
+      blank.textContent = '';
+      blank.className = 'blank';
+      blank.onclick = () => {
+        const resText = blank.parentElement.querySelector('.result-text');
+        if (blank.textContent !== "") {
+          const val = blank.textContent;
+          document.querySelectorAll('.choice').forEach(c => { if (c.textContent === val) c.classList.remove('used'); });
+          blank.textContent = "";
+          blank.className = "blank";
+          blank.parentElement.classList.remove('correct-line');
+          resText.className = 'result-text';
+        } 
+        else if (selectedEl) {
+          blank.textContent = selectedEl.textContent;
+          checkLine(blank.parentElement);
+          selectedEl.classList.add('used');
+          selectedEl.classList.remove('active-choice');
+          selectedEl = null;
+        }
+      };
+    });
+    
+    // Gán sự kiện click cho các từ để mở từ điển
+    document.querySelectorAll('.word').forEach(w => {
+      w.onclick = (e) => {
+        if(penEnabled) return; 
+        e.stopPropagation();
+        // Lọc dấu phẩy, chấm hỏi trước khi tra từ
+        const cleanWord = w.textContent.replace(/[^a-zA-Z]/g, "").trim();
+        showDict(cleanWord);
+      };
+    });
+  }
+
+  function checkLine(lineDiv) {
+    const blanks = lineDiv.querySelectorAll('.blank');
+    const resText = lineDiv.querySelector('.result-text');
+    let allCorrect = true;
+    let allFilled = true;
+
+    blanks.forEach(b => {
+      if (b.textContent === "") allFilled = false;
+      if (b.textContent === b.dataset.answer) {
+        b.classList.add('correct');
+        b.classList.remove('wrong');
+      } else if (b.textContent !== "") {
+        b.classList.add('wrong');
+        allCorrect = false;
+      }
+    });
+
+    if (allFilled) {
+      if (allCorrect) {
+        lineDiv.classList.add('correct-line');
+        resText.textContent = "Correct!";
+        resText.className = "result-text correct";
+        const audio = document.getElementById('sentenceAudio');
+        audio.src = `sounds/sentence${lineDiv.dataset.sentence}.mp3`;
+        audio.play().catch(() => {});
+      } else {
+        resText.textContent = "Wrong!";
+        resText.className = "result-text wrong";
+      }
+    }
+  }
+
+  // --- PEN LOGIC (TOUCH FIXED) ---
+  const canvas = document.getElementById('drawingCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, penEnabled = false;
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; ctx.lineCap = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = 'red'; }
+  window.addEventListener('resize', resize); resize();
+
+  function togglePen() {
+    penEnabled = !penEnabled;
+    canvas.classList.toggle('active', penEnabled);
+    document.getElementById('penBtn').textContent = penEnabled ? "Pen: ON" : "Pen: OFF";
+    document.getElementById('penBtn').classList.toggle('active', penEnabled);
+  }
+
+  function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+  canvas.addEventListener('pointerdown', (e) => { if(!penEnabled) return; drawing = true; ctx.beginPath(); ctx.moveTo(e.clientX, e.clientY); });
+  canvas.addEventListener('pointermove', (e) => { if (!drawing || !penEnabled) return; ctx.lineTo(e.clientX, e.clientY); ctx.stroke(); });
+  window.addEventListener('pointerup', () => drawing = false);
+
+  function toggleSidebar(side) { document.querySelector(`.sidebar.${side}`).classList.toggle('visible'); }
+  function toggleHeader() { document.getElementById('mainHeader').classList.toggle('hidden'); }
+  function resetAll() { initGame(); clearCanvas(); document.querySelectorAll('.result-text').forEach(r => r.className = 'result-text'); closeDict(); }
+
+  initGame();
+</script>
+</body>
+</html>

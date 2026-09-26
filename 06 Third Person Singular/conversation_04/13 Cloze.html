@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Reading Practice - Beth's School</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Utm avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+    body {
+      font-family: 'Utm avo', sans-serif;
+      background-color: #f5e8d7;
+      margin: 0; padding: 0;
+      touch-action: manipulation;
+      padding-bottom: 70px;
+    }
+    header {
+      background-color: #f3dbc1; 
+      padding: 10px 5px; 
+      display: flex; 
+      justify-content: center; 
+      gap: 12px; 
+      border-bottom: 2px solid #d4bfa6;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1001;
+    }
+   /* Style cho tất cả nút trong header */
+header button {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: normal; /* Bình thường không đậm */
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+/* Style dành riêng cho nút đang hoạt động (Active) */
+header button.active-nav {
+  font-weight: bold; /* Làm đậm chữ */
+  background-color: #e6ccb2; /* Đổi màu nền nhẹ để phân biệt */
+  border-color: #8b5e3c;     /* Viền đậm hơn */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+    header button:hover { background: #fdf5e6; border-color: #b08d5c; }
+    .sidebar {
+      width: 140px; background: #f3dbc1; padding: 15px 10px;
+      display: flex; flex-direction: column; gap: 8px;
+      position: fixed; top: 60px; bottom: 80px; z-index: 1010;
+      transform: translateX(-100%); transition: transform 0.3s ease;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1); overflow-y: auto;
+    }
+    .sidebar.right { right: 0; left: auto; transform: translateX(100%); }
+    .sidebar.visible { transform: translateX(0); }
+    .sidebar button {
+      font-family: 'Utm avo'; font-size: 14px; padding: 10px;
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+      cursor: pointer; text-align: left;
+    }
+    .toggle-btn {
+      position: fixed; top: 10px; z-index: 1020;
+      padding: 10px 20px; background: #8d6e63; border: none;
+      cursor: pointer; color: white; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; font-weight: 500;
+      border-radius: 12px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'Utm avo', sans-serif;
+    }
+    .toggle-left { left: 15px; }
+    .toggle-right { right: 15px; }
+    .toggle-btn::after { content: " ☰"; margin-left: 10px; font-size: 20px; }
+    .sidebar button.active { font-weight: bold; background-color: #d35400; color: white; }
+    .container { max-width: 1250px; margin: 10px auto 10px auto; text-align: center; padding: 0 10px; margin-top: 70px; }
+    .title { font-size: 20px; color: #d32f2f; margin-bottom: 15px; font-weight: bold; }
+    
+    .video-container {
+      width: 100%;
+      max-width: 350px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto 10px auto;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border: 4px solid #fff;
+      display: block; /* Mặc định hiện */
+    }
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Nút Show/Hide Video */
+    .btn-toggle-video {
+      background: #5d4037;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 10px;
+      font-family: 'Utm avo';
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 15px;
+      transition: 0.3s;
+    }
+    .btn-toggle-video:hover { background: #4e342e; }
+
+    .drag-container {
+      margin-bottom: 25px; min-height: 30px; padding: 15px;
+      background: rgba(255,255,255,0.5); border: 2px dashed #c9a77b;
+      border-radius: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+    }
+    .drag-word {
+      background: #bbdefb; padding: 10px 20px; border-radius: 12px;
+      font-size: 20px; cursor: pointer; user-select: none;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1); font-weight: 500; color: #0d47a1;
+      touch-action: none;
+    }
+    .content-box {
+      text-align: justify; line-height: 2.5; padding: 25px;
+      background: #fff; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-size: 20px;
+      position: relative; z-index: 10;
+    }
+    .drop-zone {
+      min-width: 100px; height: 40px; border: 2px dashed #90a4ae;
+      border-radius: 8px; background: #fffde7; display: inline-block;
+      margin: 0 5px; line-height: 38px; vertical-align: middle;
+      text-align: center; font-weight: bold; color: #1565c0;
+      cursor: pointer;
+    }
+    footer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #4e342e; padding: 8px 5px;
+      display: flex; justify-content: space-around; align-items: center;
+      gap: 4px; z-index: 1100; box-shadow: 0 -3px 10px rgba(0,0,0,0.2);
+    }
+    footer button {
+      flex: 1; padding: 8px 2px; font-family: 'Utm avo';
+      font-size: 10px; font-weight: bold; border-radius: 6px;
+      border: none; cursor: pointer; text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .btn-check { background: #81c784; color: #1b5e20; }
+    .btn-ans { background: #ce93d8; color: #4a148c; }
+    .btn-undo { background: #ffb74d; color: #e65100; }
+    .btn-reset { background: #f06292; color: #880e4f; }
+    .btn-pen { background: #64b5f6; color: #0d47a1; }
+    .btn-music { background: #a1887f; color: #fff; }
+    .active-mode { outline: 2px solid white; box-shadow: 0 0 8px white; }
+    #popup, #transPopup {
+      display:none; position:fixed; padding:15px; border-radius:15px; 
+      box-shadow:0 8px 20px rgba(0,0,0,0.15); z-index:2000; 
+      min-width: 240px; max-width: 300px;
+    }
+    #popup { background:#fff; border: 2px solid #ffcc80; }
+    #transPopup { background:#e1f5fe; border: 2px solid #81d4fa; }
+    .text-word { transition: 0.2s; border-radius: 4px; padding: 0 2px; cursor: pointer; }
+    .text-word:hover { background-color: #fff176; }
+    .word-type { color: #d32f2f; font-style: italic; font-size: 14px; display: block; margin-bottom: 5px; }
+    #penCanvas { position: fixed; top: 0; left: 0; z-index: 1000; pointer-events: none; }
+  </style>
+</head>
+<body>
+
+  <header>
+   <button  onclick="window.location.href='../conversation_01/conversation_01.html'">
+    Conversation 01
+  </button>
+  
+  <button  onclick="window.location.href='../conversation_02/conversation_02.html'">
+    Conversation 02
+  </button>
+  
+  <button  onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  
+  <button class="active-nav" onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+  </header>
+
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu</button>
+
+  <div class="sidebar left">
+    <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+    <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+    <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+    <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+    <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+    <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+    <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+  </div>
+
+  <div class="sidebar right">
+    <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button class="active" onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+    <button onclick="location.href='story.html'"><b>Story</b></button>
+  </div>
+
+  <canvas id="penCanvas"></canvas>
+
+  <div class="container">
+<div class="title"></div>    
+    <div class="video-container" id="videoBox">
+      <video id="videoLesson" controls>
+        <source src="videos/cloze.mp4" type="video/mp4">
+      </video>
+    </div>
+    <button class="btn-toggle-video" id="toggleVideoBtn" onclick="toggleVideo()">Hide Video</button>
+
+    <div class="drag-container" id="dragWords"></div>
+    <div class="content-box" id="textContent"></div>
+  </div>
+
+  <footer>
+    <button class="btn-check" onclick="checkAnswers()">Check</button>
+    <button class="btn-ans" onclick="showAnswers()">Ans</button>
+    <button class="btn-undo" id="undoBtn">Undo</button>
+    <button class="btn-pen" id="penToggle" onclick="togglePen()">Pen</button>
+    <button class="btn-pen" onclick="clearPen()">Clear</button>
+    <button class="btn-music" id="musicBtn" onclick="toggleMusic()">Music</button>
+    <button class="btn-reset" onclick="location.reload()">Reset</button>
+  </footer>
+
+<audio id="bgMusic" loop><source src="sounds/background.mp3" type="audio/mpeg"></audio>
+  <audio id="fireworkSound"><source src="sounds/firework.mp3" type="audio/mpeg"></audio>
+  <div id="popup">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <strong id="popupWord" style="font-size:20px; color:#e65100;"></strong>
+      <button onclick="closePopups()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">&times;</button>
+    </div>
+    <div id="popupPhonetic" style="line-height:1.4; font-size:16px;"></div>
+  </div>
+
+  <div id="transPopup">
+    <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom: 8px;">
+      <strong style="color: #0277bd;">Bản dịch câu</strong>
+      <button onclick="closePopups()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#999;">&times;</button>
+    </div>
+    <div id="transContent" style="font-style: italic; color: #333; line-height:1.4; font-size:16px;"></div>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    const originalText = `Tom and his sister went to the movie theater yesterday evening. The movie started about ten minutes after they arrived. They bought popcorn and cold drinks before entering the theater. Brad Pitt was the main actor in the movie. He played a policeman living in the future. Tom thought the story looked very exciting and interesting. Many people talked about the movie before its release. The movie had many good reviews online and in newspapers. Everyone said it was a great movie to watch. Tom’s sister enjoyed the action scenes very much. The audience laughed and clapped during several exciting moments. After the movie, Tom and his sister felt very happy. They hoped to watch another great movie together soon.`;
+
+const targetWords = [
+  "theater",
+  "evening",
+  "minutes",
+  "popcorn",
+  "actor",
+  "policeman",
+  "future",
+  "exciting",
+  "reviews",
+  "action",
+  "audience",
+  "moments",
+  "happy",
+  "together"
+];
+
+const translationDict = {
+  "Tom and his sister went to the movie theater yesterday evening": "Tom và em gái đã đi đến rạp chiếu phim vào tối hôm qua.",
+  "The movie started about ten minutes after they arrived": "Bộ phim bắt đầu khoảng mười phút sau khi họ đến.",
+  "They bought popcorn and cold drinks before entering the theater": "Họ đã mua bỏng ngô và đồ uống lạnh trước khi vào rạp.",
+  "Brad Pitt was the main actor in the movie": "Brad Pitt là diễn viên chính trong phim.",
+  "He played a policeman living in the future": "Anh ấy đóng vai một cảnh sát sống trong tương lai.",
+  "Tom thought the story looked very exciting and interesting": "Tom nghĩ câu chuyện trông rất kịch tính và thú vị.",
+  "Many people talked about the movie before its release": "Nhiều người đã nói về bộ phim trước khi nó ra mắt.",
+  "The movie had many good reviews online and in newspapers": "Bộ phim có nhiều đánh giá tốt trên mạng và trên báo.",
+  "Everyone said it was a great movie to watch": "Mọi người đều nói đó là một bộ phim tuyệt vời để xem.",
+  "Tom’s sister enjoyed the action scenes very much": "Em gái của Tom rất thích các cảnh hành động.",
+  "The audience laughed and clapped during several exciting moments": "Khán giả đã cười và vỗ tay trong một vài khoảnh khắc thú vị.",
+  "After the movie, Tom and his sister felt very happy": "Sau bộ phim, Tom và em gái cảm thấy rất vui.",
+  "They hoped to watch another great movie together soon": "Họ hy vọng sẽ sớm cùng nhau xem một bộ phim tuyệt vời khác."
+};
+
+const phoneticDict = {
+  // ===== PRONOUNS & NAMES =====
+  "tom": { meaning: "Tom (tên riêng)", phonetic: "/tɒm/", type: "noun" },
+  "tom’s": { meaning: "của Tom", phonetic: "/tɒmz/", type: "possessive noun" },
+  "his": { meaning: "của anh ấy", phonetic: "/hɪz/", type: "pronoun" },
+  "they": { meaning: "họ", phonetic: "/ðeɪ/", type: "pronoun" },
+  "he": { meaning: "anh ấy", phonetic: "/hiː/", type: "pronoun" },
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+  "its": { meaning: "của nó", phonetic: "/ɪts/", type: "pronoun" },
+  "everyone": { meaning: "mọi người", phonetic: "/ˈevriwʌn/", type: "pronoun" },
+  "brad": { meaning: "Brad (tên riêng)", phonetic: "/bræd/", type: "noun" },
+  "pitt": { meaning: "Pitt (tên riêng)", phonetic: "/pɪt/", type: "noun" },
+
+  // ===== NOUNS =====
+  "sister": { meaning: "chị/em gái", phonetic: "/ˈsɪstər/", type: "noun" },
+  "movie": { meaning: "bộ phim", phonetic: "/ˈmuːvi/", type: "noun" },
+  "theater": { meaning: "rạp chiếu phim", phonetic: "/ˈθiːətər/", type: "noun" },
+  "evening": { meaning: "buổi tối", phonetic: "/ˈiːvnɪŋ/", type: "noun" },
+  "minutes": { meaning: "phút", phonetic: "/ˈmɪnɪts/", type: "noun" },
+  "popcorn": { meaning: "bỏng ngô", phonetic: "/ˈpɑːpkɔːrn/", type: "noun" },
+  "drinks": { meaning: "đồ uống", phonetic: "/drɪŋks/", type: "noun" },
+  "actor": { meaning: "diễn viên", phonetic: "/ˈæktər/", type: "noun" },
+  "policeman": { meaning: "cảnh sát", phonetic: "/pəˈliːsmən/", type: "noun" },
+  "future": { meaning: "tương lai", phonetic: "/ˈfjuːtʃər/", type: "noun" },
+  "story": { meaning: "câu chuyện", phonetic: "/ˈstɔːri/", type: "noun" },
+  "people": { meaning: "mọi người", phonetic: "/ˈpiːpl/", type: "noun" },
+  "release": { meaning: "sự ra mắt/phát hành", phonetic: "/rɪˈliːs/", type: "noun" },
+  "reviews": { meaning: "đánh giá", phonetic: "/rɪˈvjuːz/", type: "noun" },
+  "newspapers": { meaning: "báo chí", phonetic: "/ˈnuːzpeɪpərz/", type: "noun" },
+  "action": { meaning: "hành động", phonetic: "/ˈækʃn/", type: "noun" },
+  "scenes": { meaning: "cảnh (phim)", phonetic: "/siːnz/", type: "noun" },
+  "audience": { meaning: "khán giả", phonetic: "/ˈɔːdiəns/", type: "noun" },
+  "moments": { meaning: "những khoảnh khắc", phonetic: "/ˈmoʊmənts/", type: "noun" },
+
+  // ===== VERBS =====
+  "went": { meaning: "đã đi", phonetic: "/went/", type: "verb" },
+  "started": { meaning: "đã bắt đầu", phonetic: "/stɑːrtɪd/", type: "verb" },
+  "arrived": { meaning: "đã đến", phonetic: "/əˈraɪvd/", type: "verb" },
+  "bought": { meaning: "đã mua", phonetic: "/bɔːt/", type: "verb" },
+  "entering": { meaning: "bước vào", phonetic: "/ˈentərɪŋ/", type: "verb" },
+  "was": { meaning: "đã là", phonetic: "/wəz/", type: "verb" },
+  "played": { meaning: "đã đóng vai", phonetic: "/pleɪd/", type: "verb" },
+  "living": { meaning: "sống", phonetic: "/ˈlɪvɪŋ/", type: "verb" },
+  "thought": { meaning: "đã nghĩ", phonetic: "/θɔːt/", type: "verb" },
+  "looked": { meaning: "trông có vẻ", phonetic: "/lʊkt/", type: "verb" },
+  "talked": { meaning: "đã nói chuyện", phonetic: "/tɔːkt/", type: "verb" },
+  "had": { meaning: "đã có", phonetic: "/hæd/", type: "verb" },
+  "said": { meaning: "đã nói", phonetic: "/sed/", type: "verb" },
+  "watch": { meaning: "xem", phonetic: "/wɑːtʃ/", type: "verb" },
+  "enjoyed": { meaning: "đã thích", phonetic: "/ɪnˈdʒɔɪd/", type: "verb" },
+  "laughed": { meaning: "đã cười", phonetic: "/læft/", type: "verb" },
+  "clapped": { meaning: "đã vỗ tay", phonetic: "/klæpt/", type: "verb" },
+  "felt": { meaning: "đã cảm thấy", phonetic: "/felt/", type: "verb" },
+  "hoped": { meaning: "đã hy vọng", phonetic: "/hoʊpt/", type: "verb" },
+
+  // ===== ADJECTIVES & ADVERBS =====
+  "yesterday": { meaning: "hôm qua", phonetic: "/ˈjestərdeɪ/", type: "adverb" },
+  "cold": { meaning: "lạnh", phonetic: "/koʊld/", type: "adjective" },
+  "main": { meaning: "chính", phonetic: "/meɪn/", type: "adjective" },
+  "very": { meaning: "rất", phonetic: "/ˈveri/", type: "adverb" },
+  "exciting": { meaning: "kịch tính/thú vị", phonetic: "/ɪkˈsaɪtɪŋ/", type: "adjective" },
+  "interesting": { meaning: "thú vị", phonetic: "/ˈɪntrəstɪŋ/", type: "adjective" },
+  "many": { meaning: "nhiều", phonetic: "/ˈmeni/", type: "determiner" },
+  "good": { meaning: "tốt", phonetic: "/ɡʊd/", type: "adjective" },
+  "online": { meaning: "trực tuyến", phonetic: "/ˌɔːnˈlaɪn/", type: "adverb" },
+  "great": { meaning: "tuyệt vời", phonetic: "/ɡreɪt/", type: "adjective" },
+  "much": { meaning: "nhiều", phonetic: "/mʌtʃ/", type: "adverb" },
+  "several": { meaning: "một vài", phonetic: "/ˈsevrəl/", type: "determiner" },
+  "happy": { meaning: "hạnh phúc/vui vẻ", phonetic: "/ˈhæpi/", type: "adjective" },
+  "another": { meaning: "một ... khác", phonetic: "/əˈnʌðər/", type: "determiner" },
+  "together": { meaning: "cùng nhau", phonetic: "/təˈɡeðər/", type: "adverb" },
+  "soon": { meaning: "sớm", phonetic: "/suːn/", type: "adverb" },
+
+  // ===== PREPOSITIONS, CONJUNCTIONS, & ARTICLES =====
+  "and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+  "to": { meaning: "đến/để", phonetic: "/tuː/", type: "preposition" },
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "about": { meaning: "về/khoảng", phonetic: "/əˈbaʊt/", type: "preposition" },
+  "after": { meaning: "sau", phonetic: "/ˈæftər/", type: "preposition" },
+  "before": { meaning: "trước", phonetic: "/bɪˈfɔːr/", type: "preposition" },
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "a": { meaning: "một", phonetic: "/ə/", type: "article" },
+  "during": { meaning: "trong suốt", phonetic: "/ˈdʊrɪŋ/", type: "preposition" },
+
+  // ===== NUMBERS =====
+  "ten": { meaning: "mười", phonetic: "/ten/", type: "number" }
+};
+
+    const placedHistory = [];
+    let selectedWord = null;
+    let selectedVoice = null, isPenActive = false, isMusicPlaying = false;
+
+    // Logic ẩn/hiện Video
+    function toggleVideo() {
+      const videoBox = document.getElementById('videoBox');
+      const btn = document.getElementById('toggleVideoBtn');
+      const videoEl = document.getElementById('videoLesson');
+      
+      if (videoBox.style.display === 'none') {
+        videoBox.style.display = 'block';
+        btn.textContent = 'Hide Video';
+      } else {
+        videoBox.style.display = 'none';
+        videoEl.pause(); // Dừng video khi ẩn
+        btn.textContent = 'Show Video';
+      }
+    }
+
+    // Canvas Pen logic
+    const canvas = document.getElementById('penCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+    function togglePen() {
+      isPenActive = !isPenActive;
+      canvas.style.pointerEvents = isPenActive ? "auto" : "none";
+      const btn = document.getElementById('penToggle');
+      btn.textContent = isPenActive ? "Pen: ON" : "Pen";
+      btn.classList.toggle('active-mode', isPenActive);
+    }
+    function clearPen() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    function startDrawing(e) { if (!isPenActive) return; drawing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); }
+    function draw(e) { if (!drawing || !isPenActive) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.strokeStyle = "red"; ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.stroke(); }
+    function stopDrawing() { drawing = false; }
+    function getPos(e) {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX, y: clientY };
+    }
+    canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); }); canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); }); canvas.addEventListener('touchend', stopDrawing);
+
+    function toggleMusic() {
+      const music = document.getElementById('bgMusic'); const btn = document.getElementById('musicBtn');
+      if (!isMusicPlaying) { music.play(); btn.textContent = "Music: ON"; }
+      else { music.pause(); btn.textContent = "Music"; }
+      isMusicPlaying = !isMusicPlaying; btn.classList.toggle('active-mode', isMusicPlaying);
+    }
+
+    function showAnswers() {
+      document.querySelectorAll('.drop-zone').forEach(zone => { zone.textContent = zone.getAttribute('data-answer'); zone.style.backgroundColor = "#e3f2fd"; zone.style.borderStyle = "solid"; });
+      document.getElementById("dragWords").innerHTML = "";
+    }
+
+    function loadVoices() {
+      const voices = speechSynthesis.getVoices();
+      selectedVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha")) || voices.find(v => v.lang.includes("en-US"));
+    }
+    if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+
+    function speak(text) { 
+      speechSynthesis.cancel(); 
+      const utter = new SpeechSynthesisUtterance(text); 
+      if (selectedVoice) utter.voice = selectedVoice;
+      utter.pitch = 1.1; utter.rate = 0.9;
+      speechSynthesis.speak(utter); 
+    }
+
+    function wrapWords(text) {
+      // Tách văn bản thành các từ và giữ lại các ký tự/dấu cách
+      const parts = text.split(/([\w']+)/); 
+      let html = "";
+      const usedMap = {};
+
+      parts.forEach(part => {
+        // Bỏ qua các phần tử không phải là chữ hoặc số (như khoảng trắng, dấu phẩy)
+        if (!/[A-Za-z0-9]/.test(part)) {
+          html += part;
+          return;
+        }
+
+        const lowerPart = part.toLowerCase();
+        const isTarget = targetWords.some(w => w.toLowerCase() === lowerPart);
+
+        if (isTarget && !usedMap[lowerPart]) {
+          usedMap[lowerPart] = true;
+          html += `<span class="drop-zone" data-answer="${part}"></span>`;
+        } else {
+          html += `<span class="text-word">${part}</span>`;
+        }
+      });
+
+      return html;
+    }
+
+    function renderDragWords() {
+      const box = document.getElementById("dragWords");
+      box.innerHTML = '';
+
+      targetWords
+        .filter(w => !placedHistory.some(p => p.word === w))
+        .sort(() => Math.random() - 0.5)
+        .forEach(word => {
+
+          const el = document.createElement('div');
+          el.className = 'drag-word';
+          el.textContent = word;
+
+          // CLICK thay vì drag
+          el.onclick = () => {
+            document.querySelectorAll('.drag-word').forEach(w => 
+              w.style.background = "#bbdefb"
+            );
+
+            el.style.background = "#ffcc80";
+            selectedWord = word;
+          };
+
+          box.appendChild(el);
+        });
+    }
+
+    function handleWordPlacement(zone, word, x, y) { 
+      zone.textContent = word; 
+      zone.style.backgroundColor = "#e3f2fd"; 
+      speak(word); 
+      showPopup(word, x, y); 
+      placedHistory.push({ word, zone }); 
+      renderDragWords(); 
+    }
+
+    function checkAnswers() {
+      let correct = 0;
+      document.querySelectorAll('.drop-zone').forEach(zone => {
+        const exp = zone.getAttribute('data-answer'); 
+        const act = zone.textContent.trim();
+        if (act !== "") { 
+          zone.style.backgroundColor = exp === act ? "#c8f7c5" : "#ffcdd2"; 
+          if (exp === act) correct++; 
+        }
+      });
+
+      // Kiểm tra nếu trả lời đúng hết toàn bộ
+      if (correct === targetWords.length) {
+        // 1. Phát âm thanh
+        const fireworkAudio = document.getElementById('fireworkSound');
+        if (fireworkAudio) {
+          fireworkAudio.currentTime = 0; // Tua lại từ đầu
+          fireworkAudio.play().catch(e => console.log("Lỗi phát âm thanh:", e));
+        }
+
+        // 2. Hiệu ứng pháo bông bắn trong 3 giây
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        const interval = setInterval(function() {
+          const timeLeft = animationEnd - Date.now();
+          if (timeLeft <= 0) {
+            return clearInterval(interval);
+          }
+          const particleCount = 50 * (timeLeft / duration);
+          // Bắn từ lề trái
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+          // Bắn từ lề phải
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
+
+        // 3. Hiển thị thông báo (delay một chút để kịp nhìn pháo bông)
+        setTimeout(() => {
+          alert(`Tuyệt vời! Bạn đã trả lời đúng tất cả: ${correct}/${targetWords.length}`);
+        }, 500);
+
+      } else {
+        // Nếu chưa đúng hết thì chỉ báo điểm như cũ
+        alert(`Kết quả: ${correct}/${targetWords.length}`);
+      }
+    }
+
+    function translateSentence(element, x, y) {
+      // Lấy từ vừa click
+      const clickedWord = element.textContent.replace(/[.,]/g, '').trim(); 
+      if (!clickedWord) return;
+
+      const lines = Object.keys(translationDict);
+      let foundTranslation = "Không tìm thấy bản dịch cho câu này.";
+
+      for (let line of lines) {
+        if (line.toLowerCase().includes(clickedWord.toLowerCase())) {
+          foundTranslation = translationDict[line];
+          break;
+        }
+      }
+
+      showTransPopup(foundTranslation, x, y);
+    }
+
+    function showPopup(word, x, y) {
+      closePopups(); 
+      const data = phoneticDict[word.toLowerCase()]; 
+      const pop = document.getElementById('popup');
+      document.getElementById('popupWord').innerText = word;
+      
+      if (data) { 
+        document.getElementById('popupPhonetic').innerHTML = `<span class="word-type">(${data.type})</span><strong>Phiên âm:</strong> ${data.phonetic}<br><strong>Nghĩa:</strong> ${data.meaning}`; 
+      } else {
+        document.getElementById('popupPhonetic').innerHTML = `<em>(Chưa có trong từ điển)</em>`;
+      }
+      
+      pop.style.display = 'block'; 
+      pop.style.left = `${Math.min(x, window.innerWidth - 260)}px`; 
+      pop.style.top = `${Math.min(y - 140, window.innerHeight - 150)}px`;
+    }
+
+    function showTransPopup(text, x, y) { 
+      closePopups(); 
+      const pop = document.getElementById('transPopup'); 
+      document.getElementById('transContent').innerText = text; 
+      pop.style.display = 'block'; 
+      pop.style.left = `${Math.min(x, window.innerWidth - 320)}px`; 
+      pop.style.top = `${Math.min(y - 100, window.innerHeight - 200)}px`; 
+    }
+
+    function closePopups() { 
+      document.getElementById('popup').style.display = 'none'; 
+      document.getElementById('transPopup').style.display = 'none'; 
+    }
+
+    function init() {
+      const box = document.getElementById("textContent"); 
+      box.innerHTML = wrapWords(originalText); 
+      renderDragWords();
+
+      // Sử dụng Event Delegation để xử lý click cho cả drop-zone và text-word
+      box.addEventListener('click', (e) => {
+        
+        // 1. Xử lý khi click vào ô trống (drop-zone)
+        if (e.target.classList.contains('drop-zone')) {
+          const zone = e.target;
+
+          // Hoàn tác: Bấm vào ô đã điền để lấy lại từ
+          if (!selectedWord && zone.textContent.trim() !== "") {
+            zone.textContent = "";
+            zone.style.backgroundColor = "#fffde7"; 
+            
+            const historyIdx = placedHistory.findIndex(p => p.zone === zone);
+            if (historyIdx > -1) {
+              placedHistory.splice(historyIdx, 1);
+            }
+            renderDragWords();
+            return;
+          }
+
+          // Điền từ đang chọn vào ô trống
+          if (selectedWord) {
+            if (zone.textContent.trim() !== "") {
+              const historyIdx = placedHistory.findIndex(p => p.zone === zone);
+              if (historyIdx > -1) {
+                placedHistory.splice(historyIdx, 1);
+              }
+            }
+            handleWordPlacement(zone, selectedWord, e.clientX, e.clientY);
+            selectedWord = null;
+          }
+          return;
+        }
+
+        // 2. Xử lý khi click vào từ bình thường để xem từ điển
+        const el = e.target.closest('.text-word'); 
+        if (el) { 
+          showPopup(el.textContent.replace(/[.,]/g, ''), e.clientX, e.clientY); 
+          speak(el.textContent); 
+        } 
+      });
+
+      // Sự kiện chuột phải để dịch câu
+      box.addEventListener('contextmenu', e => { 
+        e.preventDefault(); 
+        if (e.target.classList.contains('text-word') || e.target.classList.contains('drop-zone')) {
+          translateSentence(e.target, e.clientX, e.clientY); 
+        }
+      });
+    }
+
+    document.getElementById('undoBtn').onclick = () => { 
+      const last = placedHistory.pop(); 
+      if (last) { 
+        last.zone.textContent = ''; 
+        last.zone.style.backgroundColor = "#fffde7"; 
+        renderDragWords(); 
+      } 
+    };
+
+    function toggleSidebar(side) { document.querySelector(`.sidebar.${side}`).classList.toggle('visible'); }
+    
+    init();
+    loadVoices();
+// --- REMOTE CONTROL (ĐIỀU KHIỂN TỪ XA) ---
+    window.addEventListener('keydown', function(e) {
+  const video = document.getElementById('videoLesson');
+  const key = e.key.toLowerCase();
+
+  // ===== 1. PLAY / PAUSE =====
+  if (key === 'b' || key === '.') {
+    e.preventDefault();
+    video.paused ? video.play() : video.pause();
+    return;
+  }
+
+  // ===== 2. TUA NHANH (→ hoặc PageDown giữ nguyên) =====
+  if (key === 'arrowright') {
+    e.preventDefault();
+    video.currentTime += 5; // tua +5 giây
+    return;
+  }
+
+  // ===== 3. TUA LÙI (←) =====
+  if (key === 'arrowleft') {
+    e.preventDefault();
+    video.currentTime -= 5; // lùi -5 giây
+    return;
+  }
+
+  // ===== 4. ÂM LƯỢNG =====
+  if (key === 'arrowup') {
+    e.preventDefault();
+    video.volume = Math.min(1, video.volume + 0.1);
+    return;
+  }
+
+  if (key === 'arrowdown') {
+    e.preventDefault();
+    video.volume = Math.max(0, video.volume - 0.1);
+    return;
+  }
+
+  // ===== 5. ẨN / HIỆN VIDEO =====
+  if (key === 'v') {
+    e.preventDefault();
+    toggleVideo();
+    return;
+  }
+
+  // ===== 6. CHECK GAME (giữ PageDown riêng) =====
+  if (key === 'pagedown') {
+    e.preventDefault();
+    checkAnswers();
+    return;
+  }
+
+  // ===== 7. UNDO =====
+  if (key === 'pageup') {
+    e.preventDefault();
+    const last = placedHistory.pop(); 
+    if (last) { 
+      last.zone.textContent = ''; 
+      last.zone.style.backgroundColor = "#fffde7"; 
+      renderDragWords(); 
+    }
+    return;
+  }
+
+  // ===== 8. RESET =====
+  if (key === 'escape') {
+    location.reload();
+  }
+});
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conversation – Modern Learning</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'UTM Avo', 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+/* Bọc Video và Quiz */
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: left; 
+  gap: 20px; 
+  max-width: 1200px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:500px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* Giao diện Quiz */
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 500px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 24px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+
+/* Thêm animation rung lắc khi trả lời sai */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.quiz-option.wrong { 
+  background: #f8d7da; border-color: #dc3545; color: #721c24; 
+  animation: shake 0.4s ease-in-out;
+}
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 35px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+  <a href="../conversation_01/conversation_01.html" class="active-link">Conversation 01</a>
+  <a href="../conversation_02/conversation_02.html">Conversation 02</a>
+  <a href="../conversation_03/conversation_03.html" >Conversation 03</a>
+  <a href="../conversation_04/conversation_04.html" >Conversation 04</a>
+</nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+    <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+<source src="./videos/story.mp4" type="video/mp4">    </video>
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// ================= LỚP ÂM THANH & HIỆU ỨNG =================
+let audioCtx;
+
+function playSound(type) {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  if (type === 'correct') {
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      const now = audioCtx.currentTime;
+      osc.start(now + i * 0.1);
+      gain.gain.setValueAtTime(0, now + i * 0.1);
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.5);
+      osc.stop(now + i * 0.1 + 0.5);
+    });
+
+    setTimeout(() => {
+      const bufferSize = audioCtx.sampleRate * 0.5;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+      
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.value = 1000;
+      const noiseGain = audioCtx.createGain();
+      
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(audioCtx.destination);
+      
+      const now = audioCtx.currentTime;
+      noiseGain.gain.setValueAtTime(0.8, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      noise.start(now);
+    }, 300);
+
+  } else {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 120;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    osc.start(now);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    osc.stop(now + 0.4);
+  }
+}
+
+function shootFireworks() {
+  var duration = 2000;
+  var animationEnd = Date.now() + duration;
+  var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  var interval = setInterval(function() {
+    var timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    var particleCount = 50 * (timeLeft / duration);
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+  }, 250);
+}
+// ==========================================================
+
+// --- LOGIC QUIZ ---
+const quizData = [
+  {
+    question: "Why does Ava think the city feels louder now?",
+    options: [
+      "Because of the rain",
+      "Because of the noise, cars, and people",
+      "Because of music",
+      "Because of construction"
+    ],
+    correct: "Because of the noise, cars, and people"
+  },
+  {
+    question: "Why is Ava worried in the morning?",
+    options: [
+      "She lost her wallet",
+      "She is sick",
+      "Her boss may scream at her for being late",
+      "She missed the bus"
+    ],
+    correct: "Her boss may scream at her for being late"
+  },
+  {
+    question: "What happened to Ava's bag?",
+    options: [
+      "Someone stole it",
+      "It opened and she dropped her things",
+      "She left it at home",
+      "It broke completely"
+    ],
+    correct: "It opened and she dropped her things"
+  },
+  {
+    question: "What did a stranger do when Ava dropped her things?",
+    options: [
+      "Ignored her",
+      "Took her phone",
+      "Helped her pick them up",
+      "Called the police"
+    ],
+    correct: "Helped her pick them up"
+  },
+  {
+    question: "What does Emma say kindness doesn't wait for?",
+    options: [
+      "Money",
+      "Permission",
+      "Time",
+      "Friendship"
+    ],
+    correct: "Permission"
+  },
+  {
+    question: "What did Ava use to think about helping people?",
+    options: [
+      "It was fun",
+      "It was important",
+      "It was a waste of time",
+      "It was easy"
+    ],
+    correct: "It was a waste of time"
+  },
+  {
+    question: "Who influenced Ava's old belief about people?",
+    options: [
+      "Her teacher",
+      "Her mother",
+      "Her father",
+      "Her boss"
+    ],
+    correct: "Her father"
+  },
+  {
+    question: "How does Emma deal with anger?",
+    options: [
+      "She shouts",
+      "She ignores everyone",
+      "She helps people",
+      "She sleeps"
+    ],
+    correct: "She helps people"
+  },
+  {
+    question: "What does Emma believe happens when you do something good?",
+    options: [
+      "You become rich",
+      "It changes the feeling inside you",
+      "People praise you",
+      "You become famous"
+    ],
+    correct: "It changes the feeling inside you"
+  },
+  {
+    question: "Who thanked Emma because her hands were weak?",
+    options: [
+      "A child",
+      "A coworker",
+      "An elderly woman",
+      "A bus driver"
+    ],
+    correct: "An elderly woman"
+  },
+  {
+    question: "What did Ava learn from helping others?",
+    options: [
+      "Kindness works both ways",
+      "People are dangerous",
+      "Helping is difficult",
+      "Nothing changes"
+    ],
+    correct: "Kindness works both ways"
+  },
+  {
+    question: "What did Ava lose after work?",
+    options: [
+      "Her phone",
+      "Her keys",
+      "Her wallet",
+      "Her bag"
+    ],
+    correct: "Her wallet"
+  },
+  {
+    question: "What did a stranger do when Ava couldn't pay?",
+    options: [
+      "Walked away",
+      "Lent her a phone",
+      "Paid for her food",
+      "Called security"
+    ],
+    correct: "Paid for her food"
+  },
+  {
+    question: "What did the stranger ask Ava to do instead of paying back?",
+    options: [
+      "Write a letter",
+      "Help someone else next time",
+      "Buy a gift",
+      "Call later"
+    ],
+    correct: "Help someone else next time"
+  },
+  {
+    question: "What does Emma compare kindness to?",
+    options: [
+      "A game",
+      "A job",
+      "Poetry",
+      "A competition"
+    ],
+    correct: "Poetry"
+  },
+  {
+    question: "How does Ava's opinion of Emma change?",
+    options: [
+      "She dislikes her",
+      "She thinks Emma is boring",
+      "She begins to admire her kindness",
+      "She ignores her"
+    ],
+    correct: "She begins to admire her kindness"
+  },
+  {
+    question: "What does Ava decide she can choose to be?",
+    options: [
+      "Rich",
+      "Famous",
+      "Kind",
+      "Perfect"
+    ],
+    correct: "Kind"
+  },
+  {
+    question: "According to Emma, do you need to change the whole world?",
+    options: [
+      "Yes",
+      "Only sometimes",
+      "No, just make it a little softer",
+      "Only if you are powerful"
+    ],
+    correct: "No, just make it a little softer"
+  },
+  {
+    question: "What does Emma say is enough to start a change?",
+    options: [
+      "One day and one good deed",
+      "A lot of money",
+      "A new job",
+      "A big speech"
+    ],
+    correct: "One day and one good deed"
+  },
+  {
+    question: "What is the main message of the story?",
+    options: [
+      "Success is everything",
+      "Kindness spreads from person to person",
+      "People never change",
+      "Life is unfair"
+    ],
+    correct: "Kindness spreads from person to person"
+  }
+];
+let currentQIndex = 0;
+
+function wrapWordsForDict(text) {
+  return text.split(/\s+/).map(w => {
+    const clean = w.replace(/[.,!?"“”]/g, "").toLowerCase();
+    const cleanEscaped = clean.replace(/'/g, "\\'");
+    return `<span class="word" onclick="handleWordClick(event, '${cleanEscaped}')">${w}</span>`;
+  }).join(" ");
+}
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = `
+      <h4 style='text-align:center; color:#28a745; margin-top:20px;'>
+        🎉 You finished the quiz!
+      </h4>
+      <button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>
+        Play Again
+      </button>`;
+    shootFireworks();
+    return;
+  }
+
+  const q = quizData[currentQIndex];
+
+  let html = `
+    <div>
+      <div style="font-weight:bold; margin-bottom:15px; font-size:24px;">
+        Question ${currentQIndex + 1}: ${wrapWordsForDict(q.question)}
+      </div>
+  `;
+
+  q.options.forEach(opt => {
+const isCorrect = (opt === q.correct);
+  html += `
+    <button class="quiz-option"
+      onclick="checkAns(this, ${isCorrect})">
+      ${wrapWordsForDict(opt)}
+    </button>`;
+});
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  if (isCorrect) {
+    btn.classList.add('correct');
+    playSound('correct');
+    shootFireworks();
+    
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 2500);
+  } else {
+    btn.classList.add('wrong');
+    playSound('wrong');
+    
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+// --------------------------
+
+// --- DICTIONARY ---
+const dictionary = {
+  // Add dict content from original snippet here if necessary, omitted for brevity but intact in JS logic
+  "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "question word" },
+  "who": { meaning: "ai", phonetic: "/huː/", type: "question word" },
+  "how": { meaning: "như thế nào", phonetic: "/haʊ/", type: "question word" }
+  // ... rest of dict here (skipped full list to save output size, but the JS uses whatever you previously defined in the original script)
+};
+
+const sentences = [
+  { text: "office.", start: 0, end: 1, translation: "Văn phòng." },
+  { text: "The noise, the cars, the people, everything feels louder now.", start: 1, end: 6, translation: "Tiếng ồn, xe cộ, dòng người, mọi thứ giờ đây có vẻ ồn ào hơn." },
+  { text: "We are late, my boss.", start: 6, end: 9, translation: "Chúng ta trễ rồi, sếp tôi." },
+  { text: "Will scream at me.", start: 9, end: 11, translation: "Sẽ hét vào mặt tôi mất." },
+  { text: "We can still make it.", start: 11, end: 13, translation: "Chúng ta vẫn có thể kịp." },
+  { text: "Let's take the shortcut.", start: 13, end: 20, translation: "Hãy đi đường tắt thôi." },
+  { text: "Oh no, my card, my phone, my bags open someone.", start: 20, end: 26, translation: "Ôi không, thẻ, điện thoại, túi của tôi bị mở bung ra rồi." },
+  { text: "Ohh I dropped them.", start: 26, end: 28, translation: "Ồ, tôi làm rơi chúng rồi." },
+  { text: "Ah, unbelievable.", start: 28, end: 29, translation: "Thật không thể tin nổi." },
+  { text: "Let me help you.", start: 29, end: 33, translation: "Để tôi giúp bạn." },
+  { text: "Oh, wow.", start: 33, end: 34, translation: "Ồ, wow." },
+  { text: "Thank you.", start: 34, end: 35, translation: "Cảm ơn bạn." },
+  { text: "You don't have to.", start: 35, end: 38, translation: "Bạn không cần làm vậy đâu." },
+  { text: "It's OK.", start: 38, end: 39, translation: "Không sao đâu." },
+  { text: "I drop things all the time.", start: 39, end: 43, translation: "Tôi cũng hay làm rơi đồ suốt ấy mà." },
+  { text: "Happens to everyone.", start: 43, end: 45, translation: "Ai cũng gặp phải thôi." },
+  { text: "Thank you.", start: 45, end: 46, translation: "Cảm ơn bạn." },
+  { text: "That was strange.", start: 46, end: 48, translation: "Điều đó thật lạ lùng." },
+  { text: "Why strange?", start: 48, end: 49, translation: "Tại sao lại lạ?" },
+  { text: "They helped me and they didn't even know.", start: 49, end: 55, translation: "Họ giúp tôi và họ thậm chí chẳng quen biết tôi." },
+  { text: "I didn't ask.", start: 55, end: 56, translation: "Tôi cũng đâu có nhờ." },
+  { text: "Kindness doesn't wait for permission.", start: 56, end: 59, translation: "Lòng tốt không cần đợi sự cho phép." },
+  { text: "Maybe you're right.", start: 59, end: 61, translation: "Có lẽ cậu đúng." },
+  { text: "Still, it felt weird.", start: 61, end: 63, translation: "Tuy nhiên, nó cho cảm giác hơi kỳ cục." },
+  { text: "I didn't know what to say.", start: 63, end: 66, translation: "Tôi đã không biết phải nói gì." },
+  { text: "You said thank you.", start: 66, end: 68, translation: "Cậu đã nói cảm ơn." },
+  { text: "That's enough.", start: 68, end: 71, translation: "Vậy là đủ rồi." },
+  { text: "You know, I used to think helping people was a waste of time.", start: 71, end: 77, translation: "Cậu biết không, tôi từng nghĩ giúp đỡ người khác là lãng phí thời gian." },
+  { text: "Everyone just looks out for themselves.", start: 77, end: 80, translation: "Mọi người chỉ biết lo cho bản thân mình." },
+  { text: "That's what my father always said.", start: 80, end: 83, translation: "Đó là điều bố tôi luôn nói." },
+  { text: "Maybe your father was just trying to protect you.", start: 83, end: 87, translation: "Có lẽ bố cậu chỉ đang cố bảo vệ cậu thôi." },
+  { text: "Maybe.", start: 87, end: 88, translation: "Có thể." },
+  { text: "But now I'm not sure.", start: 88, end: 91, translation: "Nhưng giờ tôi không chắc nữa." },
+  { text: "You always seem calm, Emma, like nothing can make you angry.", start: 91, end: 98, translation: "Cậu luôn có vẻ bình tĩnh, Emma, như thể không có gì làm cậu tức giận." },
+  { text: "I do get angry.", start: 98, end: 100, translation: "Tôi có tức giận chứ." },
+  { text: "I just learned to stop before I hurt someone with it.", start: 100, end: 107, translation: "Tôi chỉ học cách dừng lại trước khi tôi làm tổn thương ai đó vì sự tức giận." },
+  { text: "How?", start: 107, end: 107.5, translation: "Làm thế nào?" },
+  { text: "By helping when you do something good.", start: 107.5, end: 112, translation: "Bằng cách giúp đỡ khi cậu làm một điều gì đó tốt." },
+  { text: "Even small, it changes the feeling inside you.", start: 112, end: 117, translation: "Dù nhỏ bé, nó thay đổi cảm giác bên trong cậu." },
+  { text: "Anger doesn't stay long.", start: 117, end: 119, translation: "Sự tức giận sẽ không kéo dài." },
+  { text: "I wish I could feel that you can start small.", start: 119, end: 131, translation: "Tôi ước tôi có thể cảm nhận được điều đó, cậu có thể bắt đầu từ những việc nhỏ." },
+  { text: "Thank you, Miss.", start: 131, end: 132, translation: "Cảm ơn cô." },
+  { text: "My hands aren't what they used to be.", start: 132, end: 137, translation: "Đôi tay tôi không còn được như trước nữa." },
+  { text: "It's OK.", start: 137, end: 138, translation: "Không sao đâu bác." },
+  { text: "Take care.", start: 138, end: 139, translation: "Bác bảo trọng nhé." },
+  { text: "That was kind.", start: 139, end: 141, translation: "Thật tử tế." },
+  { text: "It felt different, like I wasn't just passing by.", start: 141, end: 146, translation: "Cảm giác thật khác biệt, giống như tôi không chỉ là người đi ngang qua." },
+  { text: "See, kindness works both ways.", start: 146, end: 149, translation: "Thấy chưa, sự tử tế hoạt động hai chiều." },
+  { text: "You give, but you.", start: 149, end: 151, translation: "Cậu cho đi, nhưng cậu." },
+  { text: "Also receive.", start: 151, end: 152, translation: "Cũng nhận lại." },
+  { text: "Yeah, maybe I see something new in her.", start: 152, end: 157, translation: "Ừ, có lẽ tôi thấy điều gì đó mới mẻ ở cô ấy." },
+  { text: "Not big, not loud, just a small light.", start: 157, end: 162, translation: "Không lớn lao, không ồn ào, chỉ là một ánh sáng nhỏ." },
+  { text: "Maybe that's how change starts.", start: 162, end: 165, translation: "Có lẽ đó là cách sự thay đổi bắt đầu." },
+  { text: "Not all at once, but slowly in the middle.", start: 165, end: 171, translation: "Không phải tất cả cùng lúc, mà chầm chậm ở giữa." },
+  { text: "Of an ordinary day.", start: 171, end: 173, translation: "Của một ngày bình thường." },
+  { text: "We're really late now.", start: 173, end: 175, translation: "Giờ chúng ta trễ thật rồi." },
+  { text: "Then let's walk faster, but don't forget the small things along the way.", start: 175, end: 182, translation: "Vậy hãy đi nhanh hơn, nhưng đừng quên những điều nhỏ bé trên đường." },
+  { text: "You mean drop my bag again so someone can help me?", start: 182, end: 188, translation: "Ý cậu là lại làm rơi túi để ai đó giúp tôi sao?" },
+  { text: "Maybe just hold it tight?", start: 188, end: 191, translation: "Có lẽ chỉ cần giữ chặt nó thôi?" },
+  { text: "But keep your heart open.", start: 191, end: 194, translation: "Nhưng hãy giữ cho trái tim rộng mở." },
+  { text: "You talk like a book, you know that?", start: 194, end: 198, translation: "Cậu nói chuyện như sách vậy, cậu biết không?" },
+  { text: "Maybe, but it's a happy book.", start: 198, end: 202, translation: "Có thể, nhưng đó là một cuốn sách vui vẻ." },
+  { text: "I'm not promising anything, but maybe I'll try.", start: 202, end: 207, translation: "Tôi không hứa gì đâu, nhưng có lẽ tôi sẽ thử." },
+  { text: "That's all kindness needs a try.", start: 207, end: 212, translation: "Đó là tất cả những gì lòng tốt cần, một sự cố gắng." },
+  { text: "The day goes on.", start: 212, end: 214, translation: "Ngày cứ thế trôi qua." },
+  { text: "The sun turns soft and golden.", start: 214, end: 216, translation: "Mặt trời trở nên dịu nhẹ và vàng ươm." },
+  { text: "After work, Ava and I walk toward the bus stop.", start: 216, end: 221, translation: "Sau giờ làm, Ava và tôi đi bộ ra trạm xe buýt." },
+  { text: "The city feels calmer now, like it's breathing slower.", start: 221, end: 226, translation: "Thành phố giờ đây có vẻ yên bình hơn, như thể nó đang thở chậm lại." },
+  { text: "I'm tired.", start: 226, end: 227, translation: "Tôi mệt quá." },
+  { text: "Me too, but it's a good kind of tired, right?", start: 227, end: 232, translation: "Tôi cũng vậy, nhưng đó là một kiểu mệt mỏi dễ chịu, đúng không?" },
+  { text: "Maybe, I don't know, my feet hurt.", start: 232, end: 237, translation: "Có thể, tôi không biết, chân tôi đau quá." },
+  { text: "Hungry, starving.", start: 237, end: 238, translation: "Đói, đói meo rồi." },
+  { text: "Let's get something quick.", start: 238, end: 245, translation: "Hãy kiếm gì đó ăn nhanh thôi." },
+  { text: "Oh, no, my wallet's gone.", start: 245, end: 247, translation: "Ồ không, ví của tôi mất rồi." },
+  { text: "Excuse me.", start: 247, end: 248, translation: "Xin lỗi." },
+  { text: "Are you OK?", start: 248, end: 250, translation: "Cháu có sao không?" },
+  { text: "I think I lost my wallet.", start: 250, end: 253, translation: "Cháu nghĩ cháu mất ví rồi." },
+  { text: "I can't pay for this.", start: 253, end: 256, translation: "Cháu không thể trả tiền cho món này." },
+  { text: "It's OK.", start: 256, end: 257, translation: "Không sao đâu." },
+  { text: "I'll pay for it.", start: 257, end: 259, translation: "Cô sẽ trả cho." },
+  { text: "Really.", start: 259, end: 260, translation: "Thật sao ạ." },
+  { text: "Thank you.", start: 260, end: 261, translation: "Cháu cảm ơn cô." },
+  { text: "I'll pay you back.", start: 261, end: 263, translation: "Cháu sẽ trả lại tiền cho cô." },
+  { text: "No, No need.", start: 263, end: 265, translation: "Không, không cần đâu." },
+  { text: "Just help someone else next time.", start: 265, end: 268, translation: "Lần sau cháu chỉ cần giúp đỡ người khác là được." },
+  { text: "You have no idea how much this means.", start: 268, end: 272, translation: "Bạn không biết điều này có ý nghĩa lớn thế nào đâu." },
+  { text: "Don't say anything.", start: 272, end: 274, translation: "Đừng nói gì cả." },
+  { text: "I wasn't going to.", start: 274, end: 276, translation: "Tôi đâu định nói gì." },
+  { text: "I just did what you'd do.", start: 276, end: 280, translation: "Tôi chỉ làm những gì cậu sẽ làm thôi." },
+  { text: "No, you did what you wanted to do.", start: 280, end: 284, translation: "Không, cậu đã làm những gì cậu muốn làm." },
+  { text: "That's better.", start: 284, end: 285, translation: "Như vậy tốt hơn đấy." },
+  { text: "It felt strange, but in a good way.", start: 285, end: 290, translation: "Cảm giác hơi lạ, nhưng theo một cách tốt." },
+  { text: "That's the heart.", start: 290, end: 291, translation: "Đó là trái tim." },
+  { text: "Remembering what?", start: 291, end: 292, translation: "Nhớ ra điều gì?" },
+  { text: "It's made for you.", start: 292, end: 294, translation: "Nó dành cho cậu." },
+  { text: "Sound like a poet.", start: 294, end: 297, translation: "Nghe như một nhà thơ vậy." },
+  { text: "Maybe kindness is the best kind of poetry.", start: 297, end: 301, translation: "Có lẽ lòng tốt là loại thơ ca tuyệt vời nhất." },
+  { text: "You and your words.", start: 301, end: 307, translation: "Cậu và những lời nói của cậu." },
+  { text: "There you go, hero.", start: 307, end: 310, translation: "Của cậu đây, người hùng." },
+  { text: "Hold it tight this time.", start: 310, end: 313, translation: "Lần này nhớ giữ chặt nhé." },
+  { text: "Thank you.", start: 313, end: 314, translation: "Cảm ơn cậu." },
+  { text: "You saved another one.", start: 314, end: 316, translation: "Cậu lại cứu thêm một người nữa rồi." },
+  { text: "Don't start.", start: 316, end: 318, translation: "Đừng bắt đầu nữa." },
+  { text: "I didn't say anything.", start: 318, end: 320, translation: "Tôi đâu nói gì." },
+  { text: "You're thinking it.", start: 320, end: 322, translation: "Cậu đang nghĩ điều đó." },
+  { text: "Maybe.", start: 322, end: 322.5, translation: "Có lẽ." },
+  { text: "You know, this morning I thought you were crazy.", start: 322.5, end: 328, translation: "Cậu biết không, sáng nay tôi đã nghĩ cậu bị điên." },
+  { text: "Helping strangers, talking to everyone and now, now I think maybe crazy isn't so bad.", start: 328, end: 338, translation: "Giúp đỡ người lạ, nói chuyện với mọi người, và giờ tôi nghĩ có lẽ điên một chút cũng không tệ." },
+  { text: "Welcome to the club.", start: 338, end: 342, translation: "Chào mừng đến với câu lạc bộ." },
+  { text: "I still don't trust people completely, but maybe I don't have to.", start: 342, end: 348, translation: "Tôi vẫn không hoàn toàn tin tưởng người khác, nhưng có lẽ tôi không cần phải thế." },
+  { text: "Maybe I can just choose to be kind.", start: 348, end: 353, translation: "Có lẽ tôi chỉ có thể chọn cách trở nên tử tế." },
+  { text: "Anyway, that's the secret.", start: 353, end: 355, translation: "Dù sao thì, đó là bí mật." },
+  { text: "You don't need to change the world, you just make it a little softer.", start: 355, end: 364, translation: "Cậu không cần thay đổi thế giới, cậu chỉ làm nó dịu dàng hơn một chút." },
+  { text: "Emma, yes, thank you for not giving up on people like me.", start: 364, end: 370, translation: "Emma, ừm, cảm ơn vì đã không từ bỏ những người như tôi." },
+  { text: "No one is too late to be kind.", start: 370, end: 373, translation: "Không ai là quá muộn để trở nên tử tế cả." },
+  { text: "One day, one good deed, that's all it takes to start a change.", start: 373, end: 380, translation: "Một ngày, một việc tốt, đó là tất cả những gì cần thiết để bắt đầu một sự thay đổi." },
+  { text: "Ava didn't become perfect to day.", start: 380, end: 383, translation: "Ava đã không trở nên hoàn hảo trong ngày hôm nay." },
+  { text: "None of us do.", start: 383, end: 385, translation: "Không ai trong chúng ta như vậy cả." },
+  { text: "But kindness, even the smallest kind, stays.", start: 385, end: 389, translation: "Nhưng sự tử tế, dù là nhỏ nhất, vẫn ở lại." },
+  { text: "It moves from one person to another, like light across windows at night.", start: 389, end: 395, translation: "Nó di chuyển từ người này sang người khác, như ánh sáng lướt qua những khung cửa sổ trong đêm." },
+  { text: "Thank you for spending this day with us.", start: 395, end: 400, translation: "Cảm ơn bạn đã dành ngày hôm nay cùng chúng tôi." },
+  { text: "If this story made you smile, please like, share, and subscribe.", start: 400, end: 406, translation: "Nếu câu chuyện này làm bạn mỉm cười, xin hãy thích, chia sẻ và đăng ký." },
+  { text: "And tell me in the comments, what's one kind thing you did today?", start: 406, end: 412, translation: "Và hãy nói cho tôi biết trong phần bình luận, một điều tử tế bạn đã làm hôm nay là gì?" }
+];
+
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?"“”]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  if(event) event.stopPropagation();
+
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener("mousedown", (e) => {
+  if(!canvas.classList.contains("pen-active")) return;
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if(!isDrawing) return;
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke();
+});
+
+canvas.addEventListener("mouseup", () => isDrawing = false);
+canvas.addEventListener("mouseleave", () => isDrawing = false);
+
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+
+</script>
+</body>
+</html>

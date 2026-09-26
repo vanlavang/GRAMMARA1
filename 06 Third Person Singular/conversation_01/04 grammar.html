@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Mastering English - Grammar Pro</title>
+    <style>
+        @font-face { font-family: 'UTM Avo'; src: local('UTM Avo'); }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'UTM Avo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+            touch-action: none; 
+            padding-top: 10px;
+        }
+
+        /* --- HEADER & MENU --- */
+        header {
+            background-color: #d8c8b4; padding: 10px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid #d4bfa6; 
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 65px;
+            transition: all 0.3s ease;
+        }
+        .header-center { display: flex; gap: 10px; }
+        header button {
+            background-color: #fff; border: 2px solid #d4bfa6; padding: 8px 16px; border-radius: 20px;
+            cursor: pointer; font-family: 'UTM Avo'; color: #8b5e3c; transition: 0.3s;
+        }
+        header button.active-conv {
+            background-color: #8b5e3c; color: white; font-weight: bold; border-color: #5c3e26;
+        }
+        .menu-btn {
+            background-color: #8b7362 !important; color: white !important; border: none !important;
+            padding: 10px 20px !important; border-radius: 20px !important; font-weight: bold; cursor: pointer;
+        }
+
+        /* --- CONTROL BAR --- */
+        #controlBar {
+            background-color: #fff9f0; padding: 10px 20px; border-bottom: 2px solid #d4bfa6;
+            position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
+            display: flex; align-items: center; gap: 12px; height: 55px;
+            transition: all 0.3s ease;
+        }
+        .tool-btn {
+            padding: 6px 14px; border-radius: 12px; border: 1px solid #8b5e3c;
+            background: #fff; cursor: pointer; font-size: 15px; font-weight: bold; color: #8b5e3c; font-family: 'UTM Avo';
+            transition: 0.2s;
+        }
+        .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+        .tab-switcher {
+            display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; border: 1px solid #cbd5e1;
+        }
+        .tab-btn {
+            padding: 6px 16px; border-radius: 8px; border: none; background: transparent;
+            cursor: pointer; font-family: 'UTM Avo'; font-size: 14px; font-weight: bold; color: #475569; transition: 0.2s;
+        }
+        .tab-btn.active { background: white; color: #1e3a8a; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+        /* --- SIDEBAR MENU --- */
+        .side-menu {
+            position: fixed; top: 130px; bottom: 20px; width: 220px;
+            background-color: #f3dbc1; border: 2px solid #d4bfa6;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease; gap: 3px;
+            z-index: 1100; padding: 10px;
+            overflow-y: auto; 
+        }
+        .side-menu.left { left: 0; border-radius: 0 20px 20px 0; transform: translateX(-100%); }
+        .side-menu.right { right: 0; border-radius: 20px 0 0 20px; transform: translateX(100%); }
+        .side-menu.open { transform: translateX(0); }
+        .side-menu button {
+            display: block; width: 100%; background: #fff; border: 1px solid #d4bfa6;
+            margin-bottom: 10px; padding: 12px; border-radius: 12px; cursor: pointer;
+            font-family: 'UTM Avo'; font-size: 16px; font-weight: bold; color: #8b5e3c;
+        }
+        .side-menu button.active { background: #8b5e3c; color: #fff; }
+
+        /* --- TỪ ĐIỂN PANEL NÂNG CAO --- */
+        .dict-panel {
+            position: fixed; right: 20px; top: 135px; width: 340px;
+            background: white; border-radius: 20px; padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25); border: 4px solid #bae6fd;
+            display: none; flex-direction: column; gap: 10px; z-index: 1200;
+            transition: top 0.3s ease;
+        }
+        .dict-panel.active { display: flex; }
+        .dict-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        .close-dict { cursor: pointer; font-size: 26px; color: #f87171; font-weight: bold; line-height: 1; }
+        .dict-result { background: #f8fafc; border-radius: 12px; padding: 15px; min-height: 120px; font-size: 15px; color: #1e293b; border: 1px dashed #cbd5e1; max-height: 350px; overflow-y: auto;}
+        
+        .ipa-text { color: #d97706; font-family: 'Arial', sans-serif; margin-bottom: 4px; font-size: 16px; }
+        .pos-text { color: #10b981; font-style: italic; font-weight: bold; margin-bottom: 6px; }
+        .mean-text { color: #334155; font-size: 15px; line-height: 1.4; }
+
+        /* =========================================
+           MÔ PHỎNG INFOGRAPHIC MỚI NHẤT
+           ========================================= */
+        .container {
+            background: #ffffff; width: 98vw; max-width: 1300px; height: calc(100vh - 145px); margin-top: 125px;
+            padding: 20px 30px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; position: relative; z-index: 10;
+            overflow-y: auto; overflow-x: hidden; transition: all 0.3s ease;
+        }
+        .container::-webkit-scrollbar { width: 6px; }
+        .container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .tab-content { display: none; flex-direction: column; height: 100%; width: 100%; position: relative; }
+        .tab-content.active { display: flex; }
+
+        /* Trình chiếu Step */
+        .step { opacity: 0.02; filter: blur(4px); transform: scale(0.97) translateY(5px); transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
+        .step.active { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); pointer-events: auto; }
+
+        /* Word slice features */
+        .dict-word { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 4px; transition: 0.15s; }
+        .dict-word:hover { background-color: #bae6fd; color: #0369a1; }
+        .clickable-block { cursor: context-menu; transition: background 0.2s; }
+        .clickable-block:hover { background-color: rgba(226, 232, 240, 0.4); border-radius: 6px; }
+
+        /* Main Title */
+        .main-title {
+            text-align: center; font-size: 36px; color: #1e3a8a; font-weight: 900; 
+            margin-bottom: 20px; letter-spacing: -0.5px;
+        }
+
+        /* Layout Grid */
+        .infographic-grid {
+            display: grid;
+            grid-template-areas:
+                "subj obj adj"
+                "subj chart chart";
+            grid-template-columns: 1.1fr 1fr 1.2fr; /* Chia tỉ lệ các cột */
+            gap: 20px; flex: 1; padding-bottom: 20px;
+        }
+
+        /* Box Styles - Mô phỏng nét viền dày uốn lượn */
+        .info-box {
+            background: white; padding: 20px; display: flex; flex-direction: column; position: relative;
+        }
+        
+        .box-subj {
+            grid-area: subj;
+            border-left: 15px solid #3b82f6; border-bottom: 15px solid #3b82f6; border-top: 15px solid #3b82f6;
+            border-radius: 40px; box-shadow: inset 0 0 0 2px #e2e8f0;
+        }
+        .box-obj {
+            grid-area: obj;
+            border-top: 15px solid #10b981; border-left: 15px solid #10b981;
+            border-radius: 40px 0 0 0; box-shadow: inset 0 0 0 2px #e2e8f0;
+            margin-bottom: -20px; /* Overlap trick */
+            padding-bottom: 40px;
+        }
+        .box-adj {
+            grid-area: adj;
+            border-top: 15px solid #a855f7; border-right: 15px solid #a855f7; border-bottom: 15px solid #a855f7;
+            border-radius: 0 40px 40px 0; box-shadow: inset 0 0 0 2px #e2e8f0;
+        }
+        .box-chart {
+            grid-area: chart; display: flex; justify-content: flex-end; align-items: flex-end;
+            position: relative; z-index: 5;
+        }
+
+        /* Path Connectors (Cam uốn lượn) */
+        .orange-path {
+            position: absolute; border: 15px solid #f97316; border-radius: 40px 0 0 40px;
+            border-right: none; width: 60px; height: 100px;
+            left: -35px; bottom: 20px; opacity: 0.8;
+        }
+
+        /* Text Typography */
+        h2 { font-size: 24px; color: #0f172a; margin-bottom: 8px; line-height: 1.2; font-weight: 900;}
+        .desc-text { font-size: 15px; color: #475569; margin-bottom: 20px; line-height: 1.4; }
+        .bold-hl { font-weight: bold; color: #0f172a; }
+
+        /* Illustration blocks */
+        .illus-top { text-align: center; font-size: 60px; margin-bottom: 10px; line-height: 1; }
+        .illus-right { position: absolute; right: 10px; top: 10px; font-size: 50px; }
+
+        /* Icons Row */
+        .icon-row { display: flex; justify-content: space-around; align-items: center; gap: 10px; margin-top: 10px;}
+        .icon-item { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s;}
+        .icon-item:hover { transform: translateY(-5px); }
+        .circle-icon { 
+            width: 70px; height: 70px; border-radius: 50%; display: flex; justify-content: center; align-items: center; 
+            font-size: 35px; background: #f8fafc; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .icon-label { font-size: 18px; font-weight: bold; }
+        .label-blue { color: #0284c7; }
+        .label-green { color: #059669; }
+        .label-purple { color: #7e22ce; }
+
+        /* Specific modifications for Object box (Arrows) */
+        .verb-arrow { background: #e0f2fe; color: #0284c7; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 5px; border: 1px solid #bae6fd; position: relative; margin-bottom: 5px;}
+        .verb-arrow::after { content: '⬇'; display: block; text-align: center; color: #0284c7; margin-top: 2px; }
+
+        /* Use Cases block (Adjective) */
+        .use-cases { margin-top: 20px; text-align: center; }
+        .use-cases-title { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 10px; }
+        .uc-row { display: flex; justify-content: space-between; gap: 5px; }
+        .uc-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #475569;}
+        .uc-item span { font-size: 28px; margin-bottom: 2px; }
+
+        /* Chart Table */
+        .chart-container {
+            background: white; border-radius: 15px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 2px solid #e2e8f0; width: 100%; max-width: 650px; margin-left: 20px;
+        }
+        .chart-title { text-align: center; font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 15px; letter-spacing: 1px; }
+        .ref-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; }
+        .ref-table th { padding: 10px; font-weight: bold; border-bottom: 2px solid #e2e8f0; }
+        .ref-table td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; transition: background 0.2s; border-radius: 8px;}
+        .ref-table tr:hover td { background: #f8fafc; }
+        
+        /* Table Colors */
+        .th-subj { background: #e0f2fe; color: #0284c7; border-radius: 8px 0 0 8px;}
+        .th-obj { background: #d1fae5; color: #059669; }
+        .th-adj { background: #f3e8ff; color: #7e22ce; border-radius: 0 8px 8px 0;}
+        .td-ref { text-align: left; font-weight: bold; color: #334155; display: flex; align-items: center; gap: 8px; }
+
+        #inkCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; pointer-events: none; }
+        #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+    </style>
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+
+<nav class="side-menu left" id="leftMenu">
+ <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+ <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+ <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+ <button class="active" onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+ <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+ <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+ <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</nav>
+
+<nav class="side-menu right" id="rightMenu">
+   <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+    <button onclick="location.href='story.html'"><b>Story</b></button>
+
+
+</nav>
+
+<header id="mainHeader">
+    <button class="menu-btn" onclick="toggleMenu('left')">Menu ☰</button>
+    <div class="header-center">
+<button class="active-conv" onclick="window.location.href='../conversation_01/conversation_01.html'"><b>Conversation 01</b></button>
+<button onclick="window.location.href='../conversation_02/conversation_02.html'">Conversation 02</button>
+<button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+<button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu('right')">Menu ☰</button>
+</header>
+
+<div id="controlBar">
+    <button id="focusBtn" class="tool-btn" onclick="toggleFocusMode()" style="background: #10b981; color: white; border-color: #059669;">Phóng to 🔲</button>
+    <button id="penBtn" class="tool-btn" onclick="toggleInk()">Bút vẽ: Off</button>
+    <button class="tool-btn" onclick="clearInk()">Xóa mực</button>
+    
+    <div style="flex-grow: 1;"></div>
+    
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchPresentationTab('englishTab')">🇬🇧 English Tab</button>
+        <button class="tab-btn" onclick="switchPresentationTab('vietnameseTab')">🇻🇳 Vietnamese Tab</button>
+    </div>
+
+    <button class="tool-btn" onclick="goPrev()">⬅ Back</button>
+    <button class="tool-btn" onclick="goNext()">Next ➡</button>
+</div>
+
+<!-- TỪ ĐIỂN PANEL -->
+<div class="dict-panel" id="dictPanel">
+    <div class="dict-header">
+        <span style="font-weight: bold; color: #0369a1; font-family: 'UTM Avo';">Tra từ & Dịch Nghĩa 📖</span>
+        <div class="close-dict" onclick="toggleDict()">×</div>
+    </div>
+    <div class="dict-result" id="resultArea">
+        <i>💡 Hướng dẫn:<br>👉 <b>Click chuột trái</b> vào chữ tiếng Anh để tra từ.<br>👉 <b>Click chuột phải</b> vào khối chữ để dịch toàn bộ câu.</i>
+    </div>
+</div>
+
+<div class="container" id="mainContainer">
+
+    <!-- TAB: ENGLISH -->
+    <div id="englishTab" class="tab-content active">
+        
+        <div class="main-title step clickable-block">Mastering Third-Person Singular Pronouns</div>
+
+        <div class="infographic-grid">
+            
+            <div class="info-box box-subj step">
+                <div class="illus-top">👨‍🏫👩‍🏫</div>
+                <h2 class="step clickable-block">Subject Pronouns<br>(He, She, It)</h2>
+                <p class="desc-text step clickable-block">These pronouns act as the <span class="bold-hl">subject</span> and always appear <span class="bold-hl">before</span> a verb.</p>
+                
+                <div class="icon-row step">
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#e0f2fe;">👨</div>
+                        <div class="icon-label label-blue clickable-block">He</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#e0f2fe;">👩</div>
+                        <div class="icon-label label-blue clickable-block">She</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#e0f2fe;">🧊</div>
+                        <div class="icon-label label-blue clickable-block">It</div>
+                    </div>
+                </div>
+                <div style="text-align: center; font-size: 50px; margin-top: 20px;" class="step">👨‍💼💬</div>
+            </div>
+
+            <div class="info-box box-obj step">
+                <div class="orange-path"></div>
+                <div class="illus-right">⛹️‍♂️</div>
+                <h2 class="step clickable-block">Object Pronouns<br>(Him, Her, It)</h2>
+                <p class="desc-text step clickable-block" style="max-width: 80%;">These pronouns <span class="bold-hl">receive</span> the action and always appear <span class="bold-hl">after</span> a verb.</p>
+                
+                <div class="icon-row step" style="margin-top: 30px;">
+                    <div class="icon-item">
+                        <div class="verb-arrow clickable-block">VERB</div>
+                        <div class="circle-icon" style="background:#d1fae5;">🎁</div>
+                        <div class="icon-label label-green clickable-block">Him</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="verb-arrow clickable-block">VERB</div>
+                        <div class="circle-icon" style="background:#d1fae5;">🌷</div>
+                        <div class="icon-label label-green clickable-block">Her</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="verb-arrow clickable-block">VERB</div>
+                        <div class="circle-icon" style="background:#e2e8f0;">🦾</div>
+                        <div class="icon-label label-green clickable-block">It</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box box-adj step">
+                <h2 class="step clickable-block">Adjective Pronouns<br>(His, Her, Its)</h2>
+                <p class="desc-text step clickable-block">These pronouns indicate <span class="bold-hl">ownership</span> and must be placed <span class="bold-hl">before</span> a noun.</p>
+                
+                <div class="icon-row step">
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#f3e8ff;">🔑🏠</div>
+                        <div class="icon-label label-purple clickable-block">His</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#dcfce7;">🛍️🚗</div>
+                        <div class="icon-label label-green clickable-block">Her</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#ffedd5;">🏷️☕</div>
+                        <div class="icon-label label-purple clickable-block">Its</div>
+                    </div>
+                </div>
+
+                <div class="use-cases step">
+                    <div class="use-cases-title clickable-block">Possessive Use Cases</div>
+                    <div class="uc-row">
+                        <div class="uc-item clickable-block">
+                            <span>🏝️🏠</span>
+                            <b>his</b> beach house
+                        </div>
+                        <div class="uc-item clickable-block">
+                            <span>🚙</span>
+                            <b>her</b> car
+                        </div>
+                        <div class="uc-item clickable-block">
+                            <span>🏪</span>
+                            the cafe's<br>bad location
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-chart step">
+                <div class="chart-container">
+                    <div class="chart-title clickable-block">PRONOUN REFERENCE CHART</div>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th class="clickable-block" style="color:#64748b; text-align:left;">👤 Referent</th>
+                                <th class="th-subj clickable-block">📝 Subject Form</th>
+                                <th class="th-obj clickable-block">📞 Object Form</th>
+                                <th class="th-adj clickable-block">🤲 Adjective Form</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="step">
+                                <td class="td-ref clickable-block">👨 Male</td>
+                                <td class="clickable-block" style="color:#0284c7; font-weight:bold;">He</td>
+                                <td class="clickable-block" style="color:#059669; font-weight:bold;">Him</td>
+                                <td class="clickable-block" style="color:#7e22ce; font-weight:bold;">His</td>
+                            </tr>
+                            <tr class="step">
+                                <td class="td-ref clickable-block">👩 Female</td>
+                                <td class="clickable-block" style="color:#0284c7; font-weight:bold;">She</td>
+                                <td class="clickable-block" style="color:#059669; font-weight:bold;">Her</td>
+                                <td class="clickable-block" style="color:#7e22ce; font-weight:bold;">Her</td>
+                            </tr>
+                            <tr class="step">
+                                <td class="td-ref clickable-block">🧊 Thing</td>
+                                <td class="clickable-block" style="color:#0284c7; font-weight:bold;">It</td>
+                                <td class="clickable-block" style="color:#059669; font-weight:bold;">It</td>
+                                <td class="clickable-block" style="color:#7e22ce; font-weight:bold;">Its</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- TAB: VIETNAMESE -->
+    <div id="vietnameseTab" class="tab-content">
+        
+        <div class="main-title step clickable-block">Nắm Vững Đại Từ Ngôi Thứ Ba Số Ít</div>
+
+        <div class="infographic-grid">
+            
+            <div class="info-box box-subj step">
+                <div class="illus-top">👨‍🏫👩‍🏫</div>
+                <h2 class="step clickable-block">Đại Từ Chủ Ngữ<br>(He, She, It)</h2>
+                <p class="desc-text step clickable-block">Những đại từ này đóng vai trò là <span class="bold-hl">chủ ngữ</span> và luôn đứng <span class="bold-hl">trước</span> động từ.</p>
+                
+                <div class="icon-row step">
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#e0f2fe;">👨</div>
+                        <div class="icon-label label-blue clickable-block">He</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#e0f2fe;">👩</div>
+                        <div class="icon-label label-blue clickable-block">She</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#e0f2fe;">🧊</div>
+                        <div class="icon-label label-blue clickable-block">It</div>
+                    </div>
+                </div>
+                <div style="text-align: center; font-size: 50px; margin-top: 20px;" class="step">👨‍💼💬</div>
+            </div>
+
+            <div class="info-box box-obj step">
+                <div class="orange-path"></div>
+                <div class="illus-right">⛹️‍♂️</div>
+                <h2 class="step clickable-block">Đại Từ Tân Ngữ<br>(Him, Her, It)</h2>
+                <p class="desc-text step clickable-block" style="max-width: 80%;">Những đại từ này <span class="bold-hl">nhận</span> hành động và luôn đứng <span class="bold-hl">sau</span> động từ.</p>
+                
+                <div class="icon-row step" style="margin-top: 30px;">
+                    <div class="icon-item">
+                        <div class="verb-arrow clickable-block">ĐỘNG TỪ</div>
+                        <div class="circle-icon" style="background:#d1fae5;">🎁</div>
+                        <div class="icon-label label-green clickable-block">Him</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="verb-arrow clickable-block">ĐỘNG TỪ</div>
+                        <div class="circle-icon" style="background:#d1fae5;">🌷</div>
+                        <div class="icon-label label-green clickable-block">Her</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="verb-arrow clickable-block">ĐỘNG TỪ</div>
+                        <div class="circle-icon" style="background:#e2e8f0;">🦾</div>
+                        <div class="icon-label label-green clickable-block">It</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box box-adj step">
+                <h2 class="step clickable-block">Tính Từ Sở Hữu<br>(His, Her, Its)</h2>
+                <p class="desc-text step clickable-block">Những từ này chỉ <span class="bold-hl">sự sở hữu</span> và phải đứng <span class="bold-hl">trước</span> một danh từ.</p>
+                
+                <div class="icon-row step">
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#f3e8ff;">🔑🏠</div>
+                        <div class="icon-label label-purple clickable-block">His</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#dcfce7;">🛍️🚗</div>
+                        <div class="icon-label label-green clickable-block">Her</div>
+                    </div>
+                    <div class="icon-item">
+                        <div class="circle-icon" style="background:#ffedd5;">🏷️☕</div>
+                        <div class="icon-label label-purple clickable-block">Its</div>
+                    </div>
+                </div>
+
+                <div class="use-cases step">
+                    <div class="use-cases-title clickable-block">Các Trường Hợp Sở Hữu</div>
+                    <div class="uc-row">
+                        <div class="uc-item clickable-block">
+                            <span>🏝️🏠</span>
+                            ngôi nhà trên bãi biển của <b>anh ấy</b>
+                        </div>
+                        <div class="uc-item clickable-block">
+                            <span>🚙</span>
+                            xe hơi của <b>cô ấy</b>
+                        </div>
+                        <div class="uc-item clickable-block">
+                            <span>🏪</span>
+                            vị trí xấu của<br>quán cà phê
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-chart step">
+                <div class="chart-container">
+                    <div class="chart-title clickable-block">BẢNG THAM KHẢO ĐẠI TỪ</div>
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                <th class="clickable-block" style="color:#64748b; text-align:left;">👤 Đối Tượng</th>
+                                <th class="th-subj clickable-block">📝 Dạng Chủ Ngữ</th>
+                                <th class="th-obj clickable-block">📞 Dạng Tân Ngữ</th>
+                                <th class="th-adj clickable-block">🤲 Dạng Tính Từ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="step">
+                                <td class="td-ref clickable-block">👨 Nam</td>
+                                <td class="clickable-block" style="color:#0284c7; font-weight:bold;">He</td>
+                                <td class="clickable-block" style="color:#059669; font-weight:bold;">Him</td>
+                                <td class="clickable-block" style="color:#7e22ce; font-weight:bold;">His</td>
+                            </tr>
+                            <tr class="step">
+                                <td class="td-ref clickable-block">👩 Nữ</td>
+                                <td class="clickable-block" style="color:#0284c7; font-weight:bold;">She</td>
+                                <td class="clickable-block" style="color:#059669; font-weight:bold;">Her</td>
+                                <td class="clickable-block" style="color:#7e22ce; font-weight:bold;">Her</td>
+                            </tr>
+                            <tr class="step">
+                                <td class="td-ref clickable-block">🧊 Sự Vật</td>
+                                <td class="clickable-block" style="color:#0284c7; font-weight:bold;">It</td>
+                                <td class="clickable-block" style="color:#059669; font-weight:bold;">It</td>
+                                <td class="clickable-block" style="color:#7e22ce; font-weight:bold;">Its</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPT NÂNG CAO -->
+<script>
+    let stepsArray = [];
+    let currentStepIndex = -1;
+    let isFocusMode = false;
+
+    function toggleFocusMode() {
+        isFocusMode = !isFocusMode;
+        const header = document.getElementById('mainHeader');
+        const controlBar = document.getElementById('controlBar');
+        const container = document.getElementById('mainContainer');
+        const focusBtn = document.getElementById('focusBtn');
+        const sideMenus = document.querySelectorAll('.side-menu');
+        const dictPanel = document.getElementById('dictPanel');
+
+        if (isFocusMode) {
+            header.style.transform = 'translateY(-100%)';
+            controlBar.style.top = '0px';
+            container.style.marginTop = '70px';
+            container.style.height = 'calc(100vh - 85px)';
+            sideMenus.forEach(m => m.style.top = '70px');
+            dictPanel.style.top = '75px';
+            
+            focusBtn.innerHTML = 'Thu nhỏ 🔳';
+            focusBtn.style.background = '#fef3c7';
+            focusBtn.style.color = '#d97706';
+            focusBtn.style.borderColor = '#d97706';
+        } else {
+            header.style.transform = 'translateY(0)';
+            controlBar.style.top = '65px';
+            container.style.marginTop = '125px';
+            container.style.height = 'calc(100vh - 145px)';
+            sideMenus.forEach(m => m.style.top = '130px');
+            dictPanel.style.top = '135px';
+            
+            focusBtn.innerHTML = 'Phóng to 🔲';
+            focusBtn.style.background = '#10b981';
+            focusBtn.style.color = 'white';
+            focusBtn.style.borderColor = '#059669';
+        }
+    }
+
+    function switchPresentationTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        const activeTab = document.getElementById(tabId);
+        activeTab.classList.add('active');
+        
+        const activeBtn = document.querySelector(`[onclick="switchPresentationTab('${tabId}')"]`);
+        if(activeBtn) activeBtn.classList.add('active');
+        
+        initStepsForActiveTab();
+    }
+
+    function initStepsForActiveTab() {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const activeTab = document.querySelector('.tab-content.active');
+        stepsArray = activeTab.querySelectorAll('.step');
+        currentStepIndex = -1;
+    }
+
+    function goNext() {
+        if (currentStepIndex < stepsArray.length - 1) {
+            currentStepIndex++;
+            stepsArray[currentStepIndex].classList.add('active');
+            stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function goPrev() {
+        if (currentStepIndex >= 0) {
+            stepsArray[currentStepIndex].classList.remove('active');
+            currentStepIndex--;
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goNext(); }
+        if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); goPrev(); }
+    });
+
+    function toggleMenu(side) { document.getElementById(side + 'Menu').classList.toggle('open'); }
+    function toggleDict() { document.getElementById('dictPanel').classList.toggle('active'); }
+
+    async function lookupDictionary(word) {
+        const panel = document.getElementById('dictPanel');
+        if(!panel.classList.contains('active')) panel.classList.add('active');
+        
+        const resArea = document.getElementById('resultArea');
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang kết nối từ điển <b>"${word}"</b>... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const data = await res.json();
+            
+            const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(word)}`);
+            const transData = await transRes.json();
+            const vietMeaning = transData[0][0][0];
+
+            if(data.title || !Array.isArray(data)) { 
+                resArea.innerHTML = `
+                    <div style="font-size:22px; font-weight:bold; color:#0f172a;">${word}</div>
+                    <div class="mean-text" style="margin-top:10px;"><b>Nghĩa tiếng Việt:</b> <span style="color:#b91c1c; font-weight:bold;">${vietMeaning}</span></div>
+                `;
+                speakFallback(word);
+                return; 
+            }
+
+            const entry = data[0];
+            let phonetic = '';
+            let audioUrl = '';
+            
+            for(let p of entry.phonetics) {
+                if(p.text && !phonetic) phonetic = p.text;
+                if(p.audio && !audioUrl) audioUrl = p.audio;
+            }
+            if(!phonetic && entry.phonetic) phonetic = entry.phonetic;
+
+            const pos = entry.meanings[0] ? entry.meanings[0].partOfSpeech : 'vocabulary';
+            const enDef = entry.meanings[0] && entry.meanings[0].definitions[0] ? entry.meanings[0].definitions[0].definition : '';
+
+            resArea.innerHTML = `
+                <div style="font-size:24px; font-weight:bold; color:#1e3a8a; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${word}</span>
+                    <button onclick="playDirectAudio('${audioUrl}', '${word}')" style="background:#e0f2fe; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; font-size:18px;">🔊</button>
+                </div>
+                <div class="ipa-text">${phonetic ? phonetic : '[no phonetic]'}</div>
+                <div class="pos-text">(${pos})</div>
+                <div style="height:1px; background:#e2e8f0; margin: 8px 0;"></div>
+                <div class="mean-text"><b>🇻🇳 Nghĩa:</b> <span style="color:#b91c1c; font-weight:bold; font-size:16px;">${vietMeaning}</span></div>
+                ${enDef ? `<div class="mean-text" style="margin-top:6px; font-size:13px; color:#64748b;"><b>English Definition:</b> ${enDef}</div>` : ''}
+            `;
+            
+            playDirectAudio(audioUrl, word);
+
+        } catch(e) { 
+            resArea.innerHTML = `<span style="color:red;">Lỗi phân tích hoặc không tìm thấy từ.</span>`; 
+        }
+    }
+
+    function playDirectAudio(url, wordFallback) {
+        if(url && url.startsWith('http')) {
+            let audio = new Audio(url);
+            audio.play().catch(() => speakFallback(wordFallback));
+        } else {
+            speakFallback(wordFallback);
+        }
+    }
+
+    function speakFallback(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US'; u.rate = 0.8;
+        window.speechSynthesis.speak(u);
+    }
+
+    async function translateFullBlock(text) {
+        const panel = document.getElementById('dictPanel');
+        if(!panel.classList.contains('active')) panel.classList.add('active');
+        
+        const resArea = document.getElementById('resultArea');
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang biên dịch đoạn... ⏳</div>`;
+        
+        try {
+            const cleanText = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(cleanText)}`);
+            const data = await res.json();
+            
+            let fullResult = '';
+            data[0].forEach(segment => { if(segment[0]) fullResult += segment[0]; });
+
+            resArea.innerHTML = `
+                <div style="font-size:13px; color:#64748b; font-style:italic; margin-bottom:8px; border-left:3px solid #cbd5e1; padding-left:8px;">"${cleanText}"</div>
+                <div style="font-size:16px; color:#1e293b; font-weight:bold;">🇻🇳 Bản dịch Việt ngữ:</div>
+                <div class="mean-text" style="color:#0369a1; font-weight:bold; font-size:16px; margin-top:4px;">${fullResult}</div>
+                <div style="text-align:right; margin-top:12px;">
+                    <button class="tool-btn" style="font-size:12px; padding:3px 8px;" onclick="speakFallback('${cleanText.replace(/'/g, "\\'")}')">Nghe đọc khối 🔊</button>
+                </div>
+            `;
+        } catch(e) {
+            resArea.innerHTML = `<span style="color:red;">Lỗi kết nối máy chủ dịch thuật.</span>`;
+        }
+    }
+
+    function makeWordsClickable() {
+        const elements = document.querySelectorAll('.clickable-block');
+        
+        elements.forEach(el => {
+            el.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                translateFullBlock(el.innerText);
+            });
+
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) textNodes.push(node);
+
+            textNodes.forEach(textNode => {
+                if (!textNode.nodeValue.trim()) return;
+                
+                const units = textNode.nodeValue.split(/([ \n.,!?'"\[\]()\/]+)/);
+                const containerFrag = document.createDocumentFragment();
+                
+                units.forEach(unit => {
+                    if (/[a-zA-Z]/.test(unit)) {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'dict-word';
+                        wordSpan.innerText = unit;
+                        
+                        wordSpan.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            lookupDictionary(unit.replace(/[^a-zA-Z']/g, ''));
+                        });
+                        containerFrag.appendChild(wordSpan);
+                    } else {
+                        containerFrag.appendChild(document.createTextNode(unit));
+                    }
+                });
+                textNode.parentNode.replaceChild(containerFrag, textNode);
+            });
+        });
+    }
+
+    let inkCanvas, inkCtx, isDrawing = false, lastX = 0, lastY = 0;
+    function initInk() {
+        inkCanvas = document.getElementById("inkCanvas");
+        inkCtx = inkCanvas.getContext("2d");
+        inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        
+        inkCanvas.addEventListener("pointerdown", e => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; lastX = e.clientX; lastY = e.clientY; } });
+        inkCanvas.addEventListener("pointermove", e => {
+            if (!isDrawing) return;
+            inkCtx.strokeStyle = "#e67e22"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round";
+            inkCtx.beginPath(); inkCtx.moveTo(lastX, lastY); inkCtx.lineTo(e.clientX, e.clientY); inkCtx.stroke();
+            lastX = e.clientX; lastY = e.clientY;
+        });
+        window.addEventListener("pointerup", () => isDrawing = false);
+    }
+    
+    function toggleInk() {
+        const active = inkCanvas.classList.toggle("drawing");
+        document.getElementById("penBtn").textContent = active ? "Bút vẽ: On" : "Bút vẽ: Off";
+        document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    window.onload = () => {
+        initInk();
+        makeWordsClickable();
+        initStepsForActiveTab(); 
+    };
+</script>
+
+</body>
+</html>
