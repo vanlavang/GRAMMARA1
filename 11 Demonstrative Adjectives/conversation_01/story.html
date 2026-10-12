@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conversation – Modern Learning</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'UTM Avo', 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+/* Bọc Video và Quiz */
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: left; 
+  gap: 20px; 
+  max-width: 1200px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:500px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* Giao diện Quiz */
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 500px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 24px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.quiz-option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 35px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+</style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+      <a href="../conversation_01/conversation_01.html" >Conversation 01</a>
+      <a href="../conversation_02/conversation_02.html">Conversation 02</a>
+      <a href="../conversation_03/conversation_03.html"  >Conversation 03</a>
+      <a href="../conversation_04/conversation_04.html" class="active-link" >Conversation 04</a>
+    </nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+    <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+<source src="videos/story.mp4" type="video/mp4">
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+// --- AUDIO SYSTEM TỰ ĐỘNG (Web Audio API) ---
+const AudioContextAPI = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new AudioContextAPI();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playOsc(freq, type, delay, duration, volume = 0.1) {
+    if(!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+    gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + delay);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start(audioCtx.currentTime + delay);
+    osc.stop(audioCtx.currentTime + delay + duration);
+}
+
+function playSound(type) {
+    initAudio();
+    if(type === 'correct') {
+        playOsc(523.25, 'sine', 0, 0.1);    
+        playOsc(659.25, 'sine', 0.1, 0.1);  
+        playOsc(783.99, 'sine', 0.2, 0.1);  
+        playOsc(1046.50, 'sine', 0.3, 0.4); 
+        
+        setTimeout(() => {
+            if(!audioCtx) return;
+            let popOsc = audioCtx.createOscillator();
+            let popGain = audioCtx.createGain();
+            popOsc.type = 'square';
+            popOsc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            popOsc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            popGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            popGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            popOsc.connect(popGain);
+            popGain.connect(audioCtx.destination);
+            popOsc.start();
+            popOsc.stop(audioCtx.currentTime + 0.1);
+        }, 150);
+    } else {
+        playOsc(150, 'sawtooth', 0, 0.3, 0.15);
+        playOsc(140, 'sawtooth', 0.1, 0.3, 0.15);
+    }
+}
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// --- LOGIC QUIZ ---
+const quizData = [
+  {
+    question: "What did the mother ask the kids to do?",
+    options: ["Wash the dirty clothes", "Cook dinner", "Clean their room", "Buy soap"],
+    correct: "Wash the dirty clothes"
+  },
+  {
+    question: "What did Leo want to make by putting a lot of soap?",
+    options: ["Bubbles", "A polar bear", "Snow", "A monster"],
+    correct: "Bubbles"
+  },
+  {
+    question: "What did Maya think more soap would do?",
+    options: ["Make the clothes very clean", "Break the machine", "Hurt their eyes", "Waste water"],
+    correct: "Make the clothes very clean"
+  },
+  {
+    question: "What did Maya say the bubbles looked like?",
+    options: ["A polar bear", "A monster", "A ghost", "A cloud"],
+    correct: "A polar bear"
+  },
+  {
+    question: "Why did the father turn off the machine?",
+    options: ["Before it breaks down", "Because it was noisy", "To save water", "Because the clothes were clean"],
+    correct: "Before it breaks down"
+  },
+  {
+    question: "What can the soap do to the kids according to the mother?",
+    options: ["Hurt their skin and eyes", "Make them sick", "Make them clean", "Make them tired"],
+    correct: "Hurt their skin and eyes"
+  },
+  {
+    question: "What did the kids have to do before going to bed?",
+    options: ["Clean the whole room", "Say sorry", "Wash the clothes again", "Take a bath"],
+    correct: "Clean the whole room"
+  }
+];
+let currentQIndex = 0;
+
+function wrapWordsForDict(text) {
+  return text.split(/\s+/).map(w => {
+    const clean = w.replace(/[.,!?"“”]/g, "").toLowerCase();
+    const cleanEscaped = clean.replace(/'/g, "\\'");
+    return `<span class="word" onclick="handleWordClick(event, '${cleanEscaped}')">${w}</span>`;
+  }).join(" ");
+}
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = `
+      <h4 style='text-align:center; color:#28a745; margin-top:20px; font-size: 26px;'>
+        🎉 You finished the quiz! 🎉
+      </h4>
+      <button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>
+        Play Again 🔄
+      </button>`;
+      
+    if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 }, zIndex: 3000 });
+    }
+    return;
+  }
+
+  const q = quizData[currentQIndex];
+
+  let html = `
+    <div>
+      <div style="font-weight:bold; margin-bottom:15px; font-size:24px;">
+        Question ${currentQIndex + 1}: ${wrapWordsForDict(q.question)}
+      </div>
+  `;
+
+  q.options.forEach(opt => {
+    const isCorrect = (opt === q.correct);
+    html += `
+      <button class="quiz-option"
+        onclick="checkAns(this, ${isCorrect})">
+        ${wrapWordsForDict(opt)}
+      </button>`;
+  });
+
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  initAudio();
+  
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  
+  if (isCorrect) {
+    btn.classList.add('correct');
+    playSound('correct'); 
+    
+    if (typeof confetti !== 'undefined') {
+        var duration = 1.2 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+        function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+        var interval = setInterval(function() {
+          var timeLeft = animationEnd - Date.now();
+          if (timeLeft <= 0) { return clearInterval(interval); }
+          var particleCount = 50 * (timeLeft / duration);
+          
+          confetti(Object.assign({}, defaults, { particleCount,
+            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+          }));
+          confetti(Object.assign({}, defaults, { particleCount,
+            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+          }));
+        }, 250);
+    }
+
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 1500); 
+  } else {
+    btn.classList.add('wrong');
+    btn.classList.add('shake'); 
+    playSound('wrong'); 
+    
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btn.classList.remove('shake');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+
+// --- DICTIONARY ---
+const dictionary = {
+"active": { meaning: "năng động", phonetic: "/ˈæktɪv/", type: "adjective" },
+"already": { meaning: "đã rồi", phonetic: "/ɔːlˈredi/", type: "adverb" },
+"and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+"are": { meaning: "thì, là", phonetic: "/ɑːr/", type: "verb" },
+"before": { meaning: "trước khi", phonetic: "/bɪˈfɔːr/", type: "conjunction/preposition" },
+"bed": { meaning: "giường", phonetic: "/bed/", type: "noun" },
+"being": { meaning: "việc trở nên", phonetic: "/ˈbiːɪŋ/", type: "noun/verb" },
+"big": { meaning: "to lớn", phonetic: "/bɪɡ/", type: "adjective" },
+"bother": { meaning: "làm phiền", phonetic: "/ˈbɑːðər/", type: "verb" },
+"break": { meaning: "làm hỏng", phonetic: "/breɪk/", type: "verb" },
+"breaks": { meaning: "bị hỏng", phonetic: "/breɪks/", type: "verb" },
+"bubbles": { meaning: "bong bóng", phonetic: "/ˈbʌbəlz/", type: "noun" },
+"can": { meaning: "có thể", phonetic: "/kæn/", type: "modal verb" },
+"children": { meaning: "những đứa trẻ", phonetic: "/ˈtʃɪldrən/", type: "noun" },
+"clean": { meaning: "sạch, dọn dẹp", phonetic: "/kliːn/", type: "adjective/verb" },
+"cleaning": { meaning: "dọn dẹp", phonetic: "/ˈkliːnɪŋ/", type: "noun/verb" },
+"clothes": { meaning: "quần áo", phonetic: "/kloʊðz/", type: "noun" },
+"dad": { meaning: "bố", phonetic: "/dæd/", type: "noun" },
+"darling": { meaning: "con yêu", phonetic: "/ˈdɑːrlɪŋ/", type: "noun" },
+"darlings": { meaning: "các con yêu", phonetic: "/ˈdɑːrlɪŋz/", type: "noun" },
+"dirty": { meaning: "bẩn", phonetic: "/ˈdɜːrti/", type: "adjective" },
+"doing": { meaning: "đang làm", phonetic: "/ˈduːɪŋ/", type: "verb" },
+"don't": { meaning: "đừng, không", phonetic: "/doʊnt/", type: "verb" },
+"down": { meaning: "xuống", phonetic: "/daʊn/", type: "adverb" },
+"everywhere": { meaning: "khắp nơi", phonetic: "/ˈevriwer/", type: "adverb" },
+"excited": { meaning: "hào hứng", phonetic: "/ɪkˈsaɪtɪd/", type: "adjective" },
+"exhausted": { meaning: "kiệt sức", phonetic: "/ɪɡˈzɔːstɪd/", type: "adjective" },
+"expensive": { meaning: "đắt tiền", phonetic: "/ɪkˈspensɪv/", type: "adjective" },
+"eyes": { meaning: "đôi mắt", phonetic: "/aɪz/", type: "noun" },
+"feeling": { meaning: "cảm thấy", phonetic: "/ˈfiːlɪŋ/", type: "verb" },
+"feels": { meaning: "cảm thấy", phonetic: "/fiːlz/", type: "verb" },
+"finished": { meaning: "hoàn thành", phonetic: "/ˈfɪnɪʃt/", type: "verb" },
+"fun": { meaning: "niềm vui", phonetic: "/fʌn/", type: "noun" },
+"go": { meaning: "đi", phonetic: "/ɡoʊ/", type: "verb" },
+"god": { meaning: "Chúa trời", phonetic: "/ɡɑːd/", type: "noun" },
+"good": { meaning: "tốt, ngoan", phonetic: "/ɡʊd/", type: "adjective" },
+"hate": { meaning: "ghét", phonetic: "/heɪt/", type: "verb" },
+"help": { meaning: "giúp đỡ", phonetic: "/help/", type: "verb" },
+"hurt": { meaning: "làm đau, tổn thương", phonetic: "/hɜːrt/", type: "verb" },
+"kids": { meaning: "bọn trẻ", phonetic: "/kɪdz/", type: "noun" },
+"laundry": { meaning: "giặt giũ", phonetic: "/ˈlɔːndri/", type: "noun" },
+"look": { meaning: "nhìn", phonetic: "/lʊk/", type: "verb" },
+"love": { meaning: "yêu thương", phonetic: "/lʌv/", type: "verb" },
+"machine": { meaning: "máy", phonetic: "/məˈʃiːn/", type: "noun" },
+"mad": { meaning: "tức giận", phonetic: "/mæd/", type: "adjective" },
+"mess": { meaning: "sự bừa bộn", phonetic: "/mes/", type: "noun" },
+"mom": { meaning: "mẹ", phonetic: "/mɑːm/", type: "noun" },
+"monster": { meaning: "quái vật", phonetic: "/ˈmɑːnstər/", type: "noun" },
+"must": { meaning: "phải", phonetic: "/mʌst/", type: "modal verb" },
+"naughty": { meaning: "hư", phonetic: "/ˈnɔːti/", type: "adjective" },
+"play": { meaning: "chơi", phonetic: "/pleɪ/", type: "verb" },
+"places": { meaning: "những nơi", phonetic: "/ˈpleɪsɪz/", type: "noun" },
+"polar": { meaning: "Bắc Cực", phonetic: "/ˈpoʊlər/", type: "adjective" },
+"room": { meaning: "căn phòng", phonetic: "/ruːm/", type: "noun" },
+"skin": { meaning: "da", phonetic: "/skɪn/", type: "noun" },
+"snow": { meaning: "tuyết", phonetic: "/snoʊ/", type: "noun" },
+"soap": { meaning: "xà phòng", phonetic: "/soʊp/", type: "noun" },
+"sorry": { meaning: "xin lỗi", phonetic: "/ˈsɑːri/", type: "adjective" },
+"teacher": { meaning: "giáo viên", phonetic: "/ˈtiːtʃər/", type: "noun" },
+"truly": { meaning: "thực sự", phonetic: "/ˈtruːli/", type: "adverb" },
+"turning": { meaning: "tắt/chuyển", phonetic: "/ˈtɜːrnɪŋ/", type: "verb" },
+"water": { meaning: "nước", phonetic: "/ˈwɔːtər/", type: "noun" },
+"wasting": { meaning: "lãng phí", phonetic: "/ˈweɪstɪŋ/", type: "verb" },
+"wash": { meaning: "giặt, rửa", phonetic: "/wɑːʃ/", type: "verb" },
+"washing": { meaning: "đang giặt", phonetic: "/ˈwɑːʃɪŋ/", type: "verb" },
+"white": { meaning: "màu trắng", phonetic: "/waɪt/", type: "adjective" }
+};
+
+// --- SUBTITLES ---
+const sentences = [
+  { text: "My darlings, can you help me wash the dirty clothes?", start: 0, end: 6, translation: "Các con yêu, các con có thể giúp mẹ giặt quần áo bẩn không?" },
+  { text: "Yes! We're very excited to help you, Mom!", start: 8, end: 13, translation: "Vâng ạ! Chúng con rất hào hứng được giúp mẹ!" },
+  { text: "Let's put a lot of soap to make bubbles, Maya!", start: 27, end: 30, translation: "Hãy cho thật nhiều xà phòng để tạo bọt nhé, Maya!" },
+  { text: "Wow! More soap will make the clothes very clean!", start: 34, end: 39, translation: "Chà! Thêm xà phòng sẽ làm quần áo rất sạch!" },
+  { text: "... And start!", start: 40, end: 42, translation: "... Và bắt đầu!" },
+  { text: "... Yeahhhh!", start: 43, end: 45, translation: "... Yeahhhh!" },
+  { text: "Washing! Washing!", start: 46, end: 49, translation: "Đang giặt! Đang giặt!" },
+  { text: "Ooh! Look at all the white bubbles everywhere, sister!", start: 57, end: 62, translation: "Ooh! Nhìn những bong bóng trắng khắp nơi kìa chị ơi!" },
+  { text: "Hey, Leo! It's the polar bear.", start: 63, end: 68, translation: "Này Leo! Nó là gấu Bắc Cực." },
+  { text: "It feels like we are playing in the real snow!", start: 69, end: 74, translation: "Cảm giác như chúng ta đang chơi trong tuyết thật vậy!" },
+  { text: "Look at me! I'm a big white bubble monster now!", start: 86, end: 91, translation: "Nhìn em này! Giờ em là một con quái vật bong bóng trắng khổng lồ!" },
+  { text: "Oh my god! What are you doing in the laundry room?", start: 100, end: 105, translation: "Ôi trời ơi! Các con đang làm gì trong phòng giặt vậy?" },
+  { text: "I'm turning this off before the machine breaks down.", start: 108, end: 112, translation: "Bố sẽ tắt máy trước khi nó bị hỏng." },
+  { text: "The soap can hurt your skin and your eyes, kids!", start: 117, end: 122, translation: "Xà phòng có thể làm tổn thương da và mắt của các con đấy!" },
+  { text: "Too much soap means the clothes are still very dirty.", start: 123, end: 127, translation: "Quá nhiều xà phòng nghĩa là quần áo vẫn còn rất bẩn." },
+  { text: "You're wasting a lot of water and expensive soap, too.", start: 131, end: 136, translation: "Các con cũng đang lãng phí rất nhiều nước và xà phòng đắt tiền nữa." },
+  { text: "We're truly sorry, dad.", start: 138, end: 141, translation: "Chúng con thực sự xin lỗi bố." },
+  { text: "We just wanted to have fun.", start: 142, end: 145, translation: "Chúng con chỉ muốn vui chơi thôi." },
+  { text: "Please don't be mad, we'll be good children from now.", start: 147, end: 152, translation: "Xin đừng tức giận, chúng con sẽ là những đứa trẻ ngoan từ bây giờ." },
+  { text: "You must clean the whole room before you go to bed.", start: 153, end: 158, translation: "Các con phải dọn dẹp toàn bộ căn phòng trước khi đi ngủ." },
+  { text: "And you too!", start: 162, end: 164, translation: "Và con nữa!" },
+  { text: "The kids were so naughty today.", start: 183, end: 186, translation: "Bọn trẻ hôm nay hư quá." },
+  { text: "I'm feeling very exhausted.", start: 187, end: 190, translation: "Em cảm thấy rất kiệt sức." },
+  { text: "Mom, dad, we finished cleaning the laundry room already.", start: 197, end: 202, translation: "Mẹ, bố, chúng con đã dọn dẹp xong phòng giặt rồi ạ." },
+  { text: "Do you hate us because we made a big mess?", start: 204, end: 208, translation: "Bố mẹ có ghét chúng con vì chúng con đã làm ra một mớ hỗn độn lớn không?" },
+  { text: "No, we love you, but you must play in right places.", start: 210, end: 216, translation: "Không, bố mẹ yêu các con, nhưng các con phải chơi đúng chỗ." },
+  { text: "Being active is good, but don't bother other people, darlings.", start: 217, end: 222, translation: "Năng động là tốt, nhưng đừng làm phiền người khác, các con yêu." },
+  { text: "I love you, mom, dad.", start: 225, end: 229, translation: "Con yêu mẹ, bố." }
+];
+
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?"“”]/g,"").toLowerCase();
+    const cleanEscaped=clean.replace(/'/g,"\\'");
+    return `<span class="word" onclick="handleWordClick(event, '${cleanEscaped}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  if(event) event.stopPropagation();
+
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+// --- XỬ LÝ SỰ KIỆN CHO MOUSE (PC) VÀ TOUCH (ĐIỆN THOẠI) ---
+
+// Sự kiện chuột (Mouse)
+canvas.addEventListener("mousedown", (e) => {
+  if(!canvas.classList.contains("pen-active")) return;
+  isDrawing = true; 
+  ctx.beginPath();
+  const p = getPos(e); 
+  ctx.moveTo(p.x, p.y);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if(!isDrawing) return;
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); 
+  ctx.strokeStyle = "red"; 
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; 
+  ctx.stroke();
+});
+
+canvas.addEventListener("mouseup", () => isDrawing = false);
+canvas.addEventListener("mouseleave", () => isDrawing = false);
+
+
+// Sự kiện cảm ứng (Touch)
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; 
+  ctx.beginPath();
+  const p = getPos(e); 
+  ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); 
+  ctx.strokeStyle = "red"; 
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; 
+  ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+</script>
+
+</body>
+</html>

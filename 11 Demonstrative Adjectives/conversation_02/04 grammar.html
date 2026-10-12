@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Mastering Demonstrative Pronouns - Grammar Pro</title>
+    <style>
+        @font-face { font-family: 'UTM Avo'; src: local('UTM Avo'); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ink: #0f172a;
+            --soft-ink: #334155;
+            --primary-blue: #2563eb;
+            --primary-purple: #7c3aed;
+            --bg-near: #ffedd5;
+            --bg-far: #dcfce7; 
+            --panel-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+            --border-color: #cbd5e1;
+        }
+
+        body {
+            font-family: 'UTM Avo', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* --- HEADER & MENU --- */
+        header {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 65px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .header-center { display: flex; gap: 10px; }
+        header button {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'UTM Avo';
+            color: #475569;
+            transition: all 0.3s ease;
+        }
+        header button.active-conv {
+            background-color: #2563eb;
+            color: white;
+            font-weight: bold;
+            border-color: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .menu-btn {
+            background-color: #475569 !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            border-radius: 20px !important;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .menu-btn:hover { background-color: #334155 !important; }
+
+        /* --- CONTROL BAR --- */
+        #controlBar {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            border-bottom: 2px solid #e2e8f0;
+            position: fixed;
+            top: 65px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 50px;
+            overflow-x: auto;
+        }
+        .tool-btn {
+            padding: 6px 16px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            color: #475569;
+            font-family: 'UTM Avo';
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tool-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        .tool-btn.active { background: #2563eb; color: #fff; border-color: #1d4ed8; }
+
+        /* --- SIDEBAR MENU --- */
+        .side-menu {
+            position: fixed;
+            top: 130px;
+            bottom: 20px;
+            width: 230px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .side-menu.left { left: 0; border-radius: 0 24px 24px 0; transform: translateX(-100%); }
+        .side-menu.right { right: 0; border-radius: 24px 0 0 24px; transform: translateX(100%); }
+        .side-menu.open { transform: translateX(0); }
+        .side-menu button {
+            display: block;
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'UTM Avo';
+            font-size: 15px;
+            font-weight: bold;
+            color: #334155;
+            transition: 0.2s;
+        }
+        .side-menu button:hover { background: #e2e8f0; }
+        .side-menu button.active { background: #2563eb; color: #fff; border-color: #1d4ed8; }
+
+        /* --- DICTIONARY PANEL --- */
+        .dict-panel {
+            position: fixed;
+            right: 20px;
+            top: 130px;
+            width: 360px;
+            max-height: calc(100vh - 150px);
+            background: white;
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 2px solid #38bdf8;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1200;
+        }
+        .dict-panel.active { display: flex; }
+        .dict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        .close-dict { cursor: pointer; font-size: 24px; color: #f87171; font-weight: bold; }
+        .dict-panel input {
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            font-family: 'UTM Avo';
+            font-size: 15px;
+            outline: none;
+        }
+        .dict-panel input:focus { border-color: #38bdf8; }
+        .result-mode {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f766e;
+            background: #ecfeff;
+            border: 1px solid #99f6e4;
+            border-radius: 999px;
+            align-self: flex-start;
+            padding: 3px 12px;
+        }
+        .result-mode.translation { color: #9a3412; background: #fff7ed; border-color: #fdba74; }
+        .dict-result {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 14px;
+            min-height: 120px;
+            max-height: 44vh;
+            overflow: auto;
+            font-size: 15px;
+            color: #1e293b;
+            border: 1px dashed #cbd5e1;
+            line-height: 1.5;
+        }
+        .dict-word {
+            font-size: 22px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dict-phonetic {
+            font-size: 14px;
+            color: #0369a1;
+            margin-bottom: 10px;
+            font-family: Arial, sans-serif;
+            background: #e0f2fe;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .dict-definition { 
+            margin-top: 8px; 
+            padding-left: 10px;
+            border-left: 3px solid #38bdf8;
+        }
+        .dict-definition b { color: #2563eb; text-transform: capitalize; }
+        .play-btn {
+            cursor: pointer;
+            background: #0ea5e9;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        .play-btn:hover { background: #0284c7; transform: scale(1.1); }
+
+        /* --- CONTAINER --- */
+        .container {
+            background: #ffffff;
+            width: 98vw;
+            max-width: 1880px;
+            height: calc(100vh - 150px);
+            margin-top: 130px;
+            padding: 24px;
+            border-radius: 32px;
+            box-shadow: var(--panel-shadow);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            z-index: 10;
+            overflow: auto;
+        }
+        .container::-webkit-scrollbar { width: 8px; }
+        .container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+
+        #zoomWrapper {
+            transition: transform 0.3s ease;
+            transform-origin: top center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* KHỐI HIỂN THỊ LOGIC */
+        .step {
+            opacity: 0.08;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: blur(4px);
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        .step.active {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .lex {
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s;
+            display: inline-block;
+            padding: 0 2px;
+        }
+        .lex:hover {
+            background-color: rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+            color: #1d4ed8;
+        }
+
+        /* --- STAGE & POSTER --- */
+        .infographic-stage {
+            position: relative;
+            width: 100%;
+            min-height: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--ink);
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: clamp(28px, 2.5vw, 40px);
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 30px;
+            line-height: 1.3;
+            max-width: 900px;
+        }
+
+        .poster-box {
+            width: 100%;
+            max-width: 1350px;
+            border: 2px solid #e2e8f0;
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            background: #f8fafc;
+        }
+
+        .poster-headers {
+            display: flex;
+            width: 100%;
+        }
+        .col-header {
+            flex: 1;
+            text-align: center;
+            padding: 16px;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+        }
+        .header-near { background-color: var(--primary-blue); }
+        .header-far { background-color: var(--primary-purple); }
+
+        .poster-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 16px;
+            padding: 16px;
+            background: #f1f5f9;
+        }
+
+        .grid-cell {
+            background: white;
+            padding: 28px;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: 360px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .cell-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+        .cell-desc {
+            font-size: 17px;
+            color: #475569;
+            line-height: 1.5;
+            max-width: 85%;
+        }
+
+        .visual-area {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .hill {
+            position: absolute;
+            bottom: -50px;
+            width: 120%;
+            height: 140px;
+            border-radius: 50% 50% 0 0;
+            z-index: 1;
+        }
+        .hill-near { background: var(--bg-near); left: -10%; }
+        .hill-far { background: var(--bg-far); left: -10%; }
+        
+        .char-group {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            width: 100%;
+        }
+        .actor { font-size: 95px; line-height: 1; }
+        .object-near { font-size: 50px; margin-left: 10px; margin-bottom: 20px; }
+        .object-far { font-size: 50px; position: absolute; right: 20px; bottom: 20px; }
+        
+        .floating-label {
+            position: absolute;
+            font-size: 20px;
+            font-weight: 900;
+            color: #1e3a5f;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .omission-bubble {
+            position: absolute;
+            right: 20px;
+            top: 25%;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 14px;
+            padding: 12px 14px;
+            width: 180px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+        .omission-bubble::before {
+            content: '↙';
+            position: absolute;
+            left: -18px;
+            top: -10px;
+            font-size: 22px;
+            color: #0284c7;
+            font-weight: bold;
+        }
+        .omission-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; color: #0369a1; }
+        .omission-text { font-size: 13px; color: #334155; line-height: 1.4; }
+
+        #inkCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; pointer-events: none; }
+        #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+    </style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+
+<nav class="side-menu left" id="leftMenu">
+    <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+    <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+    <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+    <button class="active" onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+    <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+    <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+    <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</nav>
+
+<nav class="side-menu right" id="rightMenu">
+    <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+    <button onclick="location.href='story.html'"><b>Story</b></button>
+
+</nav>
+
+<header id="mainHeader">
+    <button class="menu-btn" onclick="toggleMenu('left')">Menu ☰</button>
+    <div class="header-center">
+        <button onclick="window.location.href='../conversation_01/conversation_01.html'">Conversation 01</button>
+        <button class="active-conv" onclick="window.location.href='../conversation_02/conversation_02.html'"><b>Conversation 02</b></button>
+        <button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+        <button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu('right')">Menu ☰</button>
+</header>
+
+<div id="controlBar">
+    <button id="penBtn" class="tool-btn" onclick="toggleInk()">Bút vẽ: Off</button>
+    <button class="tool-btn" onclick="clearInk()">Clear</button>
+    <button id="headerBtn" class="tool-btn" onclick="toggleHeader()">Header: On</button>
+    <button id="dictBtn" class="tool-btn" onclick="toggleDict()" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">Dictionary 📖</button>
+    
+    <button id="btn-en" class="tool-btn active" onclick="switchTab('en')" style="margin-left: 20px;">English</button>
+    <button id="btn-vi" class="tool-btn" onclick="switchTab('vi')">Tiếng Việt</button>
+
+    <button class="tool-btn" onclick="changeZoom(0.1)" style="margin-left: 20px;">Zoom +</button>
+    <button class="tool-btn" onclick="changeZoom(-0.1)">Zoom -</button>
+
+    <div style="flex-grow: 1;"></div>
+    <button class="tool-btn" onclick="goPrev()">⬅ Back</button>
+    <button class="tool-btn" onclick="goNext()">Next ➡</button>
+</div>
+
+<div class="dict-panel" id="dictPanel">
+    <div class="dict-header">
+        <span style="font-weight: bold; color: #0369a1; font-family: 'UTM Avo';">Tra từ & Dịch câu</span>
+        <div class="close-dict" onclick="toggleDict()">×</div>
+    </div>
+    <input type="text" id="searchInput" placeholder="Chạm chữ hoặc gõ vào đây..." onkeyup="handleSearch(event)">
+    <div class="result-mode translation" id="resultMode">Translation</div>
+    <div class="dict-result" id="resultArea">Kết quả sẽ xuất hiện ở đây...</div>
+    <div style="display: flex; gap: 8px;">
+        <button class="tool-btn" style="flex: 1; background: #0284c7; color: white; border: none;" onclick="translateInput()">Dịch câu</button>
+        <button class="tool-btn" style="flex: 1;" onclick="speakInput()">Nghe 🎙️</button>
+    </div>
+</div>
+
+<div class="container" id="mainContainer">
+    <div id="zoomWrapper">
+        <!-- TAB ENGLISH -->
+        <div id="tab-en">
+            <section class="infographic-stage">
+                
+                <!-- STEP 1: TIÊU ĐỀ + KHUNG BẢNG -->
+                <div class="step" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <h1 class="main-title">
+                        <span class="lex">Mastering</span>
+                        <span class="lex">Demonstrative</span>
+                        <span class="lex">Pronouns:</span><br>
+                        <span class="lex">This,</span>
+                        <span class="lex">That,</span>
+                        <span class="lex">These,</span>
+                        <span class="lex">and</span>
+                        <span class="lex">Those</span>
+                    </h1>
+
+                    <div class="poster-box">
+                        <div class="poster-headers">
+                            <div class="col-header header-near">
+                                <span class="lex">Close</span>
+                                <span class="lex">Proximity</span>
+                                <span class="lex">(Near)</span>
+                            </div>
+                            <div class="col-header header-far">
+                                <span class="lex">Distance</span>
+                                <span class="lex">Proximity</span>
+                                <span class="lex">(Far)</span>
+                            </div>
+                        </div>
+
+                        <div class="poster-grid">
+                            
+                            <!-- STEP 2: KHỐI THIS -->
+                            <div class="grid-cell step">
+                                <div class="cell-title">
+                                    <span class="lex">'This'</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">Singular</span>
+                                </div>
+                                <div class="cell-desc">
+                                    <span class="lex">Use</span>
+                                    <span class="lex">"this"</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">a</span>
+                                    <span class="lex">single</span>
+                                    <span class="lex">person</span>
+                                    <span class="lex">or</span>
+                                    <span class="lex">thing</span>
+                                    <span class="lex">near</span>
+                                    <span class="lex">the</span>
+                                    <span class="lex">speaker.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-near"></div>
+                                    <div class="char-group" style="justify-content: center; padding-left: 30px;">
+                                        <div class="actor">🧍🏻‍♂️</div>
+                                        <div class="object-near" style="position:relative;">
+                                            🍎
+                                            <div class="floating-label" style="top: -30px; left: -10px;">
+                                                <span class="lex">THIS</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="omission-bubble">
+                                    <div class="omission-title">
+                                        <span class="lex">Noun</span>
+                                        <span class="lex">Omission:</span>
+                                    </div>
+                                    <div class="omission-text">
+                                        <span class="lex">Omit</span>
+                                        <span class="lex">the</span>
+                                        <span class="lex">noun</span>
+                                        <span class="lex">if</span>
+                                        <span class="lex">the</span>
+                                        <span class="lex">object</span>
+                                        <span class="lex">is</span>
+                                        <span class="lex">already</span>
+                                        <span class="lex">clear.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 3: KHỐI THAT -->
+                            <div class="grid-cell step">
+                                <div class="cell-title" style="text-align: right;">
+                                    <span class="lex">'That'</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">Singular</span>
+                                </div>
+                                <div class="cell-desc" style="text-align: right; margin-left: auto;">
+                                    <span class="lex">Use</span>
+                                    <span class="lex">"that"</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">a</span>
+                                    <span class="lex">single</span>
+                                    <span class="lex">person</span>
+                                    <span class="lex">or</span>
+                                    <span class="lex">thing</span>
+                                    <span class="lex">away</span>
+                                    <span class="lex">from</span>
+                                    <span class="lex">the</span>
+                                    <span class="lex">speaker.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-far"></div>
+                                    <div class="char-group">
+                                        <div class="actor">🧍🏻‍♂️👉</div>
+                                        <div class="object-far">
+                                            🍎
+                                            <div class="floating-label" style="top: -30px; left: -20px;">
+                                                <span class="lex">THAT</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 4: KHỐI THESE -->
+                            <div class="grid-cell step">
+                                <div class="cell-title">
+                                    <span class="lex">'These'</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">Plural</span>
+                                </div>
+                                <div class="cell-desc">
+                                    <span class="lex">Use</span>
+                                    <span class="lex">"these"</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">multiple</span>
+                                    <span class="lex">people</span>
+                                    <span class="lex">or</span>
+                                    <span class="lex">things</span>
+                                    <span class="lex">near</span>
+                                    <span class="lex">the</span>
+                                    <span class="lex">speaker.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-near"></div>
+                                    <div class="char-group" style="justify-content: center; padding-left: 30px;">
+                                        <div class="actor">🧍🏻‍♂️</div>
+                                        <div class="object-near" style="position:relative;">
+                                            🧺🍎🍎
+                                            <div class="floating-label" style="top: -35px; left: 10px;">
+                                                <span class="lex">THESE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 5: KHỐI THOSE -->
+                            <div class="grid-cell step">
+                                <div class="cell-title" style="text-align: right;">
+                                    <span class="lex">'Those'</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">Plural</span>
+                                </div>
+                                <div class="cell-desc" style="text-align: right; margin-left: auto;">
+                                    <span class="lex">Use</span>
+                                    <span class="lex">"those"</span>
+                                    <span class="lex">for</span>
+                                    <span class="lex">multiple</span>
+                                    <span class="lex">people</span>
+                                    <span class="lex">or</span>
+                                    <span class="lex">things</span>
+                                    <span class="lex">away</span>
+                                    <span class="lex">from</span>
+                                    <span class="lex">the</span>
+                                    <span class="lex">speaker.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-far"></div>
+                                    <div class="char-group">
+                                        <div class="actor">🧍🏻‍♂️👉</div>
+                                        <div class="object-far">
+                                            🍎🍎🍎
+                                            <div class="floating-label" style="top: -35px; left: 0px;">
+                                                <span class="lex">THOSE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- TAB TIẾNG VIỆT -->
+        <div id="tab-vi" style="display: none;">
+            <section class="infographic-stage">
+                
+                <!-- STEP 1: TIÊU ĐỀ + KHUNG BẢNG -->
+                <div class="step" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <h1 class="main-title">
+                        <span class="lex">Nắm</span>
+                        <span class="lex">vững</span>
+                        <span class="lex">Đại từ</span>
+                        <span class="lex">chỉ định:</span><br>
+                        <span class="lex">This,</span>
+                        <span class="lex">That,</span>
+                        <span class="lex">These,</span>
+                        <span class="lex">và</span>
+                        <span class="lex">Those</span>
+                    </h1>
+
+                    <div class="poster-box">
+                        <div class="poster-headers">
+                            <div class="col-header header-near">
+                                <span class="lex">Khoảng</span>
+                                <span class="lex">cách</span>
+                                <span class="lex">gần</span>
+                                <span class="lex">(Gần)</span>
+                            </div>
+                            <div class="col-header header-far">
+                                <span class="lex">Khoảng</span>
+                                <span class="lex">cách</span>
+                                <span class="lex">xa</span>
+                                <span class="lex">(Xa)</span>
+                            </div>
+                        </div>
+
+                        <div class="poster-grid">
+                            
+                            <!-- STEP 2: KHỐI THIS -->
+                            <div class="grid-cell step">
+                                <div class="cell-title">
+                                    <span class="lex">'This'</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">Số ít</span>
+                                </div>
+                                <div class="cell-desc">
+                                    <span class="lex">Dùng</span>
+                                    <span class="lex">"this"</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">một</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">hoặc</span>
+                                    <span class="lex">vật</span>
+                                    <span class="lex">ở</span>
+                                    <span class="lex">gần</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">nói.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-near"></div>
+                                    <div class="char-group" style="justify-content: center; padding-left: 30px;">
+                                        <div class="actor">🧍🏻‍♂️</div>
+                                        <div class="object-near" style="position:relative;">
+                                            🍎
+                                            <div class="floating-label" style="top: -30px; left: -10px;">
+                                                <span class="lex">THIS</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="omission-bubble">
+                                    <div class="omission-title">
+                                        <span class="lex">Lược bỏ</span>
+                                        <span class="lex">Danh từ:</span>
+                                    </div>
+                                    <div class="omission-text">
+                                        <span class="lex">Lược bỏ</span>
+                                        <span class="lex">danh từ</span>
+                                        <span class="lex">nếu</span>
+                                        <span class="lex">đối tượng</span>
+                                        <span class="lex">đã</span>
+                                        <span class="lex">rõ ràng.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 3: KHỐI THAT -->
+                            <div class="grid-cell step">
+                                <div class="cell-title" style="text-align: right;">
+                                    <span class="lex">'That'</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">Số ít</span>
+                                </div>
+                                <div class="cell-desc" style="text-align: right; margin-left: auto;">
+                                    <span class="lex">Dùng</span>
+                                    <span class="lex">"that"</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">một</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">hoặc</span>
+                                    <span class="lex">vật</span>
+                                    <span class="lex">ở</span>
+                                    <span class="lex">xa</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">nói.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-far"></div>
+                                    <div class="char-group">
+                                        <div class="actor">🧍🏻‍♂️👉</div>
+                                        <div class="object-far">
+                                            🍎
+                                            <div class="floating-label" style="top: -30px; left: -20px;">
+                                                <span class="lex">THAT</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 4: KHỐI THESE -->
+                            <div class="grid-cell step">
+                                <div class="cell-title">
+                                    <span class="lex">'These'</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">Số nhiều</span>
+                                </div>
+                                <div class="cell-desc">
+                                    <span class="lex">Dùng</span>
+                                    <span class="lex">"these"</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">nhiều</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">hoặc</span>
+                                    <span class="lex">vật</span>
+                                    <span class="lex">ở</span>
+                                    <span class="lex">gần</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">nói.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-near"></div>
+                                    <div class="char-group" style="justify-content: center; padding-left: 30px;">
+                                        <div class="actor">🧍🏻‍♂️</div>
+                                        <div class="object-near" style="position:relative;">
+                                            🧺🍎🍎
+                                            <div class="floating-label" style="top: -35px; left: 10px;">
+                                                <span class="lex">THESE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 5: KHỐI THOSE -->
+                            <div class="grid-cell step">
+                                <div class="cell-title" style="text-align: right;">
+                                    <span class="lex">'Those'</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">Số nhiều</span>
+                                </div>
+                                <div class="cell-desc" style="text-align: right; margin-left: auto;">
+                                    <span class="lex">Dùng</span>
+                                    <span class="lex">"those"</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">nhiều</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">hoặc</span>
+                                    <span class="lex">vật</span>
+                                    <span class="lex">ở</span>
+                                    <span class="lex">xa</span>
+                                    <span class="lex">người</span>
+                                    <span class="lex">nói.</span>
+                                </div>
+                                <div class="visual-area">
+                                    <div class="hill hill-far"></div>
+                                    <div class="char-group">
+                                        <div class="actor">🧍🏻‍♂️👉</div>
+                                        <div class="object-far">
+                                            🍎🍎🍎
+                                            <div class="floating-label" style="top: -35px; left: 0px;">
+                                                <span class="lex">THOSE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+</div>
+
+<script>
+    let stepsArray = [];
+    let currentStepIndex = -1;
+    let currentTab = 'en';
+    let zoomLevel = 1;
+
+    function toggleMenu(side) {
+        document.getElementById(side + 'Menu').classList.toggle('open');
+    }
+
+    function toggleHeader() {
+        const header = document.getElementById('mainHeader');
+        const controlBar = document.getElementById('controlBar');
+        const btn = document.getElementById('headerBtn');
+        const container = document.getElementById('mainContainer');
+        const sideMenus = document.querySelectorAll('.side-menu');
+
+        if (header.style.display === 'none') {
+            header.style.display = 'flex';
+            controlBar.style.top = '65px';
+            container.style.marginTop = '130px';
+            container.style.height = 'calc(100vh - 150px)';
+            sideMenus.forEach((menu) => { menu.style.top = '130px'; });
+            btn.innerText = 'Header: On';
+        } else {
+            header.style.display = 'none';
+            controlBar.style.top = '0px';
+            container.style.marginTop = '65px';
+            container.style.height = 'calc(100vh - 85px)';
+            sideMenus.forEach((menu) => { menu.style.top = '70px'; });
+            btn.innerText = 'Header: Off';
+        }
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.getElementById('tab-en').style.display = tab === 'en' ? 'block' : 'none';
+        document.getElementById('tab-vi').style.display = tab === 'vi' ? 'block' : 'none';
+        document.getElementById('btn-en').classList.toggle('active', tab === 'en');
+        document.getElementById('btn-vi').classList.toggle('active', tab === 'vi');
+        
+        // Reset steps & update target nodes based on active tab
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        stepsArray = document.querySelectorAll(`#tab-${tab} .step`);
+        currentStepIndex = -1;
+    }
+
+    function changeZoom(delta) {
+        zoomLevel += delta;
+        if (zoomLevel < 0.5) zoomLevel = 0.5;
+        if (zoomLevel > 2.5) zoomLevel = 2.5;
+        document.getElementById('zoomWrapper').style.transform = `scale(${zoomLevel})`;
+    }
+
+    function goNext() {
+        if (currentStepIndex < stepsArray.length - 1) {
+            currentStepIndex++;
+            stepsArray[currentStepIndex].classList.add('active');
+            stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function goPrev() {
+        if (currentStepIndex >= 0) {
+            stepsArray[currentStepIndex].classList.remove('active');
+            currentStepIndex--;
+            if (currentStepIndex >= 0) {
+                stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goNext(); }
+        if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); goPrev(); }
+    });
+
+    function toggleDict() {
+        const panel = document.getElementById('dictPanel');
+        const btn = document.getElementById('dictBtn');
+        panel.classList.toggle('active');
+        btn.classList.toggle('active');
+    }
+
+    function ensureDictOpen() {
+        const panel = document.getElementById('dictPanel');
+        if (!panel.classList.contains('active')) {
+            toggleDict();
+        }
+    }
+
+    function setResultMode(mode, html) {
+        const modeTag = document.getElementById('resultMode');
+        const resArea = document.getElementById('resultArea');
+        modeTag.classList.remove('dictionary', 'translation');
+        modeTag.classList.add(mode === 'dictionary' ? 'dictionary' : 'translation');
+        modeTag.textContent = mode === 'dictionary' ? 'Dictionary' : 'Translation';
+        if (typeof html === 'string') resArea.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+        return String(text).replace(/[&<>"']/g, (char) => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]
+        ));
+    }
+
+    function normalizeWord(text) {
+        return (text || '')
+            .toLowerCase()
+            .replace(/^[^a-zA-Z'-]+|[^a-zA-Z'-]+$/g, '');
+    }
+
+    function getSelectedText() {
+        const selection = window.getSelection();
+        if (!selection) return '';
+        return selection.toString().replace(/\s+/g, ' ').trim();
+    }
+
+    function getWordFromPoint(x, y) {
+        let node = null;
+        let offset = 0;
+
+        if (document.caretPositionFromPoint) {
+            const caret = document.caretPositionFromPoint(x, y);
+            node = caret ? caret.offsetNode : null;
+            offset = caret ? caret.offset : 0;
+        } else if (document.caretRangeFromPoint) {
+            const range = document.caretRangeFromPoint(x, y);
+            node = range ? range.startContainer : null;
+            offset = range ? range.startOffset : 0;
+        }
+
+        if (!node || node.nodeType !== Node.TEXT_NODE) return '';
+        const raw = node.textContent || '';
+        if (!raw.trim()) return '';
+
+        let start = offset;
+        let end = offset;
+        while (start > 0 && /[A-Za-z'-]/.test(raw[start - 1])) start--;
+        while (end < raw.length && /[A-Za-z'-]/.test(raw[end])) end++;
+
+        return raw.slice(start, end).trim();
+    }
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const cleanText = String(text || '').replace(/\s+/g, ' ').trim();
+        if (!cleanText) return;
+        const u = new SpeechSynthesisUtterance(cleanText);
+        u.lang = 'en-US';
+        u.rate = 0.88;
+        window.speechSynthesis.speak(u);
+    }
+
+    async function translateInput(customText) {
+        let text = typeof customText === 'string' ? customText : document.getElementById('searchInput').value;
+        text = String(text || '').trim();
+        if (!text) return;
+
+        document.getElementById('searchInput').value = text;
+        setResultMode('translation', 'Đang dịch...');
+
+        try {
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURIComponent(text)}`);
+            const data = await res.json();
+            let translation = '';
+            
+            if (data && data[0]) {
+                data[0].forEach(item => { if (item[0]) translation += item[0]; });
+            }
+            
+            if (!translation) throw new Error('No translation');
+            setResultMode('translation', `<div style="font-size: 17px; color: #0f172a; line-height: 1.5;">${escapeHtml(translation)}</div>`);
+        } catch (e) {
+            setResultMode('translation', 'Lỗi kết nối dịch. Thử lại sau.');
+        }
+    }
+
+    async function lookupDictionaryWord(word) {
+        const raw = String(word || '').trim();
+        if (!raw) return;
+
+        const token = raw.includes(' ')
+            ? (raw.match(/[A-Za-z'-]+/) || [''])[0]
+            : raw;
+        const normalized = normalizeWord(token);
+        if (!normalized) {
+            await translateInput(raw);
+            return;
+        }
+
+        document.getElementById('searchInput').value = normalized;
+        setResultMode('dictionary', 'Đang phân tích từ điển...');
+
+        try {
+            let phoneticText = '';
+            let audioUrl = '';
+
+            try {
+                const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(normalized)}`);
+                if (dictRes.ok) {
+                    const dictData = await dictRes.json();
+                    const entry = dictData[0];
+                    phoneticText = entry.phonetic || (entry.phonetics || []).find((item) => item.text)?.text || '';
+                    const audioObj = (entry.phonetics || []).find((item) => item.audio && item.audio.length > 0);
+                    if (audioObj) audioUrl = audioObj.audio;
+                }
+            } catch(e) { console.log('Không tìm thấy IPA'); }
+
+            const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&dt=bd&q=${encodeURIComponent(normalized)}`);
+            const transData = await transRes.json();
+            
+            let viTranslation = transData && transData[0] && transData[0][0] ? transData[0][0][0] : '';
+            let dictHtml = '';
+
+            if (transData[1]) {
+                transData[1].forEach(posGroup => {
+                    const pos = posGroup[0]; 
+                    const terms = posGroup[1].slice(0, 4).join(', '); 
+                    dictHtml += `<div class="dict-definition"><b>${escapeHtml(pos)}:</b> ${escapeHtml(terms)}</div>`;
+                });
+            } else {
+                dictHtml = `<div class="dict-definition"><b>Nghĩa:</b> ${escapeHtml(viTranslation)}</div>`;
+            }
+
+            let html = `<div class="dict-word">${escapeHtml(normalized)}`;
+            
+            if (audioUrl) {
+                html += ` <div class="play-btn" onclick="new Audio('${audioUrl}').play()" title="Nghe phát âm">🔊</div>`;
+            } else {
+                html += ` <div class="play-btn" onclick="speak('${escapeHtml(normalized)}')" title="Nghe phát âm máy">🔊</div>`;
+            }
+            html += `</div>`;
+
+            if (phoneticText) {
+                html += `<div class="dict-phonetic">${escapeHtml(phoneticText)}</div>`;
+            }
+            
+            html += dictHtml;
+
+            setResultMode('dictionary', html);
+
+            if (audioUrl) {
+                new Audio(audioUrl).play();
+            } else {
+                speak(normalized);
+            }
+
+        } catch (e) {
+            console.error(e);
+            await translateInput(raw || normalized);
+        }
+    }
+
+    function handleSearch(e) {
+        if (e.key !== 'Enter') return;
+        const text = document.getElementById('searchInput').value.trim();
+        if (!text) return;
+        if (/^[A-Za-z'-]+$/.test(text) && !text.includes(' ')) {
+            lookupDictionaryWord(text);
+        } else {
+            translateInput(text);
+        }
+    }
+
+    function speakInput() {
+        speak(document.getElementById('searchInput').value);
+    }
+
+    function bindLexActions() {
+        const tabs = document.querySelectorAll('.infographic-stage');
+        tabs.forEach(stage => {
+            stage.addEventListener('click', (event) => {
+                const lex = event.target.closest('.lex');
+                if (!lex) return;
+                event.preventDefault();
+                const term = (lex.dataset.term || lex.textContent || '').trim();
+                if (!term) return;
+                ensureDictOpen();
+                lookupDictionaryWord(term);
+            });
+
+            stage.addEventListener('contextmenu', async (event) => {
+                event.preventDefault();
+                const selected = getSelectedText();
+                const lex = event.target.closest('.lex');
+                
+                let textToTranslate = selected;
+                
+                if (!textToTranslate && lex) {
+                    textToTranslate = lex.closest('.step') ? lex.closest('.step').textContent.replace(/\s+/g, ' ').trim() : (lex.dataset.term || lex.textContent || '').trim();
+                }
+
+                if (!textToTranslate) {
+                    textToTranslate = getWordFromPoint(event.clientX, event.clientY);
+                }
+                
+                if (!textToTranslate) return;
+                
+                ensureDictOpen();
+                document.getElementById('searchInput').value = textToTranslate;
+                await translateInput(textToTranslate);
+            });
+        });
+    }
+
+    // --- VẼ (PEN) ---
+    let inkCanvas, inkCtx, isDrawing = false, lastX = 0, lastY = 0;
+    function initInk() {
+        inkCanvas = document.getElementById('inkCanvas');
+        inkCtx = inkCanvas.getContext('2d');
+        inkCanvas.width = window.innerWidth;
+        inkCanvas.height = window.innerHeight;
+
+        inkCanvas.addEventListener('pointerdown', (e) => {
+            if (!inkCanvas.classList.contains('drawing')) return;
+            isDrawing = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        inkCanvas.addEventListener('pointermove', (e) => {
+            if (!isDrawing) return;
+            inkCtx.strokeStyle = '#2563eb';
+            inkCtx.lineWidth = 4;
+            inkCtx.lineCap = 'round';
+            inkCtx.beginPath();
+            inkCtx.moveTo(lastX, lastY);
+            inkCtx.lineTo(e.clientX, e.clientY);
+            inkCtx.stroke();
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        window.addEventListener('pointerup', () => { isDrawing = false; });
+        window.addEventListener('resize', () => {
+            inkCanvas.width = window.innerWidth;
+            inkCanvas.height = window.innerHeight;
+        });
+
+        switchTab('en');
+        bindLexActions();
+    }
+
+    function toggleInk() {
+        const active = inkCanvas.classList.toggle('drawing');
+        document.getElementById('penBtn').textContent = active ? 'Bút vẽ: On' : 'Bút vẽ: Off';
+        document.getElementById('penBtn').classList.toggle('active');
+    }
+
+    function clearInk() {
+        inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height);
+    }
+
+    window.onload = initInk;
+</script>
+
+</body>
+</html>

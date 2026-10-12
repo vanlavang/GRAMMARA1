@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conversation – Modern Learning</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'UTM Avo', 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+/* Bọc Video và Quiz */
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: left; 
+  gap: 20px; 
+  max-width: 1200px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:500px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* Giao diện Quiz */
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 500px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 24px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+
+/* Thêm animation rung lắc khi trả lời sai */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.quiz-option.wrong { 
+  background: #f8d7da; border-color: #dc3545; color: #721c24; 
+  animation: shake 0.4s ease-in-out;
+}
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 35px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+
+</style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+  <a href="../conversation_01/conversation_01.html" >Conversation 01</a>
+  <a href="../conversation_02/conversation_02.html" class="active-link">Conversation 02</a>
+  <a href="../conversation_03/conversation_03.html" >Conversation 03</a>
+  <a href="../conversation_04/conversation_04.html" >Conversation 04</a>
+</nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+    <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+      <source src="./videos/story.mp4" type="video/mp4">
+    </video>
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// ================= LỚP ÂM THANH & HIỆU ỨNG =================
+let audioCtx;
+
+function playSound(type) {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  if (type === 'correct') {
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      const now = audioCtx.currentTime;
+      osc.start(now + i * 0.1);
+      gain.gain.setValueAtTime(0, now + i * 0.1);
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.5);
+      osc.stop(now + i * 0.1 + 0.5);
+    });
+  } else {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 120;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    osc.start(now);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    osc.stop(now + 0.4);
+  }
+}
+
+function shootFireworks() {
+  var duration = 2000;
+  var animationEnd = Date.now() + duration;
+  var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  var interval = setInterval(function() {
+    var timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    var particleCount = 50 * (timeLeft / duration);
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+  }, 250);
+}
+// ==========================================================
+
+// --- LOGIC QUIZ (CẬP NHẬT THEO CÂU CHUYỆN LUCY VÀ LUKA) ---
+const quizData = [
+  {
+    question: "What score did Lucy get on her test?",
+    options: [
+      "10 out of 10",
+      "5 out of 10",
+      "8 out of 10",
+      "4 out of 10"
+    ],
+    correct: "5 out of 10"
+  },
+  {
+    question: "How did Luka do on his test?",
+    options: [
+      "He failed the test.",
+      "He got a 5.",
+      "He got another 10.",
+      "He didn't take the test."
+    ],
+    correct: "He got another 10."
+  },
+  {
+    question: "Why was Lucy sad and crying at home?",
+    options: [
+      "She lost her favorite toy.",
+      "She thought her parents only cared about Luka.",
+      "She was hungry.",
+      "Luka hit her."
+    ],
+    correct: "She thought her parents only cared about Luka."
+  },
+  {
+    question: "What did Lucy want to do for the boy at the bus stop?",
+    options: [
+      "Play with him.",
+      "Give him some money.",
+      "Give him her food.",
+      "Ignore him."
+    ],
+    correct: "Give him her food."
+  },
+  {
+    question: "What did Lucy give to the hungry boy?",
+    options: [
+      "Apple and milk.",
+      "Bread and chicken.",
+      "Money.",
+      "Only fruit."
+    ],
+    correct: "Bread and chicken."
+  },
+  {
+    question: "Did Luka want to give his food to the boy at first?",
+    options: [
+      "Yes, he gave everything.",
+      "No, he said he didn't want to give his food.",
+      "He only gave his apple.",
+      "He asked his parents first."
+    ],
+    correct: "No, he said he didn't want to give his food."
+  },
+  {
+    question: "What did Luka realize about Lucy?",
+    options: [
+      "She is very smart.",
+      "She is not good at tests, but she is very kind.",
+      "She is selfish.",
+      "She eats too much."
+    ],
+    correct: "She is not good at tests, but she is very kind."
+  },
+  {
+    question: "At school, what did Luka offer to do for Lucy?",
+    options: [
+      "Do her homework.",
+      "Buy her new food.",
+      "Share his food together with her.",
+      "Tell the teacher."
+    ],
+    correct: "Share his food together with her."
+  }
+];
+
+let currentQIndex = 0;
+
+function wrapWordsForDict(text) {
+  return text.split(/\s+/).map(w => {
+    const clean = w.replace(/[.,!?"“”]/g, "").toLowerCase();
+    const cleanEscaped = clean.replace(/'/g, "\\'");
+    return `<span class="word" onclick="handleWordClick(event, '${cleanEscaped}')">${w}</span>`;
+  }).join(" ");
+}
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = `
+      <h4 style='text-align:center; color:#28a745; margin-top:20px;'>
+        🎉 You finished the quiz!
+      </h4>
+      <button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>
+        Play Again
+      </button>`;
+    shootFireworks();
+    return;
+  }
+
+  const q = quizData[currentQIndex];
+
+  let html = `
+    <div>
+      <div style="font-weight:bold; margin-bottom:15px; font-size:24px;">
+        Question ${currentQIndex + 1}: ${wrapWordsForDict(q.question)}
+      </div>
+  `;
+
+  q.options.forEach(opt => {
+    const isCorrect = (opt === q.correct);
+    html += `
+      <button class="quiz-option"
+        onclick="checkAns(this, ${isCorrect})">
+        ${wrapWordsForDict(opt)}
+      </button>`;
+  });
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  if (isCorrect) {
+    btn.classList.add('correct');
+    playSound('correct');
+    shootFireworks();
+    
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 2500);
+  } else {
+    btn.classList.add('wrong');
+    playSound('wrong');
+    
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+// --------------------------
+
+// --- DICTIONARY (CẬP NHẬT TỪ VỰNG MỚI) ---
+const dictionary = {
+  "test": { meaning: "bài kiểm tra", phonetic: "/test/", type: "noun" },
+  "score": { meaning: "điểm số", phonetic: "/skɔːr/", type: "noun" },
+  "five": { meaning: "số năm", phonetic: "/faɪv/", type: "number" },
+  "ten": { meaning: "số mười", phonetic: "/ten/", type: "number" },
+  "high": { meaning: "cao", phonetic: "/haɪ/", type: "adjective" },
+  "study": { meaning: "học", phonetic: "/ˈstʌdi/", type: "verb" },
+  "studied": { meaning: "đã học", phonetic: "/ˈstʌdid/", type: "verb" },
+  "studying": { meaning: "việc học", phonetic: "/ˈstʌdiɪŋ/", type: "noun" },
+  "better": { meaning: "tốt hơn", phonetic: "/ˈbetər/", type: "adjective" },
+  "way": { meaning: "cách", phonetic: "/weɪ/", type: "noun" },
+  "know": { meaning: "biết", phonetic: "/nəʊ/", type: "verb" },
+  "excellent": { meaning: "xuất sắc", phonetic: "/ˈeksələnt/", type: "adjective" },
+  "proud": { meaning: "tự hào", phonetic: "/praʊd/", type: "adjective" },
+  "care": { meaning: "quan tâm", phonetic: "/keər/", type: "verb" },
+  "maybe": { meaning: "có lẽ", phonetic: "/ˈmeɪbi/", type: "adverb" },
+  "try": { meaning: "cố gắng", phonetic: "/traɪ/", type: "verb" },
+  "help": { meaning: "giúp đỡ", phonetic: "/help/", type: "verb" },
+  "boy": { meaning: "cậu bé", phonetic: "/bɔɪ/", type: "noun" },
+  "bus stop": { meaning: "trạm xe buýt", phonetic: "/bʌs stɒp/", type: "noun" },
+  "hungry": { meaning: "đói", phonetic: "/ˈhʌŋɡri/", type: "adjective" },
+  "food": { meaning: "thức ăn", phonetic: "/fuːd/", type: "noun" },
+  "lunch": { meaning: "bữa trưa", phonetic: "/lʌntʃ/", type: "noun" },
+  "fruit": { meaning: "trái cây", phonetic: "/fruːt/", type: "noun" },
+  "bread": { meaning: "bánh mì", phonetic: "/bred/", type: "noun" },
+  "chicken": { meaning: "thịt gà", phonetic: "/ˈtʃɪkɪn/", type: "noun" },
+  "give": { meaning: "cho", phonetic: "/ɡɪv/", type: "verb" },
+  "asking": { meaning: "đang yêu cầu", phonetic: "/ˈɑːskɪŋ/", type: "verb" },
+  "mine": { meaning: "của tôi", phonetic: "/maɪn/", type: "pronoun" },
+  "hello": { meaning: "xin chào", phonetic: "/həˈləʊ/", type: "interjection" },
+  "little": { meaning: "một chút", phonetic: "/ˈlɪtl/", type: "adjective" },
+  "apple": { meaning: "quả táo", phonetic: "/ˈæpl/", type: "noun" },
+  "please": { meaning: "làm ơn", phonetic: "/pliːz/", type: "interjection" },
+  "thank you": { meaning: "cảm ơn", phonetic: "/θæŋk juː/", type: "expression" },
+  "kind": { meaning: "tốt bụng", phonetic: "/kaɪnd/", type: "adjective" },
+  "school": { meaning: "trường học", phonetic: "/skuːl/", type: "noun" },
+  "share": { meaning: "chia sẻ", phonetic: "/ʃeər/", type: "verb" },
+  "together": { meaning: "cùng nhau", phonetic: "/təˈɡeðər/", type: "adverb" },
+  "dad": { meaning: "bố", phonetic: "/dæd/", type: "noun" },
+  "mom": { meaning: "mẹ", phonetic: "/mɒm/", type: "noun" },
+  "home": { meaning: "nhà", phonetic: "/həʊm/", type: "noun" },
+  "look": { meaning: "nhìn", phonetic: "/lʊk/", type: "verb" },
+  "realize": { meaning: "nhận ra", phonetic: "/ˈriːəlaɪz/", type: "verb" },
+  "smart": { meaning: "thông minh", phonetic: "/smɑːrt/", type: "adjective" },
+  "selfish": { meaning: "ích kỷ", phonetic: "/ˈselfɪʃ/", type: "adjective" },
+  "homework": { meaning: "bài tập về nhà", phonetic: "/ˈhəʊmwɜːk/", type: "noun" },
+  "teacher": { meaning: "giáo viên", phonetic: "/ˈtiːtʃər/", type: "noun" }
+};
+// --- SENTENCES (CẬP NHẬT THEO VIDEO LUCY VÀ LUKA) ---
+const sentences = [
+  { text: "Lucy, how was your test?", start: 10, end: 12, translation: "Lucy, bài kiểm tra của con thế nào?" },
+  { text: "I got five out of 10.", start: 12, end: 15, translation: "Con được 5 trên 10 điểm." },
+  { text: "Five is better than four. But it is still not high.", start: 15, end: 19, translation: "5 điểm thì tốt hơn 4 điểm. Nhưng nó vẫn chưa cao." },
+  { text: "You need to keep studying.", start: 19, end: 22, translation: "Con cần tiếp tục học chăm chỉ hơn." },
+  { text: "I did study. I studied every night.", start: 22, end: 26, translation: "Con đã học mà. Con học mỗi tối luôn." },
+  { text: "Then you need to study in a better way.", start: 26, end: 29, translation: "Vậy thì con cần học bằng một cách tốt hơn." },
+  { text: "I don't know how.", start: 29, end: 34, translation: "Con không biết làm thế nào cả." },
+  { text: "Dad! I got another 10 today!", start: 35, end: 38, translation: "Bố ơi! Hôm nay con lại được điểm 10 nữa!" },
+  { text: "Excellent Luka. You are doing so well.", start: 38, end: 42, translation: "Tuyệt vời Luka. Con đang làm rất tốt." },
+  { text: "We are proud of you.", start: 42, end: 45, translation: "Bố mẹ tự hào về con." },
+  { text: "Maybe mom and dad only care about Luka.", start: 46, end: 50, translation: "Có lẽ bố mẹ chỉ quan tâm đến Luka." },
+  { text: "Maybe they do not care about me.", start: 50, end: 53, translation: "Có lẽ họ không quan tâm đến mình." },
+  { text: "I try but I still cannot do it.", start: 53, end: 57, translation: "Mình đã cố gắng nhưng mình vẫn không thể làm được." },
+  { text: "I just want someone to help me.", start: 57, end: 61, translation: "Mình chỉ muốn ai đó giúp mình thôi." },
+  { text: "Luka, look at that boy.", start: 105, end: 108, translation: "Luka, nhìn cậu bé kia kìa." },
+  { text: "What boy?", start: 108, end: 111, translation: "Cậu bé nào?" },
+  { text: "The boy near the bus stop. He looks hungry.", start: 111, end: 114, translation: "Cậu bé gần trạm xe buýt. Cậu ấy trông có vẻ đói." },
+  { text: "I wanna give him some food maybe.", start: 114, end: 116, translation: "Em muốn cho cậu ấy chút đồ ăn." },
+  { text: "Maybe, but this is our lunch. You will be hungry.", start: 116, end: 120, translation: "Có thể, nhưng đây là bữa trưa của chúng ta. Em sẽ bị đói đấy." },
+  { text: "I still have fruit. I can give him my bread and chicken.", start: 120, end: 125, translation: "Em vẫn còn trái cây. Em có thể cho cậu ấy bánh mì và gà của em." },
+  { text: "I don't wanna give my food.", start: 126, end: 129, translation: "Anh không muốn cho đồ ăn của mình đâu." },
+  { text: "I am not asking you. I will give mine.", start: 130, end: 134, translation: "Em không bảo anh cho. Em sẽ cho phần của em." },
+  { text: "Hello, are you hungry?", start: 135, end: 137, translation: "Chào cậu, cậu có đói không?" },
+  { text: "A little, but I am OK.", start: 137, end: 140, translation: "Một chút, nhưng tớ ổn." },
+  { text: "You can have my lunch.", start: 141, end: 143, translation: "Cậu có thể lấy bữa trưa của tớ." },
+  { text: "No, it is your food.", start: 143, end: 146, translation: "Không, đó là đồ ăn của cậu mà." },
+  { text: "It is okay. I have an apple too. Please take it.", start: 147, end: 152, translation: "Không sao đâu. Tớ cũng có một quả táo. Cậu cứ cầm lấy đi." },
+  { text: "Thank you. You are very kind.", start: 153, end: 158, translation: "Cảm ơn cậu. Cậu rất tốt bụng." },
+  { text: "Lucy is not good at tests, but she is very kind.", start: 158, end: 205, translation: "Lucy không giỏi làm bài kiểm tra, nhưng em ấy rất tốt bụng." },
+  { text: "Lucy, why did you give your lunch to that boy?", start: 206, end: 210, translation: "Lucy, tại sao em lại cho cậu bé đó bữa trưa của mình?" },
+  { text: "Because he looked hungry.", start: 210, end: 213, translation: "Vì trông cậu ấy có vẻ đói." },
+  { text: "But you were hungry too.", start: 214, end: 216, translation: "Nhưng em cũng đói mà." },
+  { text: "Yes, but I can eat at home. Maybe he cannot.", start: 216, end: 221, translation: "Vâng, nhưng em có thể ăn ở nhà. Có thể cậu ấy thì không." },
+  { text: "Then let's share my food together.", start: 221, end: 225, translation: "Vậy thì chúng ta hãy cùng chia sẻ đồ ăn của anh nhé." }
+];
+
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?"“”]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  if(event) event.stopPropagation();
+
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener("mousedown", (e) => {
+  if(!canvas.classList.contains("pen-active")) return;
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if(!isDrawing) return;
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke();
+});
+
+canvas.addEventListener("mouseup", () => isDrawing = false);
+canvas.addEventListener("mouseleave", () => isDrawing = false);
+
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+
+</script>
+</body>
+</html>

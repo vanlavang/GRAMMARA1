@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conversation – Modern Learning</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'UTM Avo', 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+/* Bọc Video và Quiz */
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: left; 
+  gap: 20px; 
+  max-width: 1200px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:500px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* Giao diện Quiz */
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 500px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 24px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+
+/* Thêm animation rung lắc khi trả lời sai */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.quiz-option.wrong { 
+  background: #f8d7da; border-color: #dc3545; color: #721c24; 
+  animation: shake 0.4s ease-in-out;
+}
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 35px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+
+</style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+  <a href="../conversation_01/conversation_01.html" >Conversation 01</a>
+  <a href="../conversation_02/conversation_02.html" class="active-link">Conversation 02</a>
+  <a href="../conversation_03/conversation_03.html" >Conversation 03</a>
+  <a href="../conversation_04/conversation_04.html" >Conversation 04</a>
+</nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+   <video id="mainVideo" controls playsinline preload="metadata">
+  <source src="videos/story.mp4" type="video/mp4">
+  Trình duyệt không hỗ trợ video.
+</video>
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// ================= LỚP ÂM THANH & HIỆU ỨNG =================
+let audioCtx;
+
+function playSound(type) {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  if (type === 'correct') {
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      const now = audioCtx.currentTime;
+      osc.start(now + i * 0.1);
+      gain.gain.setValueAtTime(0, now + i * 0.1);
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.5);
+      osc.stop(now + i * 0.1 + 0.5);
+    });
+  } else {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 120;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    osc.start(now);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    osc.stop(now + 0.4);
+  }
+}
+
+function shootFireworks() {
+  var duration = 2000;
+  var animationEnd = Date.now() + duration;
+  var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  var interval = setInterval(function() {
+    var timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    var particleCount = 50 * (timeLeft / duration);
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+  }, 250);
+}
+// ==========================================================
+
+// --- LOGIC QUIZ ---
+const quizData = [
+  {
+    question: "What did Rio the parrot want people to do?",
+    options: [
+      "Give him a bone.",
+      "Listen to their pets.",
+      "Follow a red dot.",
+      "Buy more snacks."
+    ],
+    correct: "Listen to their pets."
+  },
+  {
+    question: "How did the old man stop Max the dog?",
+    options: [
+      "He threw a ball.",
+      "He offered him his favorite lunch bone.",
+      "He yelled at him.",
+      "He gave him a squirrel."
+    ],
+    correct: "He offered him his favorite lunch bone."
+  },
+  {
+    question: "Why did Lily the cat stop walking?",
+    options: [
+      "She was tired.",
+      "She heard a squirrel.",
+      "She chased a red dot from advanced light technology.",
+      "She wanted a bone."
+    ],
+    correct: "She chased a red dot from advanced light technology."
+  },
+  {
+    question: "Where did Rio fly into and lock the door?",
+    options: [
+      "The pet store.",
+      "The announcement room.",
+      "The bathroom.",
+      "The manager's office."
+    ],
+    correct: "The announcement room."
+  },
+  {
+    question: "Why did the humans say 'Free for all' is dangerous?",
+    options: [
+      "People will run and children could get lost in the crowd.",
+      "The pets will eat all the food.",
+      "The doors will lock automatically.",
+      "The lights will turn off."
+    ],
+    correct: "People will run and children could get lost in the crowd."
+  }
+];
+
+let currentQIndex = 0;
+
+function wrapWordsForDict(text) {
+  return text.split(/\s+/).map(w => {
+    const clean = w.replace(/[.,!?"“”]/g, "").toLowerCase();
+    const cleanEscaped = clean.replace(/'/g, "\\'");
+    return `<span class="word" onclick="handleWordClick(event, '${cleanEscaped}')">${w}</span>`;
+  }).join(" ");
+}
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = `
+      <h4 style='text-align:center; color:#28a745; margin-top:20px;'>
+        🎉 You finished the quiz!
+      </h4>
+      <button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>
+        Play Again
+      </button>`;
+    shootFireworks();
+    return;
+  }
+
+  const q = quizData[currentQIndex];
+
+  let html = `
+    <div>
+      <div style="font-weight:bold; margin-bottom:15px; font-size:24px;">
+        Question ${currentQIndex + 1}: ${wrapWordsForDict(q.question)}
+      </div>
+  `;
+
+  q.options.forEach(opt => {
+    const isCorrect = (opt === q.correct);
+    html += `
+      <button class="quiz-option"
+        onclick="checkAns(this, ${isCorrect})">
+        ${wrapWordsForDict(opt)}
+      </button>`;
+  });
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  if (isCorrect) {
+    btn.classList.add('correct');
+    playSound('correct');
+    shootFireworks();
+    
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 2500);
+  } else {
+    btn.classList.add('wrong');
+    playSound('wrong');
+    
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+// --------------------------
+
+// --- DICTIONARY ---
+const dictionary = {
+  "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "pronoun" },
+  "did": { meaning: "đã (trợ động từ quá khứ)", phonetic: "/dɪd/", type: "auxiliary verb" },
+  "rio": { meaning: "Rio", phonetic: "/ˈriːoʊ/", type: "proper noun" },
+  "parrot": { meaning: "con vẹt", phonetic: "/ˈpærət/", type: "noun" },
+  "want": { meaning: "muốn", phonetic: "/wɒnt/", type: "verb" },
+  "people": { meaning: "mọi người", phonetic: "/ˈpiːpl/", type: "noun" },
+  "to": { meaning: "để", phonetic: "/tuː/", type: "particle" },
+  "do": { meaning: "làm", phonetic: "/duː/", type: "verb" },
+  "give": { meaning: "cho", phonetic: "/ɡɪv/", type: "verb" },
+  "him": { meaning: "anh ấy, cậu ấy", phonetic: "/hɪm/", type: "pronoun" },
+  "a": { meaning: "một", phonetic: "/ə/", type: "article" },
+  "bone": { meaning: "khúc xương", phonetic: "/bəʊn/", type: "noun" },
+  "listen": { meaning: "lắng nghe", phonetic: "/ˈlɪsn/", type: "verb" },
+  "their": { meaning: "của họ", phonetic: "/ðeər/", type: "possessive adjective" },
+  "pets": { meaning: "thú cưng", phonetic: "/pets/", type: "noun" },
+  "follow": { meaning: "đi theo", phonetic: "/ˈfɒləʊ/", type: "verb" },
+  "red": { meaning: "màu đỏ", phonetic: "/red/", type: "adjective" },
+  "dot": { meaning: "chấm", phonetic: "/dɒt/", type: "noun" },
+  "buy": { meaning: "mua", phonetic: "/baɪ/", type: "verb" },
+  "more": { meaning: "nhiều hơn", phonetic: "/mɔːr/", type: "adjective" },
+  "snacks": { meaning: "đồ ăn vặt", phonetic: "/snæks/", type: "noun" },
+
+  "how": { meaning: "như thế nào", phonetic: "/haʊ/", type: "adverb" },
+  "old": { meaning: "già, lớn tuổi", phonetic: "/əʊld/", type: "adjective" },
+  "man": { meaning: "người đàn ông", phonetic: "/mæn/", type: "noun" },
+  "stop": { meaning: "ngăn lại", phonetic: "/stɒp/", type: "verb" },
+  "max": { meaning: "Max", phonetic: "/mæks/", type: "proper noun" },
+  "dog": { meaning: "con chó", phonetic: "/dɒɡ/", type: "noun" },
+  "he": { meaning: "anh ấy", phonetic: "/hiː/", type: "pronoun" },
+  "threw": { meaning: "đã ném", phonetic: "/θruː/", type: "verb" },
+  "ball": { meaning: "quả bóng", phonetic: "/bɔːl/", type: "noun" },
+  "offered": { meaning: "đã đưa cho", phonetic: "/ˈɒfəd/", type: "verb" },
+  "favorite": { meaning: "yêu thích", phonetic: "/ˈfeɪvərɪt/", type: "adjective" },
+  "lunch": { meaning: "bữa trưa", phonetic: "/lʌntʃ/", type: "noun" },
+  "yelled": { meaning: "đã la hét", phonetic: "/jeld/", type: "verb" },
+  "at": { meaning: "vào, với", phonetic: "/æt/", type: "preposition" },
+  "gave": { meaning: "đã cho", phonetic: "/ɡeɪv/", type: "verb" },
+  "squirrel": { meaning: "con sóc", phonetic: "/ˈskwɪrəl/", type: "noun" },
+
+  "why": { meaning: "tại sao", phonetic: "/waɪ/", type: "adverb" },
+  "lily": { meaning: "Lily", phonetic: "/ˈlɪli/", type: "proper noun" },
+  "cat": { meaning: "con mèo", phonetic: "/kæt/", type: "noun" },
+  "walking": { meaning: "đi bộ", phonetic: "/ˈwɔːkɪŋ/", type: "verb" },
+  "she": { meaning: "cô ấy", phonetic: "/ʃiː/", type: "pronoun" },
+  "was": { meaning: "đã là", phonetic: "/wɒz/", type: "verb" },
+  "tired": { meaning: "mệt mỏi", phonetic: "/ˈtaɪəd/", type: "adjective" },
+  "heard": { meaning: "đã nghe thấy", phonetic: "/hɜːd/", type: "verb" },
+  "chased": { meaning: "đã đuổi theo", phonetic: "/tʃeɪst/", type: "verb" },
+  "from": { meaning: "từ", phonetic: "/frɒm/", type: "preposition" },
+  "advanced": { meaning: "tiên tiến", phonetic: "/ədˈvɑːnst/", type: "adjective" },
+  "light": { meaning: "ánh sáng", phonetic: "/laɪt/", type: "noun" },
+  "technology": { meaning: "công nghệ", phonetic: "/tekˈnɒlədʒi/", type: "noun" },
+  "wanted": { meaning: "muốn", phonetic: "/ˈwɒntɪd/", type: "verb" },
+
+  "where": { meaning: "ở đâu", phonetic: "/weər/", type: "adverb" },
+  "fly": { meaning: "bay", phonetic: "/flaɪ/", type: "verb" },
+  "into": { meaning: "vào trong", phonetic: "/ˈɪntuː/", type: "preposition" },
+  "and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+  "lock": { meaning: "khóa", phonetic: "/lɒk/", type: "verb" },
+  "door": { meaning: "cánh cửa", phonetic: "/dɔːr/", type: "noun" },
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "pet": { meaning: "thú cưng", phonetic: "/pet/", type: "noun" },
+  "store": { meaning: "cửa hàng", phonetic: "/stɔːr/", type: "noun" },
+  "announcement": { meaning: "thông báo", phonetic: "/əˈnaʊnsmənt/", type: "noun" },
+  "room": { meaning: "căn phòng", phonetic: "/ruːm/", type: "noun" },
+  "bathroom": { meaning: "phòng tắm", phonetic: "/ˈbɑːθruːm/", type: "noun" },
+  "manager": { meaning: "quản lý", phonetic: "/ˈmænɪdʒər/", type: "noun" },
+  "office": { meaning: "văn phòng", phonetic: "/ˈɒfɪs/", type: "noun" },
+
+  "humans": { meaning: "con người", phonetic: "/ˈhjuːmənz/", type: "noun" },
+  "say": { meaning: "nói", phonetic: "/seɪ/", type: "verb" },
+  "free": { meaning: "tự do", phonetic: "/friː/", type: "adjective" },
+  "for": { meaning: "cho", phonetic: "/fɔːr/", type: "preposition" },
+  "all": { meaning: "tất cả", phonetic: "/ɔːl/", type: "pronoun" },
+  "is": { meaning: "là", phonetic: "/ɪz/", type: "verb" },
+  "dangerous": { meaning: "nguy hiểm", phonetic: "/ˈdeɪndʒərəs/", type: "adjective" },
+  "will": { meaning: "sẽ", phonetic: "/wɪl/", type: "modal verb" },
+  "run": { meaning: "chạy", phonetic: "/rʌn/", type: "verb" },
+  "children": { meaning: "trẻ em", phonetic: "/ˈtʃɪldrən/", type: "noun" },
+  "could": { meaning: "có thể", phonetic: "/kʊd/", type: "modal verb" },
+  "get": { meaning: "trở nên; bị", phonetic: "/ɡet/", type: "verb" },
+  "lost": { meaning: "bị lạc", phonetic: "/lɒst/", type: "adjective" },
+  "in": { meaning: "trong", phonetic: "/ɪn/", type: "preposition" },
+  "crowd": { meaning: "đám đông", phonetic: "/kraʊd/", type: "noun" },
+  "incorrect": { meaning: "không đúng", phonetic: "/ˌɪnkəˈrekt/", type: "adjective" },
+  "tail": { meaning: "cái đuôi", phonetic: "/teɪl/", type: "noun" },
+  "position": { meaning: "vị trí", phonetic: "/pəˈzɪʃn/", type: "noun" },
+  "acceptable": { meaning: "có thể chấp nhận", phonetic: "/əkˈseptəbl/", type: "adjective" },
+  "challenge": { meaning: "thử thách", phonetic: "/ˈtʃælɪndʒ/", type: "noun" },
+  "listen": { meaning: "lắng nghe", phonetic: "/ˈlɪsn/", type: "verb" },
+  "pet": { meaning: "thú cưng", phonetic: "/pet/", type: "noun" },
+  "trouble": { meaning: "rắc rối", phonetic: "/ˈtrʌbl/", type: "noun" },
+  "worse": { meaning: "tồi tệ hơn", phonetic: "/wɜːs/", type: "adjective" },
+  "misunderstanding": { meaning: "sự hiểu lầm", phonetic: "/ˌmɪsʌndəˈstændɪŋ/", type: "noun" },
+  "contest": { meaning: "cuộc thi", phonetic: "/ˈkɒntest/", type: "noun" },
+  "surprise": { meaning: "sự ngạc nhiên", phonetic: "/səˈpraɪz/", type: "noun" },
+  "gift": { meaning: "món quà", phonetic: "/ɡɪft/", type: "noun" },
+  "rolling": { meaning: "lăn lộn", phonetic: "/ˈrəʊlɪŋ/", type: "verb" },
+  "bone": { meaning: "cục xương", phonetic: "/bəʊn/", type: "noun" },
+  "needs": { meaning: "nhu cầu", phonetic: "/niːdz/", type: "noun" },
+  "snacks": { meaning: "đồ ăn vặt", phonetic: "/snæks/", type: "noun" },
+  "hurry": { meaning: "vội vàng", phonetic: "/ˈhʌri/", type: "verb" },
+  "unfair": { meaning: "không công bằng", phonetic: "/ˌʌnˈfeər/", type: "adjective" },
+  "educating": { meaning: "giáo dục", phonetic: "/ˈedʒukeɪtɪŋ/", type: "verb" },
+  "advanced": { meaning: "tiên tiến", phonetic: "/ədˈvɑːnst/", type: "adjective" },
+  "technology": { meaning: "công nghệ", phonetic: "/tekˈnɒlədʒi/", type: "noun" },
+  "chasing": { meaning: "đuổi theo", phonetic: "/ˈtʃeɪsɪŋ/", type: "verb" },
+  "allowed": { meaning: "cho phép", phonetic: "/əˈlaʊd/", type: "verb" },
+  "voice": { meaning: "giọng nói", phonetic: "/vɔɪs/", type: "noun" },
+  "squirrel": { meaning: "con sóc", phonetic: "/ˈskwɪrəl/", type: "noun" },
+  "locked": { meaning: "bị khóa", phonetic: "/lɒkt/", type: "adjective" },
+  "microphone": { meaning: "micrô", phonetic: "/ˈmaɪkrəfəʊn/", type: "noun" },
+  "announcement": { meaning: "thông báo", phonetic: "/əˈnaʊnsmənt/", type: "noun" },
+  "buttons": { meaning: "nút bấm", phonetic: "/ˈbʌtnz/", type: "noun" },
+  "bell": { meaning: "cái chuông", phonetic: "/bel/", type: "noun" },
+  "keycard": { meaning: "thẻ từ", phonetic: "/ˈkiːkɑːd/", type: "noun" },
+  "tactical": { meaning: "chiến thuật", phonetic: "/ˈtæktɪkl/", type: "adjective" },
+  "choice": { meaning: "sự lựa chọn", phonetic: "/tʃɔɪs/", type: "noun" },
+  "rules": { meaning: "quy tắc", phonetic: "/ruːlz/", type: "noun" },
+  "dangerous": { meaning: "nguy hiểm", phonetic: "/ˈdeɪndʒərəs/", type: "adjective" },
+  "crowd": { meaning: "đám đông", phonetic: "/kraʊd/", type: "noun" },
+  "hurt": { meaning: "bị thương", phonetic: "/hɜːt/", type: "adjective" }
+};
+// --- SENTENCES ---
+const sentences = [
+  { text: "They look like us!", start: 1, end: 3, translation: "Chúng trông giống chúng ta!" },
+  { text: "Lily? Incorrect tail position, but acceptable.", start: 4, end: 8, translation: "Lily? Vị trí đuôi không đúng, nhưng có thể chấp nhận được." },
+  { text: "Final challenge! Say, I will listen to my pet!", start: 8, end: 12, translation: "Thử thách cuối cùng! Hãy nói, tôi sẽ lắng nghe thú cưng của mình!" },
+  { text: "I will listen to my pet!", start: 13, end: 15, translation: "Tôi sẽ lắng nghe thú cưng của mình!" },
+  { text: "I have questions.", start: 16, end: 17, translation: "Tôi có vài câu hỏi." },
+  { text: "Later.", start: 17, end: 18, translation: "Để sau đi." },
+  { text: "That is usually when trouble gets worse.", start: 19, end: 23, translation: "Đó thường là lúc rắc rối trở nên tồi tệ hơn." },
+  { text: "Everyone, this is a misunderstanding. There is no contest.", start: 23, end: 27, translation: "Mọi người, đây là một sự hiểu lầm. Không có cuộc thi nào cả." },
+  { text: "And no surprise gift. And please stop rolling over.", start: 28, end: 32, translation: "Và không có món quà bất ngờ nào. Và làm ơn ngừng lăn lộn đi." },
+  { text: "No. I was just starting.", start: 33, end: 37, translation: "Không. Tôi chỉ mới bắt đầu." },
+  { text: "How do we stop them?", start: 38, end: 40, translation: "Làm sao chúng ta ngăn chúng lại?" },
+  { text: "I have an idea. Max!", start: 40, end: 44, translation: "Tôi có một ý tưởng. Max!" },
+  { text: "Your favorite lunch bone.", start: 45, end: 47, translation: "Khúc xương ăn trưa yêu thích của cậu." },
+  { text: "The big one? The big one.", start: 48, end: 51, translation: "Cái lớn à? Cái lớn." },
+  { text: "Max, do not stop now! But it is the big bone.", start: 51, end: 55, translation: "Max, đừng dừng lại lúc này! Nhưng nó là khúc xương lớn." },
+  { text: "Humans always say later!", start: 56, end: 58, translation: "Con người luôn nói để sau!" },
+  { text: "Not later. Now.", start: 58, end: 60, translation: "Không phải sau. Bây giờ." },
+  { text: "I am a good dog with needs.", start: 61, end: 63, translation: "Tôi là một chú chó ngoan có nhu cầu." },
+  { text: "Stay, Max.", start: 64, end: 65, translation: "Ở yên đó, Max." },
+  { text: "Staying is easier with snacks.", start: 66, end: 70, translation: "Ở yên dễ hơn khi có đồ ăn vặt." },
+  { text: "Lily!", start: 71, end: 73, translation: "Lily!" },
+  { text: "I heard you. I simply chose not to hurry.", start: 74, end: 77, translation: "Tôi nghe rồi. Tôi chỉ đơn giản là chọn không vội vàng." },
+  { text: "That is unfair.", start: 78, end: 80, translation: "Thật không công bằng." },
+  { text: "Lily, we are still educating humans!", start: 84, end: 86, translation: "Lily, chúng ta vẫn đang giáo dục con người!" },
+  { text: "I was caught by advanced light technology.", start: 87, end: 90, translation: "Tôi đã bị bắt bởi công nghệ ánh sáng tiên tiến." },
+  { text: "I am above it while chasing it.", start: 91, end: 93, translation: "Tôi cao ngạo mặc kệ nó trong khi vẫn đuổi theo nó." },
+  { text: "Got you. I allowed this.", start: 94, end: 96, translation: "Bắt được em rồi. Tôi đã cho phép điều này." },
+  { text: "You both stopped too soon.", start: 97, end: 99, translation: "Cả hai bạn dừng lại quá sớm." },
+  { text: "Rio, please come down.", start: 100, end: 102, translation: "Rio, làm ơn xuống đây." },
+  { text: "No. People only listen when the voice is big.", start: 102, end: 106, translation: "Không. Mọi người chỉ lắng nghe khi giọng nói đủ lớn." },
+  { text: "Max! Stop Rio!", start: 107, end: 109, translation: "Max! Ngăn Rio lại!" },
+  { text: "Rio, wait! Squirrel!", start: 110, end: 113, translation: "Rio, đợi đã! Con sóc!" },
+  { text: "Where?", start: 114, end: 115, translation: "Ở đâu?" },
+  { text: "Max! I heard the word.", start: 116, end: 119, translation: "Max! Tớ đã nghe thấy từ đó." },
+  { text: "Big room.", start: 121, end: 122, translation: "Căn phòng lớn." },
+  { text: "Rio!", start: 123, end: 125, translation: "Rio!" },
+  { text: "It is locked!", start: 129, end: 131, translation: "Nó bị khóa rồi!" },
+  { text: "Big room. Hello?", start: 134, end: 140, translation: "Phòng lớn. Xin chào?" },
+  { text: "He found the microphone.", start: 142, end: 144, translation: "Nó đã tìm thấy micro." },
+  { text: "That is the announcement room.", start: 144, end: 146, translation: "Đó là phòng thông báo." },
+  { text: "Please tell me that room does not have more buttons.", start: 147, end: 150, translation: "Làm ơn nói với tôi rằng phòng đó không có thêm nút bấm nào." },
+  { text: "It definitely has more buttons.", start: 150, end: 153, translation: "Nó chắc chắn có nhiều nút bấm hơn." },
+  { text: "Oh. Bigger bell.", start: 154, end: 156, translation: "Ồ. Cái chuông lớn hơn." },
+  { text: "Rio! It is still locked.", start: 157, end: 161, translation: "Rio! Nó vẫn bị khóa." },
+  { text: "Staff keycard only.", start: 164, end: 165, translation: "Chỉ dùng thẻ nhân viên." },
+  { text: "Great. The bird has a room.", start: 166, end: 168, translation: "Tuyệt. Con chim đã có một căn phòng." },
+  { text: "You found me.", start: 169, end: 170, translation: "Các người tìm thấy tôi rồi." },
+  { text: "Rio, open the door.", start: 171, end: 172, translation: "Rio, mở cửa ra." },
+  { text: "Birds do not use doors.", start: 173, end: 175, translation: "Loài chim không dùng cửa." },
+  { text: "He has a point.", start: 176, end: 177, translation: "Nó nói có lý." },
+  { text: "Lily! A bad point, but a point.", start: 178, end: 181, translation: "Lily! Một điểm không hay, nhưng cũng là một quan điểm." },
+  { text: "Rio, you wanted people to hear you. They heard you.", start: 182, end: 185, translation: "Rio, mi muốn mọi người nghe thấy mi. Họ đã nghe thấy mi rồi." },
+  { text: "Not enough.", start: 185, end: 186, translation: "Chưa đủ." },
+  { text: "Rio, come out.", start: 187, end: 188, translation: "Rio, ra đây." },
+  { text: "You stopped too soon, Max.", start: 189, end: 191, translation: "Cậu đã dừng lại quá sớm, Max." },
+  { text: "It was my favorite.", start: 192, end: 195, translation: "Nó là thứ tôi thích nhất." },
+  { text: "And you followed a red dot.", start: 196, end: 198, translation: "Và cậu thì đi theo một chấm đỏ." },
+  { text: "I made a tactical choice.", start: 199, end: 201, translation: "Tôi đã đưa ra một lựa chọn chiến thuật." },
+  { text: "Humans love rules.", start: 202, end: 204, translation: "Con người yêu thích các quy tắc." },
+  { text: "That sentence never ends well.", start: 205, end: 207, translation: "Câu nói đó không bao giờ có kết thúc tốt đẹp." },
+  { text: "Buy this. Wait there. Do not touch that. Sit. Stay. Be quiet.", start: 208, end: 213, translation: "Mua cái này. Đợi ở đó. Đừng chạm vào cái đó. Ngồi xuống. Ở yên. Im lặng." },
+  { text: "Rio, do not do this.", start: 214, end: 216, translation: "Rio, đừng làm vậy." },
+  { text: "One rule for everyone. Free for all.", start: 217, end: 220, translation: "Một quy tắc cho tất cả. Tự do cho mọi người." },
+  { text: "That is dangerous.", start: 221, end: 222, translation: "Điều đó thật nguy hiểm." },
+  { text: "People will run.", start: 223, end: 225, translation: "Mọi người sẽ chạy." },
+  { text: "Children could get lost in the crowd.", start: 226, end: 228, translation: "Trẻ em có thể bị lạc trong đám đông." },
+  { text: "Rio, stop before someone gets hurt.", start: 228, end: 231, translation: "Rio, dừng lại trước khi ai đó bị thương." }
+];
+
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?"“”]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  if(event) event.stopPropagation();
+
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener("mousedown", (e) => {
+  if(!canvas.classList.contains("pen-active")) return;
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if(!isDrawing) return;
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke();
+});
+
+canvas.addEventListener("mouseup", () => isDrawing = false);
+canvas.addEventListener("mouseleave", () => isDrawing = false);
+
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+
+</script>
+</body>
+</html>

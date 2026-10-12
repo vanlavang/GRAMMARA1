@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Mastering English Demonstrative Pronouns - Grammar Pro</title>
+    <style>
+        @font-face { font-family: 'UTM Avo'; src: local('UTM Avo'); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ink: #0f172a;
+            --soft-ink: #334155;
+            --blue: #2563eb;
+            --orange: #ea580c;
+            --orange-light: #ffedd5;
+            --orange-box: #fed7aa;
+            --yellow-light: #fef08a;
+            --yellow-box: #fde047;
+            --green-light: #dcfce7;
+            --green-box: #86efac;
+            --teal-light: #ccfbf1;
+            --teal-box: #5eead4;
+            --panel-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+        }
+
+        body {
+            font-family: 'UTM Avo', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; touch-action: none;
+        }
+
+        /* --- HEADER & MENU --- */
+        header {
+            background-color: #d8c8b4; padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #d4bfa6; position: fixed;
+            top: 0; left: 0; right: 0; z-index: 1000; height: 65px;
+            transition: all 0.3s ease;
+        }
+        .header-center { display: flex; gap: 10px; }
+        header button {
+            background-color: #fff; border: 2px solid #d4bfa6; padding: 8px 16px; border-radius: 20px;
+            cursor: pointer; font-family: 'UTM Avo'; color: #8b5e3c; transition: 0.3s;
+        }
+        header button.active-conv { background-color: #8b5e3c; color: white; font-weight: bold; border-color: #5c3e26; }
+        .menu-btn {
+            background-color: #8b7362 !important; color: white !important; border: none !important;
+            padding: 10px 20px !important; border-radius: 20px !important; font-weight: bold; cursor: pointer;
+        }
+
+        /* --- CONTROL BAR --- */
+        #controlBar {
+            background-color: #fff9f0; padding: 10px 20px; border-bottom: 2px solid #d4bfa6;
+            position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
+            display: flex; align-items: center; gap: 12px; height: 55px;
+            transition: all 0.3s ease;
+        }
+        .tool-btn {
+            padding: 6px 14px; border-radius: 12px; border: 1px solid #8b5e3c;
+            background: #fff; cursor: pointer; font-size: 15px; font-weight: bold; color: #8b5e3c; font-family: 'UTM Avo';
+            transition: 0.2s;
+        }
+        .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+        .tab-switcher { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; border: 1px solid #cbd5e1; }
+        .tab-btn {
+            padding: 6px 16px; border-radius: 8px; border: none; background: transparent;
+            cursor: pointer; font-family: 'UTM Avo'; font-size: 14px; font-weight: bold; color: #475569; transition: 0.2s;
+        }
+        .tab-btn.active { background: white; color: #1e3a8a; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+        /* --- SIDEBAR MENU --- */
+        .side-menu {
+            position: fixed; top: 130px; bottom: 20px; width: 220px;
+            background-color: #f3dbc1; border: 2px solid #d4bfa6;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease;
+            z-index: 1100; padding: 20px; overflow-y: auto;
+        }
+        .side-menu.left { left: 0; border-radius: 0 20px 20px 0; transform: translateX(-100%); }
+        .side-menu.right { right: 0; border-radius: 20px 0 0 20px; transform: translateX(100%); }
+        .side-menu.open { transform: translateX(0); }
+        .side-menu button {
+            display: block; width: 100%; background: #fff; border: 1px solid #d4bfa6;
+            margin-bottom: 10px; padding: 12px; border-radius: 12px; cursor: pointer;
+            font-family: 'UTM Avo'; font-size: 16px; font-weight: bold; color: #8b5e3c;
+        }
+        .side-menu button.active { background: #8b5e3c; color: #fff; }
+
+        /* --- TỪ ĐIỂN --- */
+        .dict-panel {
+            position: fixed; right: 20px; top: 135px; width: 360px; max-height: calc(100vh - 150px);
+            background: white; border-radius: 25px; padding: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            border: 4px solid #bae6fd; display: none; flex-direction: column; gap: 10px; z-index: 1200;
+            transition: top 0.3s ease;
+        }
+        .dict-panel.active { display: flex; }
+        .dict-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+        .close-dict { cursor: pointer; font-size: 26px; color: #f87171; font-weight: bold; line-height: 1; }
+        .dict-panel input { padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: 'UTM Avo'; outline: none;}
+        
+        .result-mode {
+            font-size: 14px; font-weight: 700; color: #0f766e; background: #ecfeff;
+            border: 1px solid #99f6e4; border-radius: 999px; align-self: flex-start; padding: 3px 10px;
+        }
+        .result-mode.translation { color: #9a3412; background: #fff7ed; border-color: #fdba74; }
+        
+        .dict-result {
+            background: #f8fafc; border-radius: 12px; padding: 15px; min-height: 120px;
+            max-height: 44vh; overflow: auto; font-size: 15px; color: #1e293b;
+            border: 1px dashed #cbd5e1; line-height: 1.4;
+        }
+        .dict-word { font-size: 24px; font-weight: 900; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;}
+        .dict-phonetic { font-size: 15px; color: #0369a1; margin-bottom: 10px; font-family: Arial, sans-serif; background: #e0f2fe; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .dict-definition { margin-top: 8px; padding-left: 10px; border-left: 3px solid #cbd5e1; }
+        .dict-definition b { color: #b45309; text-transform: capitalize; }
+        .play-btn { cursor: pointer; background: #0ea5e9; color: white; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.2s; }
+        .play-btn:hover { background: #0284c7; transform: scale(1.1); }
+
+        /* --- CONTAINER MỚI --- */
+        .container {
+            background: #ffffff; width: 98vw; max-width: 1880px; height: calc(100vh - 145px);
+            margin-top: 125px; padding: 16px; border-radius: 38px; box-shadow: var(--panel-shadow);
+            display: flex; flex-direction: column; border: 10px solid #ffffff; position: relative; z-index: 10; overflow: auto;
+            transition: all 0.3s ease;
+        }
+        .container::-webkit-scrollbar { width: 8px; }
+        .container::-webkit-scrollbar-thumb { background: #d6e4ff; border-radius: 999px; }
+
+        .tab-content { display: none; flex-direction: column; width: 100%; min-height: 100%; position: relative; }
+        .tab-content.active { display: flex; }
+
+        .step { opacity: 0.05; transition: all 0.5s ease; filter: blur(5px); transform: scale(0.98); pointer-events: none; }
+        .step.active { opacity: 1; filter: blur(0); transform: scale(1); pointer-events: auto; }
+
+        .lex { cursor: pointer; border-radius: 4px; transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s; display: inline-block; }
+        .lex:hover { background-color: rgba(59, 130, 246, 0.15); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); color: #1d4ed8; }
+
+        /* --- MÔ PHỎNG CSS INFOGRAPHIC GỐC --- */
+        .infographic-stage {
+            position: relative; width: 100%; min-height: 100%;
+            background: radial-gradient(circle at 10% 20%, #fdfbfb 0%, #f4f8ff 100%);
+            border-radius: 20px; padding: 40px 60px; display: flex; flex-direction: column; color: #0f172a; overflow: hidden;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 30px 30px;
+        }
+        
+        .infographic-stage::before { content: ''; position: absolute; top: 10%; left: 5%; width: 200px; height: 200px; background: radial-gradient(circle, #f0f9ff 0%, transparent 70%); z-index: 0; }
+        .infographic-stage::after { content: ''; position: absolute; top: 5%; right: 10%; width: 300px; height: 300px; background: radial-gradient(circle, #eff6ff 0%, transparent 70%); z-index: 0; }
+
+        .main-title { text-align: center; font-size: clamp(32px, 3.5vw, 48px); font-weight: 900; margin-bottom: 40px; letter-spacing: -0.5px; position: relative; z-index: 2; }
+        .layout-wrapper { display: flex; gap: 30px; flex-grow: 1; }
+
+        /* Cột Trái (Side Panel) */
+        .side-panel { width: 25%; min-width: 280px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
+        .side-title { font-size: clamp(28px, 3vw, 42px); font-weight: 900; line-height: 1.2; margin-bottom: 30px; text-align: left; width: 100%; }
+        .side-avatar { font-size: 160px; margin-top: 20px; position: relative; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.1)); }
+        .side-avatar::after { content: ''; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 140px; height: 20px; background: rgba(0,0,0,0.05); border-radius: 50%; z-index: -1; }
+
+        /* Cột Phải (Grid Panel 2x2) */
+        .grid-panel { flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 30px; position: relative; z-index: 2; }
+
+        .card { border-radius: 30px; padding: 25px; display: flex; flex-direction: column; position: relative; overflow: visible; }
+        .card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 70%; border-radius: 30px; z-index: 0; clip-path: ellipse(80% 100% at 30% 100%); }
+        .card-this::before { background: var(--bg-orange); }
+        .card-that::before { background: var(--bg-blue); }
+        .card-these::before { background: var(--bg-green); }
+        .card-those::before { background: var(--bg-purple); }
+
+        .card-header { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 20px; z-index: 2; }
+        .card-body { display: flex; gap: 15px; z-index: 2; flex-grow: 1; align-items: center; }
+
+        .card-visual { flex: 1.2; display: flex; flex-direction: column; align-items: center; position: relative; font-size: 90px; }
+        .wood-shelf { width: 120%; height: 12px; background: #d4bfa6; border-radius: 10px; margin-top: -10px; border-bottom: 4px solid #bba387; }
+        
+        .card-text { flex: 1; display: flex; flex-direction: column; }
+        .word-big { font-size: clamp(40px, 4vw, 55px); font-weight: 900; margin-bottom: 10px; letter-spacing: -1px; line-height: 1; }
+        .color-this { color: var(--orange); }
+        .color-that { color: var(--blue); }
+        .color-these { color: var(--green); }
+        .color-those { color: var(--purple); }
+
+        .desc { font-size: 16px; line-height: 1.5; color: #334155; font-weight: 500; }
+
+        .omitting-bubble {
+            position: absolute; bottom: -15px; right: 0; background: white; border: 2px solid #bae6fd;
+            padding: 12px 15px; border-radius: 15px 15px 0 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            font-size: 13px; line-height: 1.4; max-width: 180px; z-index: 10;
+        }
+        .omitting-bubble h4 { font-size: 14px; margin-bottom: 4px; color: #0f172a; }
+
+        #inkCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; pointer-events: none; }
+        #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+    </style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+
+<!-- MENU SIDEBAR -->
+<nav class="side-menu left" id="leftMenu">
+ <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+ <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+ <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+ <button class="active" onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+ <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+ <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+ <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</nav>
+
+<nav class="side-menu right" id="rightMenu">
+   <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+<button onclick="location.href='story.html'"><b>story</b></button>
+
+
+</nav>
+
+<header id="mainHeader">
+    <button class="menu-btn" onclick="toggleMenu('left')">Menu ☰</button>
+    <div class="header-center">
+<button class="active-conv" onclick="window.location.href='../conversation_01/conversation_01.html'"><b>Conversation 01</b></button>
+<button onclick="window.location.href='../conversation_02/conversation_02.html'">Conversation 02</button>
+<button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+<button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu('right')">Menu ☰</button>
+</header>
+
+<!-- CONTROL BAR -->
+<div id="controlBar">
+    <button id="focusBtn" class="tool-btn" onclick="toggleFocusMode()" style="background: #10b981; color: white; border-color: #059669;">Phóng to 🔲</button>
+    <button id="penBtn" class="tool-btn" onclick="toggleInk()">Bút vẽ: Off</button>
+    <button class="tool-btn" onclick="clearInk()">Xóa mực</button>
+    
+    <div style="flex-grow: 1;"></div>
+    
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchPresentationTab('englishTab')">🇬🇧 English Tab</button>
+        <button class="tab-btn" onclick="switchPresentationTab('vietnameseTab')">🇻🇳 Vietnamese Tab</button>
+    </div>
+
+    <button class="tool-btn" onclick="goPrev()">⬅ Back</button>
+    <button class="tool-btn" onclick="goNext()">Next ➡</button>
+</div>
+
+<!-- TỪ ĐIỂN PANEL -->
+<div class="dict-panel" id="dictPanel">
+    <div class="dict-header">
+        <span style="font-weight: bold; color: #0369a1; font-family: 'UTM Avo';">Tra từ & Dịch Câu 📖</span>
+        <div class="close-dict" onclick="toggleDict()">×</div>
+    </div>
+    <input type="text" id="searchInput" placeholder="Chạm chữ hoặc gõ vào đây..." onkeyup="handleSearch(event)">
+    <div class="result-mode translation" id="resultMode">Translation</div>
+    <div class="dict-result" id="resultArea">Kết quả sẽ xuất hiện ở đây...</div>
+    <div style="display: flex; gap: 8px;">
+        <button class="tool-btn" style="flex: 1; background: #0369a1; color: white;" onclick="translateInput()">Dịch câu</button>
+        <button class="tool-btn" style="flex: 1;" onclick="speakInput()">Nghe 🎙️</button>
+    </div>
+</div>
+
+<div class="container" id="mainContainer">
+
+    <!-- ==================== ENGLISH TAB ==================== -->
+    <div id="englishTab" class="tab-content active">
+        <section class="infographic-stage">
+            
+            <h1 class="main-title step">
+                <span class="lex" data-term="Mastering">Mastering</span>
+                <span class="lex" data-term="Demonstrative">Demonstrative</span>
+                <span class="lex" data-term="Pronouns:">Pronouns:</span>
+                <span class="lex" data-term="This,">This,</span>
+                <span class="lex" data-term="That,">That,</span>
+                <span class="lex" data-term="These,">These,</span>
+                <span class="lex" data-term="and">and</span>
+                <span class="lex" data-term="Those">Those</span>
+            </h1>
+
+            <div class="layout-wrapper">
+                
+                <div class="side-panel">
+                    <div class="side-title step">
+                        <span class="lex" data-term="Use">Use</span>
+                        <span class="lex" data-term="This">"This"</span>
+                        <span class="lex" data-term="and">and</span><br>
+                        <span class="lex" data-term="That">"That"</span>
+                        <span class="lex" data-term="for">for</span><br>
+                        <span class="lex" data-term="Singular">Singular</span>
+                        <span class="lex" data-term="Nouns">Nouns</span>
+                    </div>
+                    <div class="side-avatar step">🧍🏻‍♂️📱</div>
+                </div>
+
+                <div class="grid-panel">
+                    
+                    <div class="card card-this">
+                        <div class="card-header step">
+                            <span class="lex" data-term="Near">Near</span>
+                            <span class="lex" data-term="the">the</span>
+                            <span class="lex" data-term="Speaker">Speaker</span>
+                            <span class="lex" data-term="(Close)">(Close)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:center;">
+                                    <div style="font-size: 70px;">🧍🏻‍♂️👉</div>
+                                    <div style="font-size: 50px;">👕</div>
+                                </div>
+                                <div class="wood-shelf"></div>
+                                <div style="font-size: 60px; margin-top: 10px;">🚲</div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-this step">
+                                    <span class="lex" data-term="THIS">THIS</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex" data-term="Use">Use</span>
+                                    <span class="lex" data-term="this">this</span>
+                                    <span class="lex" data-term="when">when</span>
+                                    <span class="lex" data-term="referring">referring</span>
+                                    <span class="lex" data-term="to">to</span>
+                                    <span class="lex" data-term="a">a</span>
+                                    <span class="lex" data-term="single">single</span>
+                                    <span class="lex" data-term="item">item</span>
+                                    <span class="lex" data-term="like">like</span>
+                                    <span class="lex" data-term="a">a</span>
+                                    <span class="lex" data-term="shirt,">shirt,</span>
+                                    <span class="lex" data-term="bike,">bike,</span>
+                                    <span class="lex" data-term="or">or</span>
+                                    <span class="lex" data-term="car.">car.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-that">
+                        <div class="card-header step">
+                            <span class="lex" data-term="Away">Away</span>
+                            <span class="lex" data-term="from">from</span>
+                            <span class="lex" data-term="the">the</span>
+                            <span class="lex" data-term="Speaker">Speaker</span>
+                            <span class="lex" data-term="(Far)">(Far)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div style="font-size: 70px; margin-right: 30px;">🧍🏻‍♂️ 🫵</div>
+                                    <div style="font-size: 40px; margin-bottom: 20px;">👕🚲</div>
+                                </div>
+                                <div class="wood-shelf" style="width: 80%; align-self: flex-end;"></div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-that step">
+                                    <span class="lex" data-term="THAT">THAT</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex" data-term="Use">Use</span>
+                                    <span class="lex" data-term="That">"That"</span>
+                                    <span class="lex" data-term="for">for</span>
+                                    <span class="lex" data-term="a">a</span>
+                                    <span class="lex" data-term="single">single</span>
+                                    <span class="lex" data-term="item">item</span>
+                                    <span class="lex" data-term="further">further</span>
+                                    <span class="lex" data-term="away.">away.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="omitting-bubble step">
+                            <h4>
+                                <span class="lex" data-term="Omitting">Omitting</span>
+                                <span class="lex" data-term="the">the</span>
+                                <span class="lex" data-term="Noun">Noun</span>
+                            </h4>
+                            <span class="lex" data-term="You">You</span>
+                            <span class="lex" data-term="can">can</span>
+                            <span class="lex" data-term="drop">drop</span>
+                            <span class="lex" data-term="the">the</span>
+                            <span class="lex" data-term="noun">noun</span>
+                            <span class="lex" data-term="(e.g.,">(e.g.,</span>
+                            <span class="lex" data-term="Do">"Do</span>
+                            <span class="lex" data-term="you">you</span>
+                            <span class="lex" data-term="like">like</span>
+                            <span class="lex" data-term="this?)">this?")</span>
+                            <span class="lex" data-term="if">if</span>
+                            <span class="lex" data-term="the">the</span>
+                            <span class="lex" data-term="object">object</span>
+                            <span class="lex" data-term="is">is</span>
+                            <span class="lex" data-term="clear.">clear.</span>
+                        </div>
+                    </div>
+
+                    <div class="card card-these">
+                        <div class="card-header step">
+                            <span class="lex" data-term="Near">Near</span>
+                            <span class="lex" data-term="the">the</span>
+                            <span class="lex" data-term="Speaker">Speaker</span>
+                            <span class="lex" data-term="(Close)">(Close)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div style="font-size: 70px;">🧍🏻‍♂️👉</div>
+                                    <div style="font-size: 50px;">👖📚</div>
+                                </div>
+                                <div class="wood-shelf"></div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-these step">
+                                    <span class="lex" data-term="THESE">THESE</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex" data-term="Use">Use</span>
+                                    <span class="lex" data-term="these">these</span>
+                                    <span class="lex" data-term="when">when</span>
+                                    <span class="lex" data-term="referring">referring</span>
+                                    <span class="lex" data-term="to">to</span>
+                                    <span class="lex" data-term="multiple">multiple</span>
+                                    <span class="lex" data-term="items">items</span>
+                                    <span class="lex" data-term="like">like</span>
+                                    <span class="lex" data-term="jeans">jeans</span>
+                                    <span class="lex" data-term="or">or</span>
+                                    <span class="lex" data-term="books.">books.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-those">
+                        <div class="card-header step">
+                            <span class="lex" data-term="Away">Away</span>
+                            <span class="lex" data-term="from">from</span>
+                            <span class="lex" data-term="the">the</span>
+                            <span class="lex" data-term="Speaker">Speaker</span>
+                            <span class="lex" data-term="(Far)">(Far)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div style="font-size: 70px; margin-right: 30px;">🧍🏻‍♂️ 🫵</div>
+                                    <div style="font-size: 40px; margin-bottom: 20px;">👖📚</div>
+                                </div>
+                                <div class="wood-shelf" style="width: 80%; align-self: flex-end;"></div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-those step">
+                                    <span class="lex" data-term="THOSE">THOSE</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex" data-term="Use">Use</span>
+                                    <span class="lex" data-term="Those">'Those'</span>
+                                    <span class="lex" data-term="for">for</span>
+                                    <span class="lex" data-term="multiple">multiple</span>
+                                    <span class="lex" data-term="items">items</span>
+                                    <span class="lex" data-term="(plural)">(plural)</span>
+                                    <span class="lex" data-term="for">for</span>
+                                    <span class="lex" data-term="objects">objects</span>
+                                    <span class="lex" data-term="further">further</span>
+                                    <span class="lex" data-term="away.">away.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==================== VIETNAMESE TAB ==================== -->
+    <div id="vietnameseTab" class="tab-content">
+        <section class="infographic-stage">
+            
+            <h1 class="main-title step">
+                <span class="lex">Làm chủ</span>
+                <span class="lex">Đại từ</span>
+                <span class="lex">Chỉ định:</span>
+                <span class="lex">This,</span>
+                <span class="lex">That,</span>
+                <span class="lex">These,</span>
+                <span class="lex">và</span>
+                <span class="lex">Those</span>
+            </h1>
+
+            <div class="layout-wrapper">
+                
+                <div class="side-panel">
+                    <div class="side-title step">
+                        <span class="lex">Dùng</span>
+                        <span class="lex">"This"</span>
+                        <span class="lex">và</span><br>
+                        <span class="lex">"That"</span>
+                        <span class="lex">cho</span><br>
+                        <span class="lex">Danh từ</span>
+                        <span class="lex">Số ít</span>
+                    </div>
+                    <div class="side-avatar step">🧍🏻‍♂️📱</div>
+                </div>
+
+                <div class="grid-panel">
+                    
+                    <div class="card card-this">
+                        <div class="card-header step">
+                            <span class="lex">Gần</span>
+                            <span class="lex">Người</span>
+                            <span class="lex">nói</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:center;">
+                                    <div style="font-size: 70px;">🧍🏻‍♂️👉</div>
+                                    <div style="font-size: 50px;">👕</div>
+                                </div>
+                                <div class="wood-shelf"></div>
+                                <div style="font-size: 60px; margin-top: 10px;">🚲</div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-this step">
+                                    <span class="lex">THIS</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex">Sử dụng</span>
+                                    <span class="lex">"this"</span>
+                                    <span class="lex">khi</span>
+                                    <span class="lex">nhắc</span>
+                                    <span class="lex">đến</span>
+                                    <span class="lex">một</span>
+                                    <span class="lex">sự vật</span>
+                                    <span class="lex">đơn lẻ</span>
+                                    <span class="lex">như</span>
+                                    <span class="lex">áo sơ mi,</span>
+                                    <span class="lex">xe đạp,</span>
+                                    <span class="lex">hoặc</span>
+                                    <span class="lex">xe hơi.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-that">
+                        <div class="card-header step">
+                            <span class="lex">Xa</span>
+                            <span class="lex">Người</span>
+                            <span class="lex">nói</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div style="font-size: 70px; margin-right: 30px;">🧍🏻‍♂️ 🫵</div>
+                                    <div style="font-size: 40px; margin-bottom: 20px;">👕🚲</div>
+                                </div>
+                                <div class="wood-shelf" style="width: 80%; align-self: flex-end;"></div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-that step">
+                                    <span class="lex">THAT</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex">Dùng</span>
+                                    <span class="lex">"That"</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">một</span>
+                                    <span class="lex">sự vật</span>
+                                    <span class="lex">ở</span>
+                                    <span class="lex">khoảng cách</span>
+                                    <span class="lex">xa</span>
+                                    <span class="lex">hơn.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="omitting-bubble step">
+                            <h4>
+                                <span class="lex">Lược bỏ</span>
+                                <span class="lex">Danh từ</span>
+                            </h4>
+                            <span class="lex">Bạn</span>
+                            <span class="lex">có thể</span>
+                            <span class="lex">bỏ</span>
+                            <span class="lex">danh từ</span>
+                            <span class="lex">(Ví dụ:</span>
+                            <span class="lex">"Do</span>
+                            <span class="lex">you</span>
+                            <span class="lex">like</span>
+                            <span class="lex">this?")</span>
+                            <span class="lex">nếu</span>
+                            <span class="lex">sự vật</span>
+                            <span class="lex">đã</span>
+                            <span class="lex">rõ ràng.</span>
+                        </div>
+                    </div>
+
+                    <div class="card card-these">
+                        <div class="card-header step">
+                            <span class="lex">Gần</span>
+                            <span class="lex">Người</span>
+                            <span class="lex">nói</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div style="font-size: 70px;">🧍🏻‍♂️👉</div>
+                                    <div style="font-size: 50px;">👖📚</div>
+                                </div>
+                                <div class="wood-shelf"></div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-these step">
+                                    <span class="lex">THESE</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex">Dùng</span>
+                                    <span class="lex">"these"</span>
+                                    <span class="lex">khi</span>
+                                    <span class="lex">nhắc</span>
+                                    <span class="lex">đến</span>
+                                    <span class="lex">nhiều</span>
+                                    <span class="lex">sự vật</span>
+                                    <span class="lex">như</span>
+                                    <span class="lex">quần jean</span>
+                                    <span class="lex">hoặc</span>
+                                    <span class="lex">sách.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-those">
+                        <div class="card-header step">
+                            <span class="lex">Xa</span>
+                            <span class="lex">Người</span>
+                            <span class="lex">nói</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-visual step">
+                                <div style="display:flex; align-items:flex-end;">
+                                    <div style="font-size: 70px; margin-right: 30px;">🧍🏻‍♂️ 🫵</div>
+                                    <div style="font-size: 40px; margin-bottom: 20px;">👖📚</div>
+                                </div>
+                                <div class="wood-shelf" style="width: 80%; align-self: flex-end;"></div>
+                            </div>
+                            <div class="card-text">
+                                <div class="word-big color-those step">
+                                    <span class="lex">THOSE</span>
+                                </div>
+                                <div class="desc step">
+                                    <span class="lex">Dùng</span>
+                                    <span class="lex">'Those'</span>
+                                    <span class="lex">cho</span>
+                                    <span class="lex">nhiều</span>
+                                    <span class="lex">sự vật</span>
+                                    <span class="lex">(số nhiều)</span>
+                                    <span class="lex">ở</span>
+                                    <span class="lex">khoảng cách</span>
+                                    <span class="lex">xa</span>
+                                    <span class="lex">hơn.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+</div>
+
+<script>
+    let stepsArray = [];
+    let currentStepIndex = -1;
+    let isFocusMode = false;
+
+    // --- DOM TREE WALKER: TỰ ĐỘNG BỌC TỪ ---
+    function wrapWords() {
+        const interactables = document.querySelectorAll('.lex');
+        
+        interactables.forEach(el => {
+            const fullSentence = el.innerText; 
+            
+            // Nếu đã chia nhỏ sẵn thủ công thì chỉ gán event
+            if(el.children.length === 0) {
+                // Click Trái: Tra từ
+                el.onclick = (e) => {
+                    e.stopPropagation();
+                    const cleanWord = el.textContent.replace(/[^a-zA-Z0-9-']/g, '');
+                    if(cleanWord) lookUpSpecific(cleanWord);
+                };
+                
+                // Click Phải: Dịch cả câu/khối
+                el.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const parentText = el.closest('.step') ? el.closest('.step').textContent.replace(/\s+/g, ' ').trim() : fullSentence;
+                    lookUpSpecific(parentText, true);
+                };
+            }
+        });
+    }
+
+    // --- DICTIONARY & TRANSLATION CORE ---
+    function lookUpSpecific(text, isSentence = false) {
+        document.getElementById('searchInput').value = text.replace(/\n/g, ' ');
+        if(!document.getElementById('dictPanel').classList.contains('active')) toggleDict();
+        if(!isSentence) speak(text);
+        
+        if(isSentence) {
+            translateInput();
+        } else {
+            fetchDictionary(text);
+        }
+    }
+
+    async function fetchDictionary(word) {
+        const resArea = document.getElementById('resultArea');
+        const modeTag = document.getElementById('resultMode');
+        
+        modeTag.className = 'result-mode dictionary';
+        modeTag.textContent = 'Dictionary';
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang kết nối từ điển <b>"${word}"</b>... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const data = await res.json();
+            
+            const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(word)}`);
+            const transData = await transRes.json();
+            const vietMeaning = transData[0][0][0];
+
+            if(data.title || !Array.isArray(data)) { 
+                resArea.innerHTML = `
+                    <div class="dict-word">${word}</div>
+                    <div class="dict-definition"><b>Nghĩa tiếng Việt:</b> ${vietMeaning}</div>
+                `;
+                return; 
+            }
+
+            const entry = data[0];
+            let phonetic = entry.phonetic || (entry.phonetics && entry.phonetics.find(p => p.text)?.text) || '';
+            let audioUrl = (entry.phonetics && entry.phonetics.find(p => p.audio)?.audio) || '';
+            const pos = entry.meanings[0] ? entry.meanings[0].partOfSpeech : 'vocabulary';
+            const enDef = entry.meanings[0] && entry.meanings[0].definitions[0] ? entry.meanings[0].definitions[0].definition : '';
+
+            resArea.innerHTML = `
+                <div class="dict-word">
+                    <span>${word}</span>
+                    <button class="play-btn" onclick="playDirectAudio('${audioUrl}', '${word}')" title="Nghe phát âm">🔊</button>
+                </div>
+                ${phonetic ? `<div class="dict-phonetic">${phonetic}</div>` : ''}
+                <div style="font-style:italic; color:#10b981; font-weight:bold; margin-bottom:5px;">(${pos})</div>
+                <div style="height:1px; background:#e2e8f0; margin: 8px 0;"></div>
+                <div class="dict-definition"><b>Nghĩa:</b> ${vietMeaning}</div>
+                ${enDef ? `<div class="dict-definition" style="margin-top:6px; font-size:13px; color:#64748b;"><b>English Def:</b> ${enDef}</div>` : ''}
+            `;
+            if(audioUrl) playDirectAudio(audioUrl, word);
+        } catch(e) { 
+            resArea.innerHTML = `<span style="color:red;">Lỗi phân tích hoặc không tìm thấy từ.</span>`; 
+        }
+    }
+
+    async function translateInput() {
+        let text = document.getElementById('searchInput').value.trim();
+        const resArea = document.getElementById('resultArea');
+        const modeTag = document.getElementById('resultMode');
+        
+        if (!text) return;
+        
+        modeTag.className = 'result-mode translation';
+        modeTag.textContent = 'Translation';
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang biên dịch... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(text)}`);
+            const data = await res.json();
+            let transResult = data[0].map(item => item[0]).join('');
+            resArea.innerHTML = `
+                <div style="font-size:13px; color:#64748b; font-style:italic; margin-bottom:8px; border-left:3px solid #cbd5e1; padding-left:8px;">"${text}"</div>
+                <div style="font-size:16px; color:#1e293b; font-weight:bold;">🇻🇳 Bản dịch Việt ngữ:</div>
+                <div class="dict-definition" style="color:#0369a1; font-weight:bold; font-size:16px; margin-top:4px;">${transResult}</div>
+            `;
+        } catch(e) { resArea.innerHTML = "Lỗi kết nối. Thử lại sau."; }
+    }
+
+    function toggleDict() { document.getElementById('dictPanel').classList.toggle('active'); }
+    
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/[^a-zA-Z0-9 ,.!?'"-]/g, '').replace(/\n/g, ' ');
+        const u = new SpeechSynthesisUtterance(cleanText);
+        u.lang = 'en-US'; u.rate = 0.85;
+        window.speechSynthesis.speak(u);
+    }
+    
+    function playDirectAudio(url, wordFallback) {
+        if(url && url.startsWith('http')) {
+            let audio = new Audio(url);
+            audio.play().catch(() => speak(wordFallback));
+        } else {
+            speak(wordFallback);
+        }
+    }
+
+    function speakInput() { speak(document.getElementById('searchInput').value); }
+    function handleSearch(e) { if (e.key === 'Enter') translateInput(); }
+
+    // --- MỞ RỘNG MÀN HÌNH (FOCUS MODE) ---
+    function toggleFocusMode() {
+        isFocusMode = !isFocusMode;
+        const header = document.getElementById('mainHeader');
+        const controlBar = document.getElementById('controlBar');
+        const container = document.getElementById('mainContainer');
+        const focusBtn = document.getElementById('focusBtn');
+        const sideMenus = document.querySelectorAll('.side-menu');
+        const dictPanel = document.getElementById('dictPanel');
+
+        if (isFocusMode) {
+            header.style.transform = 'translateY(-100%)';
+            controlBar.style.top = '0px';
+            container.style.marginTop = '70px';
+            container.style.height = 'calc(100vh - 85px)';
+            sideMenus.forEach(m => m.style.top = '70px');
+            dictPanel.style.top = '75px';
+            focusBtn.innerHTML = 'Thu nhỏ 🔳';
+            focusBtn.style.background = '#fef3c7';
+            focusBtn.style.color = '#d97706';
+            focusBtn.style.borderColor = '#d97706';
+        } else {
+            header.style.transform = 'translateY(0)';
+            controlBar.style.top = '65px';
+            container.style.marginTop = '125px';
+            container.style.height = 'calc(100vh - 145px)';
+            sideMenus.forEach(m => m.style.top = '130px');
+            dictPanel.style.top = '135px';
+            focusBtn.innerHTML = 'Phóng to 🔲';
+            focusBtn.style.background = '#10b981';
+            focusBtn.style.color = 'white';
+            focusBtn.style.borderColor = '#059669';
+        }
+    }
+
+    // --- TAB SWITCHING & ĐỒNG BỘ STEP ---
+    function switchPresentationTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector(`[onclick="switchPresentationTab('${tabId}')"]`).classList.add('active');
+        
+        const prevIndex = currentStepIndex;
+        initStepsForActiveTab();
+        
+        for(let i = 0; i <= prevIndex; i++) {
+            if(stepsArray[i]) stepsArray[i].classList.add('active');
+        }
+        currentStepIndex = prevIndex;
+    }
+
+    function initStepsForActiveTab() {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab) {
+            stepsArray = activeTab.querySelectorAll('.step');
+        }
+        currentStepIndex = -1;
+    }
+
+    // --- STEP CONTROLS (Tích hợp Auto-Scroll cho Bút Trình Chiếu) ---
+    function goNext() {
+        if (currentStepIndex < stepsArray.length - 1) {
+            currentStepIndex++;
+            stepsArray[currentStepIndex].classList.add('active');
+            stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function goPrev() {
+        if (currentStepIndex >= 0) {
+            stepsArray[currentStepIndex].classList.remove('active');
+            currentStepIndex--;
+            if (currentStepIndex >= 0) {
+                stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' ', 'Enter', 'N', 'n'].includes(e.key)) { e.preventDefault(); goNext(); }
+        if (['ArrowLeft', 'PageUp', 'P', 'p', 'Backspace'].includes(e.key)) { e.preventDefault(); goPrev(); }
+    });
+
+    function toggleMenu(side) { document.getElementById(side + 'Menu').classList.toggle('open'); }
+
+    // --- BÚT VẼ (PEN TOOL) ---
+    let inkCanvas, inkCtx, isDrawing = false, lastX = 0, lastY = 0;
+    function initInk() {
+        inkCanvas = document.getElementById("inkCanvas");
+        inkCtx = inkCanvas.getContext("2d");
+        inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        
+        window.addEventListener("resize", () => {
+            inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        });
+
+        inkCanvas.addEventListener("pointerdown", e => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; lastX = e.clientX; lastY = e.clientY; } });
+        inkCanvas.addEventListener("pointermove", e => {
+            if (!isDrawing) return;
+            inkCtx.strokeStyle = "#e67e22"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round";
+            inkCtx.beginPath(); inkCtx.moveTo(lastX, lastY); inkCtx.lineTo(e.clientX, e.clientY); inkCtx.stroke();
+            lastX = e.clientX; lastY = e.clientY;
+        });
+        window.addEventListener("pointerup", () => isDrawing = false);
+    }
+    
+    function toggleInk() {
+        const active = inkCanvas.classList.toggle("drawing");
+        document.getElementById("penBtn").textContent = active ? "Bút vẽ: On" : "Bút vẽ: Off";
+        document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    // --- KHỞI CHẠY ---
+    window.onload = () => {
+        initInk();
+        wrapWords(); // Kích hoạt tương tác từ vựng
+        initStepsForActiveTab(); 
+    };
+</script>
+
+</body>
+</html>

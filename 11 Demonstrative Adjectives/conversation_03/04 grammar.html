@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Mastering English Demonstrative Pronouns - Grammar Pro</title>
+    <style>
+        @font-face { font-family: 'UTM Avo'; src: local('UTM Avo'); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ink: #0f172a;
+            --soft-ink: #334155;
+            --panel-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+            /* Colors for the 2x2 Grid */
+            --bg-this: #fde68a;
+            --col-this: #d97706;
+            --bg-that: #bae6fd;
+            --col-that: #0284c7;
+            --bg-these: #bbf7d0;
+            --col-these: #16a34a;
+            --bg-those: #e9d5ff;
+            --col-those: #9333ea;
+        }
+
+        body {
+            font-family: 'UTM Avo', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; touch-action: none;
+        }
+
+        /* --- HEADER & MENU --- */
+        header {
+            background-color: #d8c8b4; padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #d4bfa6; position: fixed;
+            top: 0; left: 0; right: 0; z-index: 1000; height: 65px;
+            transition: all 0.3s ease;
+        }
+        .header-center { display: flex; gap: 10px; }
+        header button {
+            background-color: #fff; border: 2px solid #d4bfa6; padding: 8px 16px; border-radius: 20px;
+            cursor: pointer; font-family: 'UTM Avo'; color: #8b5e3c; transition: 0.3s;
+        }
+        header button.active-conv { background-color: #8b5e3c; color: white; font-weight: bold; border-color: #5c3e26; }
+        .menu-btn {
+            background-color: #8b7362 !important; color: white !important; border: none !important;
+            padding: 10px 20px !important; border-radius: 20px !important; font-weight: bold; cursor: pointer;
+        }
+
+        /* --- CONTROL BAR --- */
+        #controlBar {
+            background-color: #fff9f0; padding: 10px 20px; border-bottom: 2px solid #d4bfa6;
+            position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
+            display: flex; align-items: center; gap: 15px; height: 55px;
+            transition: all 0.3s ease;
+        }
+        .tool-btn {
+            padding: 6px 14px; border-radius: 12px; border: 1px solid #8b5e3c;
+            background: #fff; cursor: pointer; font-size: 15px; font-weight: bold; color: #8b5e3c; font-family: 'UTM Avo';
+            transition: 0.2s;
+        }
+        .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+        .tab-switcher { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; border: 1px solid #cbd5e1; }
+        .tab-btn {
+            padding: 6px 16px; border-radius: 8px; border: none; background: transparent;
+            cursor: pointer; font-family: 'UTM Avo'; font-size: 14px; font-weight: bold; color: #475569; transition: 0.2s;
+        }
+        .tab-btn.active { background: white; color: #1e3a8a; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+        /* --- SIDEBAR MENU --- */
+        .side-menu {
+            position: fixed; top: 130px; bottom: 20px; width: 220px;
+            background-color: #f3dbc1; border: 2px solid #d4bfa6;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease;
+            z-index: 1100; padding: 20px; overflow-y: auto;
+        }
+        .side-menu.left { left: 0; border-radius: 0 20px 20px 0; transform: translateX(-100%); }
+        .side-menu.right { right: 0; border-radius: 20px 0 0 20px; transform: translateX(100%); }
+        .side-menu.open { transform: translateX(0); }
+        .side-menu button {
+            display: block; width: 100%; background: #fff; border: 1px solid #d4bfa6;
+            margin-bottom: 10px; padding: 12px; border-radius: 12px; cursor: pointer;
+            font-family: 'UTM Avo'; font-size: 16px; font-weight: bold; color: #8b5e3c;
+        }
+        .side-menu button.active { background: #8b5e3c; color: #fff; }
+
+        /* --- TỪ ĐIỂN --- */
+        .dict-panel {
+            position: fixed; right: 20px; top: 135px; width: 360px; max-height: calc(100vh - 150px);
+            background: white; border-radius: 25px; padding: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            border: 4px solid #bae6fd; display: none; flex-direction: column; gap: 10px; z-index: 1200;
+            transition: top 0.3s ease;
+        }
+        .dict-panel.active { display: flex; }
+        .dict-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+        .close-dict { cursor: pointer; font-size: 26px; color: #f87171; font-weight: bold; line-height: 1; }
+        .dict-panel input { padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: 'UTM Avo'; outline: none;}
+        
+        .result-mode {
+            font-size: 14px; font-weight: 700; color: #0f766e; background: #ecfeff; border: 1px solid #99f6e4;
+            border-radius: 999px; align-self: flex-start; padding: 3px 10px;
+        }
+        .result-mode.translation { color: #9a3412; background: #fff7ed; border-color: #fdba74; }
+        .dict-result {
+            background: #f8fafc; border-radius: 12px; padding: 15px; min-height: 120px;
+            max-height: 44vh; overflow: auto; font-size: 15px; color: #1e293b;
+            border: 1px dashed #cbd5e1; line-height: 1.4;
+        }
+        .dict-word { font-size: 24px; font-weight: 900; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;}
+        .dict-phonetic { font-size: 15px; color: #0369a1; margin-bottom: 10px; font-family: Arial, sans-serif; background: #e0f2fe; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .dict-definition { margin-top: 8px; padding-left: 10px; border-left: 3px solid #cbd5e1; }
+        .dict-definition b { color: #b45309; text-transform: capitalize; }
+        .play-btn { cursor: pointer; background: #0ea5e9; color: white; border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.2s; }
+        .play-btn:hover { background: #0284c7; transform: scale(1.1); }
+
+        /* --- MAIN VIEW CONTAINER --- */
+        .container {
+            background: #ffffff; width: 98vw; max-width: 1440px; height: calc(100vh - 145px);
+            margin-top: 125px; padding: 16px; border-radius: 38px; box-shadow: var(--panel-shadow);
+            display: flex; flex-direction: column; border: 8px solid white; position: relative; z-index: 10; overflow: auto;
+            transition: all 0.3s ease;
+        }
+        .container::-webkit-scrollbar { width: 8px; }
+        .container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+
+        .tab-content { display: none; flex-direction: column; width: 100%; min-height: 100%; position: relative; }
+        .tab-content.active { display: flex; }
+
+        .step { opacity: 0.05; transition: all 0.5s ease; filter: blur(5px); transform: scale(0.98); pointer-events: none; }
+        .step.active { opacity: 1; filter: blur(0); transform: scale(1); pointer-events: auto; }
+
+        /* Bọc từ tương tác */
+        .lex { cursor: pointer; border-radius: 4px; transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s; display: inline-block; }
+        .lex:hover { background-color: rgba(59, 130, 246, 0.15); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); color: #1d4ed8; }
+
+        /* =========================================
+           INFOGRAPHIC REBUILD - CSS LAYOUT (BẢN GỐC)
+           ========================================= */
+        .infographic-stage {
+            position: relative; width: 100%; min-height: 100%; background: #ffffff;
+            border-radius: 20px; padding: 40px; display: flex; flex-direction: column; align-items: center; color: var(--ink);
+        }
+
+        .main-title { text-align: center; font-size: clamp(32px, 3.5vw, 48px); font-weight: 900; color: #1e293b; margin-bottom: 30px; line-height: 1.2; width: 100%; }
+
+        .demo-grid {
+            display: grid; grid-template-columns: 45px 1fr 1fr; grid-template-rows: 40px 1fr 1fr;
+            gap: 15px; width: 100%; max-width: 1300px;
+        }
+
+        /* Header Rows & Cols */
+        .empty-corner { background: transparent; }
+        .grid-header {
+            background: #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 18px; color: #0f172a; text-align: center;
+        }
+        .row-header { writing-mode: vertical-rl; transform: rotate(180deg); padding: 20px 0; font-size: 16px; }
+
+        /* 4 Cells */
+        .demo-cell { border-radius: 20px; padding: 25px; display: flex; position: relative; overflow: hidden; min-height: 280px; }
+        .bg-this { background: var(--bg-this); }
+        .bg-that { background: var(--bg-that); }
+        .bg-these { background: var(--bg-these); }
+        .bg-those { background: var(--bg-those); }
+
+        .cell-left { flex: 1; display: flex; align-items: center; justify-content: flex-start; position: relative; z-index: 2; }
+        .actor { font-size: 110px; line-height: 1; display: flex; align-items: center; }
+        .actor-prop { font-size: 60px; margin-left: -10px; margin-top: -30px; }
+        
+        .cell-right { flex: 1.2; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; text-align: right; z-index: 2; }
+
+        .cell-title { font-size: clamp(40px, 4vw, 55px); font-weight: 900; letter-spacing: -1px; line-height: 1.1; }
+        .cell-title.color-this { color: var(--col-this); }
+        .cell-title.color-that { color: var(--col-that); }
+        .cell-title.color-these { color: var(--col-these); }
+        .cell-title.color-those { color: var(--col-those); }
+
+        .cell-ex { font-size: 24px; font-weight: 700; color: #0f172a; margin-top: 5px; margin-bottom: auto; }
+
+        .cell-hint { display: flex; align-items: center; gap: 12px; margin-top: 20px; text-align: left; max-width: 250px; }
+        .hint-icon { font-size: 35px; }
+        .hint-text { font-size: 16px; font-weight: 500; color: #334155; line-height: 1.4; }
+
+        /* Props floating in THAT & THOSE */
+        .prop-far { position: absolute; right: 20px; bottom: 40px; font-size: 90px; z-index: 1; opacity: 0.9; }
+
+        /* Footer */
+        .footer-note { margin-top: 30px; font-size: 18px; font-weight: 600; color: #334155; text-align: center; width: 100%; }
+
+        #inkCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; pointer-events: none; }
+        #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+    </style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+
+<!-- MENU SIDEBAR -->
+<nav class="side-menu left" id="leftMenu">
+   <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+    <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+    <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+    <button class="active" onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+    <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+    <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+    <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</nav>
+
+<!-- RIGHT MENU -->
+<nav class="side-menu right" id="rightMenu">
+     <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>story</b></button>
+
+</nav>
+
+<!-- HEADER -->
+<header id="mainHeader">
+    <button class="menu-btn" onclick="toggleMenu('left')">Menu ☰</button>
+    <div class="header-center">
+<button  onclick="window.location.href='../conversation_01/conversation_01.html'">Conversation 01</button> 
+<button  onclick="window.location.href='../conversation_02/conversation_02.html'">Conversation 02</button>
+<button class="active-conv" onclick="window.location.href='../conversation_03/conversation_03.html'"><b>Conversation 03</b></button>
+<button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu('right')">Menu ☰</button>
+</header>
+
+<!-- CONTROL BAR -->
+<div id="controlBar">
+    <button id="focusBtn" class="tool-btn" onclick="toggleFocusMode()" style="background: #10b981; color: white; border-color: #059669;">Phóng to 🔲</button>
+    <button id="penBtn" class="tool-btn" onclick="toggleInk()">Bút vẽ: Off</button>
+    <button class="tool-btn" onclick="clearInk()">Xóa mực</button>
+    
+    <div style="flex-grow: 1;"></div>
+    
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchPresentationTab('englishTab')">🇬🇧 English Tab</button>
+        <button class="tab-btn" onclick="switchPresentationTab('vietnameseTab')">🇻🇳 Vietnamese Tab</button>
+    </div>
+
+    <button class="tool-btn" onclick="goPrev()">⬅ Back</button>
+    <button class="tool-btn" onclick="goNext()">Next ➡</button>
+</div>
+
+<!-- TỪ ĐIỂN PANEL -->
+<div class="dict-panel" id="dictPanel">
+    <div class="dict-header">
+        <span style="font-weight: bold; color: #0369a1; font-family: 'UTM Avo';">Tra từ & Dịch Câu 📖</span>
+        <div class="close-dict" onclick="toggleDict()">×</div>
+    </div>
+    <input type="text" id="searchInput" placeholder="Chạm chữ hoặc gõ vào đây..." onkeyup="handleSearch(event)">
+    <div class="result-mode translation" id="resultMode">Translation</div>
+    <div class="dict-result" id="resultArea">Kết quả sẽ xuất hiện ở đây...</div>
+    <div style="display: flex; gap: 8px;">
+        <button class="tool-btn" style="flex: 1; background: #0369a1; color: white;" onclick="translateInput()">Dịch câu</button>
+        <button class="tool-btn" style="flex: 1;" onclick="speakInput()">Nghe 🎙️</button>
+    </div>
+</div>
+
+<div class="container" id="mainContainer">
+
+    <!-- ==================== ENGLISH TAB ==================== -->
+    <div id="englishTab" class="tab-content active">
+        <section class="infographic-stage">
+            
+            <h1 class="main-title step">
+                <span class="lex" data-term="This">This,</span>
+                <span class="lex" data-term="That">That,</span>
+                <span class="lex" data-term="These">These,</span>
+                <span class="lex" data-term="Those">Those:</span><br>
+                <span class="lex" data-term="The">The</span>
+                <span class="lex" data-term="Quick">Quick</span>
+                <span class="lex" data-term="Guide">Guide</span>
+                <span class="lex" data-term="to">to</span>
+                <span class="lex" data-term="Demonstratives">Demonstratives</span>
+            </h1>
+
+            <div class="demo-grid">
+                <div class="empty-corner"></div>
+                
+                <div class="grid-header step">
+                    <span class="lex" data-term="NEAR">NEAR</span>&nbsp;
+                    <span class="lex" data-term="(Close" style="font-weight: 500; font-size: 15px;">(Close</span>&nbsp;
+                    <span class="lex" data-term="to" style="font-weight: 500; font-size: 15px;">to</span>&nbsp;
+                    <span class="lex" data-term="Speaker)" style="font-weight: 500; font-size: 15px;">Speaker)</span>
+                </div>
+                
+                <div class="grid-header step">
+                    <span class="lex" data-term="FAR">FAR</span>&nbsp;
+                    <span class="lex" data-term="(Away" style="font-weight: 500; font-size: 15px;">(Away</span>&nbsp;
+                    <span class="lex" data-term="from" style="font-weight: 500; font-size: 15px;">from</span>&nbsp;
+                    <span class="lex" data-term="Speaker)" style="font-weight: 500; font-size: 15px;">Speaker)</span>
+                </div>
+
+                <div class="grid-header row-header step">
+                    <span class="lex" data-term="SINGULAR">SINGULAR</span>&nbsp;
+                    <span class="lex" data-term="(One" style="font-weight: 500; font-size: 14px;">(One</span>&nbsp;
+                    <span class="lex" data-term="Object)" style="font-weight: 500; font-size: 14px;">Object)</span>
+                </div>
+
+                <!-- CELL 1: THIS -->
+                <div class="demo-cell bg-this">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️<span class="actor-prop">👕</span></div>
+                    </div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-this step"><span class="lex" data-term="THIS">THIS</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex" data-term="I">I</span>
+                                <span class="lex" data-term="like">like</span>
+                                <span class="lex" data-term="this">this</span>
+                                <span class="lex" data-term="shirt.">shirt.</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🤲🍎</div>
+                            <div class="hint-text">
+                                <span class="lex" data-term="Use">Use</span>
+                                <span class="lex" data-term="for">for</span>
+                                <span class="lex" data-term="a">a</span>
+                                <span class="lex" data-term="single">single</span>
+                                <span class="lex" data-term="item">item</span>
+                                <span class="lex" data-term="close">close</span>
+                                <span class="lex" data-term="by.">by.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CELL 2: THAT -->
+                <div class="demo-cell bg-that">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️👉</div>
+                    </div>
+                    <div class="prop-far step">🚗</div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-that step"><span class="lex" data-term="THAT">THAT</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex" data-term="Look">Look</span>
+                                <span class="lex" data-term="at">at</span>
+                                <span class="lex" data-term="that">that</span>
+                                <span class="lex" data-term="car!">car!</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🫵🍎</div>
+                            <div class="hint-text">
+                                <span class="lex" data-term="Use">Use</span>
+                                <span class="lex" data-term="for">for</span>
+                                <span class="lex" data-term="a">a</span>
+                                <span class="lex" data-term="single">single</span>
+                                <span class="lex" data-term="item">item</span>
+                                <span class="lex" data-term="further">further</span>
+                                <span class="lex" data-term="away.">away.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-header row-header step">
+                    <span class="lex" data-term="PLURAL">PLURAL</span>&nbsp;
+                    <span class="lex" data-term="(Multiple" style="font-weight: 500; font-size: 14px;">(Multiple</span>&nbsp;
+                    <span class="lex" data-term="Objects)" style="font-weight: 500; font-size: 14px;">Objects)</span>
+                </div>
+
+                <!-- CELL 3: THESE -->
+                <div class="demo-cell bg-these">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️<span class="actor-prop">👖👖</span></div>
+                    </div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-these step"><span class="lex" data-term="THESE">THESE</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex" data-term="These">These</span>
+                                <span class="lex" data-term="jeans">jeans</span>
+                                <span class="lex" data-term="are">are</span>
+                                <span class="lex" data-term="tight.">tight.</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🤲🍎🍎</div>
+                            <div class="hint-text">
+                                <span class="lex" data-term="Use">Use</span>
+                                <span class="lex" data-term="for">for</span>
+                                <span class="lex" data-term="multiple">multiple</span>
+                                <span class="lex" data-term="items">items</span>
+                                <span class="lex" data-term="close">close</span>
+                                <span class="lex" data-term="by.">by.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CELL 4: THOSE -->
+                <div class="demo-cell bg-those">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️👉</div>
+                    </div>
+                    <div class="prop-far step">🧥🧥</div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-those step"><span class="lex" data-term="THOSE">THOSE</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex" data-term="Try">Try</span>
+                                <span class="lex" data-term="those">those</span>
+                                <span class="lex" data-term="jeans">jeans</span>
+                                <span class="lex" data-term="over">over</span>
+                                <span class="lex" data-term="there.">there.</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🫵🍎🍎</div>
+                            <div class="hint-text">
+                                <span class="lex" data-term="Use">Use</span>
+                                <span class="lex" data-term="for">for</span>
+                                <span class="lex" data-term="multiple">multiple</span>
+                                <span class="lex" data-term="items">items</span>
+                                <span class="lex" data-term="further">further</span>
+                                <span class="lex" data-term="away.">away.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-note step">
+                <span class="lex" data-term="Nouns" style="font-weight: 800; color: #0f172a;">Nouns</span>
+                <span class="lex" data-term="are" style="font-weight: 800; color: #0f172a;">are</span>
+                <span class="lex" data-term="Optional:" style="font-weight: 800; color: #0f172a;">Optional:</span>
+                <span class="lex" data-term="You">You</span>
+                <span class="lex" data-term="can">can</span>
+                <span class="lex" data-term="omit">omit</span>
+                <span class="lex" data-term="the">the</span>
+                <span class="lex" data-term="noun">noun</span>
+                <span class="lex" data-term="if">if</span>
+                <span class="lex" data-term="it">it</span>
+                <span class="lex" data-term="is">is</span>
+                <span class="lex" data-term="already">already</span>
+                <span class="lex" data-term="clear">clear</span>
+                <span class="lex" data-term="what">what</span>
+                <span class="lex" data-term="you">you</span>
+                <span class="lex" data-term="are">are</span>
+                <span class="lex" data-term="pointing">pointing</span>
+                <span class="lex" data-term="to.">to.</span>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- ==================== VIETNAMESE TAB ==================== -->
+    <div id="vietnameseTab" class="tab-content">
+        <section class="infographic-stage">
+            
+            <h1 class="main-title step">
+                <span class="lex">This,</span>
+                <span class="lex">That,</span>
+                <span class="lex">These,</span>
+                <span class="lex">Those:</span><br>
+                <span class="lex">Hướng dẫn</span>
+                <span class="lex">nhanh</span>
+                <span class="lex">về</span>
+                <span class="lex">Đại từ</span>
+                <span class="lex">Chỉ định</span>
+            </h1>
+
+            <div class="demo-grid">
+                <div class="empty-corner"></div>
+                
+                <div class="grid-header step">
+                    <span class="lex">GẦN</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 15px;">(Gần</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 15px;">với</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 15px;">Người nói)</span>
+                </div>
+                
+                <div class="grid-header step">
+                    <span class="lex">XA</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 15px;">(Cách xa</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 15px;">Người nói)</span>
+                </div>
+
+                <div class="grid-header row-header step">
+                    <span class="lex">SỐ ÍT</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 14px;">(Một</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 14px;">Vật)</span>
+                </div>
+
+                <!-- CELL 1: THIS -->
+                <div class="demo-cell bg-this">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️<span class="actor-prop">👕</span></div>
+                    </div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-this step"><span class="lex">THIS</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex">I</span>
+                                <span class="lex">like</span>
+                                <span class="lex">this</span>
+                                <span class="lex">shirt.</span><br>
+                                <span style="font-size: 14px; font-weight: normal; color: #475569;" class="lex">(Tôi thích chiếc áo này.)</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🤲🍎</div>
+                            <div class="hint-text">
+                                <span class="lex">Dùng</span>
+                                <span class="lex">cho</span>
+                                <span class="lex">một</span>
+                                <span class="lex">vật</span>
+                                <span class="lex">ở</span>
+                                <span class="lex">vị trí</span>
+                                <span class="lex">gần.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CELL 2: THAT -->
+                <div class="demo-cell bg-that">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️👉</div>
+                    </div>
+                    <div class="prop-far step">🚗</div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-that step"><span class="lex">THAT</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex">Look</span>
+                                <span class="lex">at</span>
+                                <span class="lex">that</span>
+                                <span class="lex">car!</span><br>
+                                <span style="font-size: 14px; font-weight: normal; color: #475569;" class="lex">(Nhìn chiếc xe kia kìa!)</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🫵🍎</div>
+                            <div class="hint-text">
+                                <span class="lex">Dùng</span>
+                                <span class="lex">cho</span>
+                                <span class="lex">một</span>
+                                <span class="lex">vật</span>
+                                <span class="lex">ở</span>
+                                <span class="lex">vị trí</span>
+                                <span class="lex">xa.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-header row-header step">
+                    <span class="lex">SỐ NHIỀU</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 14px;">(Nhiều</span>&nbsp;
+                    <span class="lex" style="font-weight: 500; font-size: 14px;">Vật)</span>
+                </div>
+
+                <!-- CELL 3: THESE -->
+                <div class="demo-cell bg-these">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️<span class="actor-prop">👖👖</span></div>
+                    </div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-these step"><span class="lex">THESE</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex">These</span>
+                                <span class="lex">jeans</span>
+                                <span class="lex">are</span>
+                                <span class="lex">tight.</span><br>
+                                <span style="font-size: 14px; font-weight: normal; color: #475569;" class="lex">(Những chiếc quần này chật.)</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🤲🍎🍎</div>
+                            <div class="hint-text">
+                                <span class="lex">Dùng</span>
+                                <span class="lex">cho</span>
+                                <span class="lex">nhiều</span>
+                                <span class="lex">vật</span>
+                                <span class="lex">ở</span>
+                                <span class="lex">gần.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CELL 4: THOSE -->
+                <div class="demo-cell bg-those">
+                    <div class="cell-left step">
+                        <div class="actor">🧍🏻‍♂️👉</div>
+                    </div>
+                    <div class="prop-far step">🧥🧥</div>
+                    <div class="cell-right">
+                        <div>
+                            <div class="cell-title color-those step"><span class="lex">THOSE</span></div>
+                            <div class="cell-ex step">
+                                <span class="lex">Try</span>
+                                <span class="lex">those</span>
+                                <span class="lex">jeans</span>
+                                <span class="lex">over</span>
+                                <span class="lex">there.</span><br>
+                                <span style="font-size: 14px; font-weight: normal; color: #475569;" class="lex">(Thử những chiếc quần đằng kia xem.)</span>
+                            </div>
+                        </div>
+                        <div class="cell-hint step">
+                            <div class="hint-icon">🫵🍎🍎</div>
+                            <div class="hint-text">
+                                <span class="lex">Dùng</span>
+                                <span class="lex">cho</span>
+                                <span class="lex">nhiều</span>
+                                <span class="lex">vật</span>
+                                <span class="lex">ở</span>
+                                <span class="lex">xa.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-note step">
+                <span class="lex" style="font-weight: 800; color: #0f172a;">Lược bỏ</span>
+                <span class="lex" style="font-weight: 800; color: #0f172a;">Danh từ:</span>
+                <span class="lex">Bạn</span>
+                <span class="lex">có thể</span>
+                <span class="lex">lược bỏ</span>
+                <span class="lex">danh từ</span>
+                <span class="lex">đi</span>
+                <span class="lex">kèm</span>
+                <span class="lex">nếu</span>
+                <span class="lex">mọi người</span>
+                <span class="lex">đều</span>
+                <span class="lex">đã</span>
+                <span class="lex">rõ</span>
+                <span class="lex">bạn</span>
+                <span class="lex">đang</span>
+                <span class="lex">nhắc</span>
+                <span class="lex">tới</span>
+                <span class="lex">cái gì.</span>
+            </div>
+
+        </section>
+    </div>
+
+</div>
+
+<script>
+    let stepsArray = [];
+    let currentStepIndex = -1;
+    let isFocusMode = false;
+
+    // --- DOM TREE WALKER: TỰ ĐỘNG BỌC TỪ (CHỈ ĐỐI VỚI CLASS .LEX ĐỂ BẢO TOÀN CSS BẢN GỐC) ---
+    function wrapWords() {
+        const interactables = document.querySelectorAll('.lex');
+        
+        interactables.forEach(el => {
+            const fullSentence = el.innerText; 
+            
+            // Nếu đã chia nhỏ sẵn thủ công (lex có chứa text)
+            if(el.children.length === 0) {
+                // Click Trái: Tra từ
+                el.onclick = (e) => {
+                    e.stopPropagation();
+                    const cleanWord = el.textContent.replace(/[^a-zA-Z0-9-']/g, '');
+                    if(cleanWord) lookUpSpecific(cleanWord);
+                };
+                
+                // Click Phải: Dịch cả khối
+                el.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const parentText = el.closest('.step') ? el.closest('.step').textContent.replace(/\s+/g, ' ').trim() : fullSentence;
+                    lookUpSpecific(parentText, true);
+                };
+            }
+        });
+    }
+
+    // --- DICTIONARY & TRANSLATION CORE ---
+    function lookUpSpecific(text, isSentence = false) {
+        document.getElementById('searchInput').value = text.replace(/\n/g, ' ');
+        if(!document.getElementById('dictPanel').classList.contains('active')) toggleDict();
+        if(!isSentence) speak(text);
+        
+        if(isSentence) {
+            translateInput();
+        } else {
+            fetchDictionary(text);
+        }
+    }
+
+    async function fetchDictionary(word) {
+        const resArea = document.getElementById('resultArea');
+        const modeTag = document.getElementById('resultMode');
+        
+        modeTag.className = 'result-mode dictionary';
+        modeTag.textContent = 'Dictionary';
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang kết nối từ điển <b>"${word}"</b>... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const data = await res.json();
+            
+            const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(word)}`);
+            const transData = await transRes.json();
+            const vietMeaning = transData[0][0][0];
+
+            if(data.title || !Array.isArray(data)) { 
+                resArea.innerHTML = `
+                    <div class="dict-word">${word}</div>
+                    <div class="dict-definition"><b>Nghĩa tiếng Việt:</b> ${vietMeaning}</div>
+                `;
+                return; 
+            }
+
+            const entry = data[0];
+            let phonetic = entry.phonetic || (entry.phonetics && entry.phonetics.find(p => p.text)?.text) || '';
+            let audioUrl = (entry.phonetics && entry.phonetics.find(p => p.audio)?.audio) || '';
+            const pos = entry.meanings[0] ? entry.meanings[0].partOfSpeech : 'vocabulary';
+            const enDef = entry.meanings[0] && entry.meanings[0].definitions[0] ? entry.meanings[0].definitions[0].definition : '';
+
+            resArea.innerHTML = `
+                <div class="dict-word">
+                    <span>${word}</span>
+                    <button class="play-btn" onclick="playDirectAudio('${audioUrl}', '${word}')" title="Nghe phát âm">🔊</button>
+                </div>
+                ${phonetic ? `<div class="dict-phonetic">${phonetic}</div>` : ''}
+                <div style="font-style:italic; color:#10b981; font-weight:bold; margin-bottom:5px;">(${pos})</div>
+                <div style="height:1px; background:#e2e8f0; margin: 8px 0;"></div>
+                <div class="dict-definition"><b>Nghĩa:</b> ${vietMeaning}</div>
+                ${enDef ? `<div class="dict-definition" style="margin-top:6px; font-size:13px; color:#64748b;"><b>English Def:</b> ${enDef}</div>` : ''}
+            `;
+            if(audioUrl) playDirectAudio(audioUrl, word);
+        } catch(e) { 
+            resArea.innerHTML = `<span style="color:red;">Lỗi phân tích hoặc không tìm thấy từ.</span>`; 
+        }
+    }
+
+    async function translateInput() {
+        let text = document.getElementById('searchInput').value.trim();
+        const resArea = document.getElementById('resultArea');
+        const modeTag = document.getElementById('resultMode');
+        
+        if (!text) return;
+        
+        modeTag.className = 'result-mode translation';
+        modeTag.textContent = 'Translation';
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang biên dịch... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(text)}`);
+            const data = await res.json();
+            let transResult = data[0].map(item => item[0]).join('');
+            resArea.innerHTML = `
+                <div style="font-size:13px; color:#64748b; font-style:italic; margin-bottom:8px; border-left:3px solid #cbd5e1; padding-left:8px;">"${text}"</div>
+                <div style="font-size:16px; color:#1e293b; font-weight:bold;">🇻🇳 Bản dịch Việt ngữ:</div>
+                <div class="dict-definition" style="color:#0369a1; font-weight:bold; font-size:16px; margin-top:4px;">${transResult}</div>
+            `;
+        } catch(e) { resArea.innerHTML = "Lỗi kết nối. Thử lại sau."; }
+    }
+
+    function toggleDict() { document.getElementById('dictPanel').classList.toggle('active'); }
+    
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/[^a-zA-Z0-9 ,.!?'"-]/g, '').replace(/\n/g, ' ');
+        const u = new SpeechSynthesisUtterance(cleanText);
+        u.lang = 'en-US'; u.rate = 0.85;
+        window.speechSynthesis.speak(u);
+    }
+    
+    function playDirectAudio(url, wordFallback) {
+        if(url && url.startsWith('http')) {
+            let audio = new Audio(url);
+            audio.play().catch(() => speak(wordFallback));
+        } else {
+            speak(wordFallback);
+        }
+    }
+
+    function speakInput() { speak(document.getElementById('searchInput').value); }
+    function handleSearch(e) { if (e.key === 'Enter') translateInput(); }
+
+    // --- MỞ RỘNG MÀN HÌNH (FOCUS MODE) ---
+    function toggleFocusMode() {
+        isFocusMode = !isFocusMode;
+        const header = document.getElementById('mainHeader');
+        const controlBar = document.getElementById('controlBar');
+        const container = document.getElementById('mainContainer');
+        const focusBtn = document.getElementById('focusBtn');
+        const sideMenus = document.querySelectorAll('.side-menu');
+        const dictPanel = document.getElementById('dictPanel');
+
+        if (isFocusMode) {
+            header.style.transform = 'translateY(-100%)';
+            controlBar.style.top = '0px';
+            container.style.marginTop = '70px';
+            container.style.height = 'calc(100vh - 85px)';
+            sideMenus.forEach(m => m.style.top = '70px');
+            dictPanel.style.top = '75px';
+            focusBtn.innerHTML = 'Thu nhỏ 🔳';
+            focusBtn.style.background = '#fef3c7';
+            focusBtn.style.color = '#d97706';
+            focusBtn.style.borderColor = '#d97706';
+        } else {
+            header.style.transform = 'translateY(0)';
+            controlBar.style.top = '65px';
+            container.style.marginTop = '125px';
+            container.style.height = 'calc(100vh - 145px)';
+            sideMenus.forEach(m => m.style.top = '130px');
+            dictPanel.style.top = '135px';
+            focusBtn.innerHTML = 'Phóng to 🔲';
+            focusBtn.style.background = '#10b981';
+            focusBtn.style.color = 'white';
+            focusBtn.style.borderColor = '#059669';
+        }
+    }
+
+    // --- TAB SWITCHING & ĐỒNG BỘ STEP ---
+    function switchPresentationTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector(`[onclick="switchPresentationTab('${tabId}')"]`).classList.add('active');
+        
+        const prevIndex = currentStepIndex;
+        initStepsForActiveTab();
+        
+        for(let i = 0; i <= prevIndex; i++) {
+            if(stepsArray[i]) stepsArray[i].classList.add('active');
+        }
+        currentStepIndex = prevIndex;
+    }
+
+    function initStepsForActiveTab() {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab) {
+            stepsArray = activeTab.querySelectorAll('.step');
+        }
+        currentStepIndex = -1;
+    }
+
+    // --- STEP CONTROLS (Tích hợp Auto-Scroll cho Bút Trình Chiếu) ---
+    function goNext() {
+        if (currentStepIndex < stepsArray.length - 1) {
+            currentStepIndex++;
+            stepsArray[currentStepIndex].classList.add('active');
+            stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function goPrev() {
+        if (currentStepIndex >= 0) {
+            stepsArray[currentStepIndex].classList.remove('active');
+            currentStepIndex--;
+            if (currentStepIndex >= 0) {
+                stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        // Hỗ trợ các phím từ bàn phím và Bút trình chiếu (Clicker)
+        if (['ArrowRight', 'PageDown', ' ', 'Enter', 'N', 'n'].includes(e.key)) { e.preventDefault(); goNext(); }
+        if (['ArrowLeft', 'PageUp', 'P', 'p', 'Backspace'].includes(e.key)) { e.preventDefault(); goPrev(); }
+    });
+
+    function toggleMenu(side) { document.getElementById(side + 'Menu').classList.toggle('open'); }
+
+    // --- BÚT VẼ (PEN TOOL) ---
+    let inkCanvas, inkCtx, isDrawing = false, lastX = 0, lastY = 0;
+    function initInk() {
+        inkCanvas = document.getElementById("inkCanvas");
+        inkCtx = inkCanvas.getContext("2d");
+        inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        
+        window.addEventListener("resize", () => {
+            inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        });
+
+        inkCanvas.addEventListener("pointerdown", e => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; lastX = e.clientX; lastY = e.clientY; } });
+        inkCanvas.addEventListener("pointermove", e => {
+            if (!isDrawing) return;
+            inkCtx.strokeStyle = "#e67e22"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round";
+            inkCtx.beginPath(); inkCtx.moveTo(lastX, lastY); inkCtx.lineTo(e.clientX, e.clientY); inkCtx.stroke();
+            lastX = e.clientX; lastY = e.clientY;
+        });
+        window.addEventListener("pointerup", () => isDrawing = false);
+    }
+    
+    function toggleInk() {
+        const active = inkCanvas.classList.toggle("drawing");
+        document.getElementById("penBtn").textContent = active ? "Bút vẽ: On" : "Bút vẽ: Off";
+        document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    // --- KHỞI CHẠY ---
+    window.onload = () => {
+        initInk();
+        wrapWords(); // Kích hoạt Event trên thẻ Lex
+        initStepsForActiveTab(); 
+    };
+</script>
+
+</body>
+</html>

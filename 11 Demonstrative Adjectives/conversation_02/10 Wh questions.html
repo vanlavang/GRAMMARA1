@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>01 Be Verbs 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'UTM Avo';
+      src: url('fonts/UTM Avo.ttf') format('truetype');
+    }
+
+    :root {
+      --primary-color: #d35400;
+      --primary-hover: #e67e22;
+      --bg-color: #fcf6ef;
+      --header-bg: rgba(253, 246, 238, 0.9);
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --shadow-soft: 0 8px 24px rgba(139, 94, 60, 0.12);
+      --shadow-hover: 0 12px 32px rgba(139, 94, 60, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'UTM Avo', 'Roboto', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #fdfbfb 0%, #f3ebdf 100%);
+      color: var(--text-main);
+      padding-top: 100px !important;
+      padding-bottom: 100px !important; 
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* === HEADER === */
+    header {
+      background: var(--header-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid rgba(212, 191, 166, 0.5);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    header nav {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    header button {
+      background-color: #fff;
+      border: 1px solid #d4bfa6;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500; 
+      color: #8b5e3c;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    header button:hover {
+      border-color: var(--primary-hover);
+      color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(211, 84, 0, 0.1);
+    }
+
+    header button.active-nav {
+      font-weight: bold; 
+      background-color: var(--primary-color); 
+      color: #fff;
+      border-color: var(--primary-color);     
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* === SIDEBARS === */
+    .sidebar {
+      width: 240px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: fixed;
+      top: 80px;
+      bottom: 80px;
+      overflow-y: auto;
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+      border-radius: 0 20px 20px 0;
+      border-right: 1px solid #eee;
+    }
+
+    .sidebar.right {
+      right: 0;
+      left: auto;
+      transform: translateX(100%);
+      border-radius: 20px 0 0 20px;
+      border-right: none;
+      border-left: 1px solid #eee;
+      box-shadow: -4px 0 15px rgba(0,0,0,0.05);
+    }
+
+    .sidebar.visible { transform: translateX(0); }
+    .sidebar.left { left: 0; }
+
+    .sidebar button {
+      font-size: 15px;
+      padding: 12px 15px;
+      background: #fdfdfd;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      color: #555;
+    }
+
+    .sidebar button:hover {
+      background: #fff3e0;
+      border-color: #ffb74d;
+      transform: translateX(4px);
+    }
+
+    .sidebar button.active {
+      background-color: var(--primary-color); 
+      color: #fff;               
+      border: none;
+      box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+    }
+
+    .sidebar button.active b { color: #fff; }
+
+    /* === TOGGLE BUTTONS === */
+    .toggle-btn {
+      position: fixed;
+      top: 95px;
+      z-index: 1000;
+      width: auto;
+      padding: 10px 16px;
+      height: 44px;
+      background: #fff;
+      border: 1px solid #d4bfa6;
+      color: #8b5e3c;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .toggle-btn:hover {
+      background: #fdf6ed;
+      color: var(--primary-color);
+      transform: scale(1.05);
+    }
+
+    .toggle-left {
+      left: -2px;
+      border-radius: 0 22px 22px 0;
+    }
+
+    .toggle-right {
+      right: -2px;
+      border-radius: 22px 0 0 22px;
+    }
+
+    /* === MAIN CONTAINER === */
+    .outer-box {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 40px;
+      border-radius: 30px;
+      box-shadow: var(--shadow-soft);
+      max-width: 1200px;
+      margin: 0 auto;
+      border: 1px solid rgba(255,255,255,0.6);
+      transition: all 0.3s ease;
+    }
+
+    .outer-box:hover { box-shadow: var(--shadow-hover); }
+
+    h2 {
+      color: #2c3e50;
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 25px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    audio {
+      display: block;
+      margin: 0 auto 30px auto;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      height: 40px;
+      outline: none;
+    }
+
+    /* === QUIZ SECTION === */
+    .question-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      margin-bottom: 25px;
+      border: 1px solid #f0f0f0;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #questionLabel {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2c3e50;
+      display: block;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .word {
+      cursor: pointer;
+      color: #2980b9;
+      transition: color 0.2s;
+      border-bottom: 2px dotted transparent;
+    }
+
+    .word:hover {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+    }
+
+    input {
+      font-size: 24px;
+      padding: 12px 20px;
+      width: 100%;
+      max-width: 900px;
+      border: 2px solid #e0e0e0;
+      border-radius: 15px;
+      color: #2c3e50;
+      font-weight: bold;
+      background: #fbfbfb;
+      transition: all 0.3s ease;
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    input:focus {
+      background: #fff;
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1);
+    }
+
+    .feedback {
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 20px;
+      padding: 10px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .wrong { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+    /* === BUTTONS === */
+    #navigation {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    #navigation button, #submitBtn {
+      padding: 12px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      border-radius: 15px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #submitBtn {
+      background: var(--primary-color);
+      color: white;
+      box-shadow: 0 4px 15px rgba(211, 84, 0, 0.2);
+      margin-top: 10px;
+    }
+    
+    #submitBtn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(211, 84, 0, 0.3); }
+
+    #playBtn { background: #27ae60; color: white; }
+    #playBtn:hover { background: #2ecc71; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3); }
+
+    #prevBtn, #nextBtn { background: #fff; color: #34495e; border: 2px solid #e0e0e0; }
+    #prevBtn:hover, #nextBtn:hover { border-color: #bdc3c7; background: #f9f9f9; transform: translateY(-2px); }
+
+    #resetBtn { background: #34495e; color: white; }
+    #resetBtn:hover { background: #2c3e50; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(52, 73, 94, 0.3); }
+
+    #result {
+      margin-top: 35px;
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      color: var(--primary-color);
+      background: #fff;
+      padding: 15px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      display: inline-block;
+      width: 100%;
+    }
+    #result:empty { display: none; }
+
+    /* === DICTIONARY POPUP === */
+    #dictionaryPopup {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,0,0,0.1);
+      padding: 25px;
+      border-radius: 24px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      z-index: 9999;
+      min-width: 320px;
+      max-width: 90%;
+      animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popUp {
+      from { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
+      to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    }
+
+    #dictWord { font-size: 28px; color: #2c3e50; margin-bottom: 5px; font-weight: bold; }
+    #dictPhonetic { font-style: italic; color: #7f8c8d; font-size: 18px; }
+    #dictType { color: #e67e22; font-weight: bold; font-size: 16px; margin: 10px 0; display: inline-block; background: #fff3e0; padding: 4px 10px; border-radius: 8px;}
+    #dictType:empty { display: none; }
+    #dictMeaning { margin: 15px 0; font-size: 22px; color: #34495e; line-height: 1.4; }
+
+    #dictionaryPopup button {
+      background: #f1f2f6;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 8px 15px;
+      font-size: 20px;
+    }
+    #dictionaryPopup button:hover { background: #dfe4ea; transform: scale(1.05); }
+
+    /* === CANVAS & FOOTER === */
+    #paintCanvas {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      z-index: 5; 
+      pointer-events: none;
+      display: block;
+    }
+
+    #paintCanvas.active {
+      pointer-events: auto;
+      z-index: 9998; 
+      cursor: crosshair;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 75px;
+      background: var(--header-bg);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      border-top: 1px solid rgba(212, 191, 166, 0.5);
+      z-index: 9999;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
+    }
+
+    footer button {
+      padding: 10px 22px;
+      border-radius: 20px;
+      border: 2px solid #d4bfa6;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      background: white;
+      color: #8b5e3c;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    footer button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+  </style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+<body>
+<header>
+  <nav>
+   <button onclick="window.location.href='../conversation_01/conversation_01.html'">Conversation 01</button>
+   <button class="active-nav" onclick="window.location.href='../conversation_02/conversation_02.html'">Conversation 02</button>
+   <button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+   <button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+  </nav>
+</header>
+
+<button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">☰ Menu</button>
+<button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu ☰</button>
+
+<div class="sidebar left">
+  <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+  <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+  <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+  <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+  <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+  <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+</div>
+
+<div class="sidebar right">
+  <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button class="active" onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button onclick="location.href='story.html'"><b>Story</b></button>
+</div>
+
+  <div class="outer-box">
+    <h2>WH-Questions – Answer One by One</h2>
+    <audio id="audioPlayer" controls src="sounds/A1-11-2-Demonstratives-Jeans.mp3"></audio>
+    <div id="quiz" class="question-box"></div>
+
+    <div id="navigation">
+      <button onclick="startQuiz()" id="playBtn">▶️ Play</button>
+      <button onclick="prevPage()" id="prevBtn" style="display:none;">Previous</button>
+      <button onclick="nextPage()" id="nextBtn" style="display:none;">Next</button>
+      <button onclick="resetQuiz()" id="resetBtn" style="display:none;">🔁 Làm lại từ đầu</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <div id="dictionaryPopup">
+    <div id="dictWord" style="font-weight: bold; font-size: 28px;"></div>
+    <div id="dictPhonetic" style="font-style: italic; color: #555;"></div>
+    <div id="dictType" style="color: #e67e22; font-weight: bold; font-size: 18px; margin-top: 5px;"></div>
+    <div id="dictMeaning" style="margin: 10px 0;"></div>
+    <div style="display: flex; gap: 10px;">
+      <button onclick="speakWord()" style="padding: 6px 12px; font-size: 20px;">🔊</button>
+      <button onclick="closeDict()" style="padding: 6px 12px; font-size: 20px;">❌</button>
+    </div>
+  </div>
+
+  <audio id="audioWordPlayer"></audio>
+<canvas id="paintCanvas"></canvas>
+
+<footer>
+    <button id="musicBtn" onclick="toggleMusic()">🎵 Music: OFF</button>
+    <button id="penBtn" onclick="togglePen()">✏️ Pen: OFF</button>
+    <button onclick="clearCanvas()" style="background: #fff0f0; border-color: #ffcdd2; color: #c0392b;">🗑️ Clear</button>
+</footer>
+
+<audio id="bgMusic" loop src="../../shared-sounds/background_music.mp3"></audio>
+
+  <script>
+    const questions = [
+  { q: "1. What does the man like first?", a: ["these jeans", "the jeans", "jeans"] },
+  { q: "2. Does the woman like the jeans too?", a: ["yes", "yes she does", "she likes those too"] },
+  { q: "3. Does the woman like this shirt?", a: ["no", "no she doesn't", "no she likes that shirt"] },
+  { q: "4. Which shirt does the woman like?", a: ["the green one", "that shirt", "green one"] },
+  { q: "5. Does the man like the green color?", a: ["no", "no he doesn't", "he doesn't like that color"] }
+];
+
+const dictionary = {
+  // ===== QUESTION WORDS & PRONOUNS =====
+  "what": { meaning: "cái gì", phonetic: "/wʌt/", type: "question word" },
+  "which": { meaning: "cái nào", phonetic: "/wɪtʃ/", type: "question word" },
+  "these": { meaning: "những cái này", phonetic: "/ðiːz/", type: "pronoun / determiner" },
+  "those": { meaning: "những cái kia", phonetic: "/ðoʊz/", type: "pronoun / determiner" },
+  "this": { meaning: "cái này", phonetic: "/ðɪs/", type: "pronoun / determiner" },
+  "that": { meaning: "cái kia / đó", phonetic: "/ðæt/", type: "pronoun / determiner" },
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+  "one": { meaning: "cái (dùng thay thế cho danh từ)", phonetic: "/wʌn/", type: "pronoun" },
+
+  // ===== VERBS & AUXILIARIES =====
+  "do": { meaning: "trợ động từ", phonetic: "/duː/", type: "auxiliary verb" },
+  "does": { meaning: "trợ động từ (ngôi thứ 3)", phonetic: "/dʌz/", type: "auxiliary verb" },
+  "like": { meaning: "thích", phonetic: "/laɪk/", type: "verb" },
+  "don't": { meaning: "không (do not)", phonetic: "/doʊnt/", type: "auxiliary verb" },
+
+  // ===== NOUNS =====
+  "jeans": { meaning: "quần bò / quần jean", phonetic: "/dʒiːnz/", type: "noun" },
+  "shirt": { meaning: "áo sơ mi", phonetic: "/ʃɜːrt/", type: "noun" },
+  "color": { meaning: "màu sắc", phonetic: "/ˈkʌlər/", type: "noun" },
+  "man": { meaning: "người đàn ông", phonetic: "/mæn/", type: "noun" },
+  "woman": { meaning: "người phụ nữ", phonetic: "/ˈwʊmən/", type: "noun" },
+
+  // ===== ADJECTIVES & ADVERBS =====
+  "blue": { meaning: "màu xanh dương", phonetic: "/bluː/", type: "adjective" },
+  "green": { meaning: "màu xanh lá", phonetic: "/ɡriːn/", type: "adjective" },
+  "too": { meaning: "cũng", phonetic: "/tuː/", type: "adverb" },
+  "no": { meaning: "không", phonetic: "/noʊ/", type: "adverb" },
+  "really": { meaning: "thật sự", phonetic: "/ˈriːəli/", type: "adverb" },
+  "first": { meaning: "đầu tiên", phonetic: "/fɜːrst/", type: "adverb" },
+
+  // ===== ARTICLES & CONJUNCTIONS =====
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "but": { meaning: "nhưng", phonetic: "/bʌt/", type: "conjunction" }
+};
+    let currentPage = 0;
+    const userAnswers = Array(questions.length).fill("");
+    let googleUSVoice = null;
+
+    speechSynthesis.onvoiceschanged = () => {
+      const voices = speechSynthesis.getVoices();
+      googleUSVoice = voices.find(v => v.name.toLowerCase().includes("google") && v.lang === "en-US");
+    };
+
+    function speak(text, callback) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      if (googleUSVoice) utter.voice = googleUSVoice;
+      utter.onend = callback || (() => {});
+      utter.onerror = callback || (() => {}); 
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    function normalizeWord(word) {
+      word = word.toLowerCase().replace(/[^a-z']/g, "");
+      if (word.endsWith("'s")) return { base: word.slice(0, -2), possessive: true };
+      return { base: word };
+    }
+
+    function startQuiz() {
+      currentPage = 0;
+      document.getElementById("playBtn").style.display = "none";
+      document.getElementById("prevBtn").style.display = "inline-flex";
+      document.getElementById("nextBtn").style.display = "inline-flex";
+      document.getElementById("resetBtn").style.display = "none";
+      renderPage();
+    }
+
+    function renderPage() {
+      const q = questions[currentPage];
+      const quizDiv = document.getElementById("quiz");
+
+      const highlighted = q.q.replace(/\b[\w’']+\b/g, (word) => {
+        let safeWord = word.replace(/'/g, "\\'"); 
+        return `<span class="word" onclick="showDict('${safeWord}')">${word}</span>`;
+      });
+
+      quizDiv.innerHTML = `
+        <label id="questionLabel">${highlighted}</label><br>
+        <input type="text" id="answerInput" onkeypress="if(event.key === 'Enter') submitAnswer()" />
+        <button onclick="submitAnswer()" id="submitBtn">Submit</button>
+        <div class="feedback" id="feedback"></div>
+      `;
+
+      speak(q.q);
+
+      setTimeout(() => { document.getElementById("answerInput").focus(); }, 100);
+
+      document.getElementById("prevBtn").style.display = currentPage > 0 ? "inline-flex" : "none";
+      document.getElementById("nextBtn").style.display = currentPage < questions.length - 1 ? "inline-flex" : "none";
+      
+      if(userAnswers[currentPage]) {
+          document.getElementById("answerInput").value = userAnswers[currentPage];
+      }
+    }
+
+    function submitAnswer() {
+      const input = document.getElementById("answerInput").value.trim().toLowerCase();
+      if(!input) return; 
+      
+      userAnswers[currentPage] = input;
+      const correctAnswers = questions[currentPage].a;
+      const feedbackDiv = document.getElementById("feedback");
+
+      if (correctAnswers.includes(input)) {
+        feedbackDiv.textContent = "Correct!";
+        feedbackDiv.className = "feedback correct";
+      } else {
+        feedbackDiv.textContent = `Wrong! Correct answer: ${correctAnswers[0]}`;
+        feedbackDiv.className = "feedback wrong";
+      }
+
+      speak(feedbackDiv.textContent);
+      updateScore();
+    }
+
+    function nextPage() {
+      if (currentPage < questions.length - 1) {
+        currentPage++;
+        renderPage();
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        renderPage();
+      }
+    }
+
+    function resetQuiz() {
+      currentPage = 0;
+      userAnswers.fill("");
+      document.getElementById("result").textContent = "";
+      document.getElementById("resetBtn").style.display = "none";
+      document.getElementById("playBtn").style.display = "inline-flex";
+      document.getElementById("prevBtn").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("quiz").innerHTML = "";
+      speechSynthesis.cancel();
+    }
+
+    function updateScore() {
+      const resultEl = document.getElementById("result");
+      let correct = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (questions[i].a.includes(userAnswers[i])) correct++;
+      }
+      resultEl.textContent = `Score: ${correct} / ${questions.length}`;
+      if (currentPage === questions.length - 1) {
+        document.getElementById("resetBtn").style.display = "inline-flex";
+      }
+    }
+
+    function speakWord() {
+      const word = document.getElementById("dictWord").textContent;
+      speak(word);
+    }
+
+    function showDict(rawWord) {
+      const info = normalizeWord(rawWord);
+      const dictData = dictionary[info.base];
+
+      if (dictData) {
+        let finalMeaning = dictData.meaning;
+        if (info.possessive) {
+          finalMeaning = "của " + finalMeaning; 
+        }
+
+        document.getElementById("dictWord").textContent = rawWord;
+        document.getElementById("dictPhonetic").textContent = dictData.phonetic;
+        
+        const typeText = dictData.type ? `(${dictData.type})` : "";
+        document.getElementById("dictType").textContent = typeText;
+
+        document.getElementById("dictMeaning").textContent = finalMeaning;
+        document.getElementById("dictionaryPopup").style.display = "block";
+        speakWord();
+      } else {
+        document.getElementById("dictWord").textContent = rawWord;
+        document.getElementById("dictPhonetic").textContent = "";
+        document.getElementById("dictType").textContent = ""; 
+        document.getElementById("dictMeaning").textContent = "(Từ này chưa có trong từ điển)";
+        document.getElementById("dictionaryPopup").style.display = "block";
+      }
+    }
+
+    function closeDict() {
+      document.getElementById("dictionaryPopup").style.display = "none";
+    }
+
+    function toggleSidebar(side) {
+      const sidebar = document.querySelector(`.sidebar.${side}`);
+      const button = document.querySelector(`.toggle-${side}`);
+      sidebar.classList.toggle('visible');
+    }
+
+    const canvas = document.getElementById('paintCanvas');
+    const ctx = canvas.getContext('2d');
+    const bgMusic = document.getElementById('bgMusic');
+    let isPainting = false;
+    let penActive = false;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight; 
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function toggleMusic() {
+        const btn = document.getElementById('musicBtn');
+        if (bgMusic.paused) {
+            bgMusic.play().catch(() => alert("Click vào màn hình để cho phép phát nhạc"));
+            btn.textContent = "🎵 Music: ON";
+            btn.style.background = "#e6ccb2";
+            btn.style.borderColor = "var(--primary-color)";
+        } else {
+            bgMusic.pause();
+            btn.textContent = "🎵 Music: OFF";
+            btn.style.background = "white";
+            btn.style.borderColor = "#d4bfa6";
+        }
+    }
+
+    function togglePen() {
+        penActive = !penActive;
+        const btn = document.getElementById('penBtn');
+        if (penActive) {
+            canvas.classList.add('active');
+            btn.textContent = "✏️ Pen: ON";
+            btn.style.background = "var(--primary-color)";
+            btn.style.borderColor = "var(--primary-color)";
+            btn.style.color = "white";
+        } else {
+            canvas.classList.remove('active');
+            btn.textContent = "✏️ Pen: OFF";
+            btn.style.background = "white";
+            btn.style.borderColor = "#d4bfa6";
+            btn.style.color = "#8b5e3c";
+            isPainting = false;
+        }
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function getEventPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function startDraw(e) {
+        if (!penActive) return;
+        isPainting = true;
+        const pos = getEventPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        if (e.cancelable) e.preventDefault();
+    }
+
+    function doDraw(e) {
+        if (!isPainting || !penActive) return;
+        const pos = getEventPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.strokeStyle = "#e74c3c";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.stroke();
+        if (e.cancelable) e.preventDefault();
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', doDraw);
+    window.addEventListener('mouseup', () => isPainting = false);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', doDraw, { passive: false });
+    canvas.addEventListener('touchend', () => isPainting = false);
+
+    // ===== REMOTE CONTROL (BÚT TRÌNH CHIẾU) =====
+    document.addEventListener("keydown", function(e) {
+        const key = e.key.toLowerCase();
+        
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+            if (key === "enter") {
+                const submitBtn = document.getElementById("submitBtn");
+                if (submitBtn) submitBtn.click();
+            }
+            return; 
+        }
+
+        if (key === "arrowright" || key === "pagedown") nextPage();
+        if (key === "arrowleft" || key === "pageup") prevPage();
+        if (key === "enter") {
+            const submitBtn = document.getElementById("submitBtn");
+            if (submitBtn) submitBtn.click();
+        }
+        if (key === "p") togglePen();
+    });
+
+    document.addEventListener("contextmenu", function(e) {
+      e.preventDefault();
+
+      const text = e.target.innerText?.trim();
+
+      if (text && translations[text]) {
+        const popup = document.getElementById("dictionaryPopup");
+
+        document.getElementById("dictWord").textContent = text;
+        document.getElementById("dictPhonetic").textContent = "";
+        document.getElementById("dictType").textContent = "Translation";
+        document.getElementById("dictMeaning").textContent = translations[text];
+
+        popup.style.display = "block";
+      }
+    });
+
+   const translations = {
+  // ===== QUESTIONS =====
+  "1. What does the man like first?": "Người đàn ông thích cái gì đầu tiên?",
+  "2. Does the woman like the jeans too?": "Người phụ nữ cũng thích chiếc quần bò đó chứ?",
+  "3. Does the woman like this shirt?": "Người phụ nữ có thích chiếc áo sơ mi này không?",
+  "4. Which shirt does the woman like?": "Người phụ nữ thích chiếc áo sơ mi nào?",
+  "5. Does the man like the green color?": "Người đàn ông có thích màu xanh lá không?",
+
+  // ===== ANSWERS =====
+  "these jeans": "những chiếc quần bò này",
+  "the jeans": "chiếc quần bò",
+  "jeans": "quần bò",
+  "yes": "có",
+  "yes she does": "vâng cô ấy có thích",
+  "she likes those too": "cô ấy cũng thích chúng",
+  "no": "không",
+  "no she doesn't": "không cô ấy không thích",
+  "no she likes that shirt": "không cô ấy thích chiếc áo kia",
+  "the green one": "chiếc màu xanh lá",
+  "that shirt": "chiếc áo đó",
+  "green one": "chiếc màu xanh lá",
+  "no he doesn't": "không anh ấy không thích",
+  "he doesn't like that color": "anh ấy không thích màu đó"
+};
+  </script>
+</body>
+</html>

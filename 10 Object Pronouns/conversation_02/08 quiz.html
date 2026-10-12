@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Conversation 02 Quiz - Best Friend Sue</title>
+  <style>
+    @font-face { font-family: 'UTM Avo'; src: url('fonts/UTM Avo.ttf') format('truetype'); }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'UTM Avo', Roboto, sans-serif; }
+    
+    body { background: #f0e2cd; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+
+    header { background-color: #f3dbc1; padding: 10px; display: flex; justify-content: center; gap: 10px; border-bottom: 2px solid #d4bfa6; z-index: 1000; height: 60px; }
+    footer { background-color: #fff3cd; border-top: 2px solid #ffeeba; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; height: 80px; }
+
+    #main-container { flex: 1; position: relative; overflow: hidden; }
+    #inkCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
+    #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+
+    .content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px 80px; z-index: 10; overflow-y: auto; text-align: center; }
+
+    /* CÂU HỎI SIÊU TO */
+    .content h3 {
+      font-size: 50px !important; 
+      margin-bottom: 30px;
+      color: #4e73df;
+      line-height: 1.3;
+    }
+    header button {
+      background-color: #fff;
+      border: 2px solid #d4bfa6;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: normal; 
+      color: #8b5e3c;
+      transition: 0.3s;
+    }
+
+    /* Style dành riêng cho nút đang hoạt động (Active) */
+    header button.active-nav {
+      font-weight: bold; 
+      background-color: #e6ccb2; 
+      border-color: #8b5e3c;     
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header a { font-size: 16px; padding: 8px 15px; border: 1px solid #c9a77b; background: #fff3e0; border-radius: 10px; text-decoration: none; color: black; }
+    .sidebar { width: 180px; background: #f3dbc1; padding: 15px; position: fixed; top: 60px; bottom: 80px; overflow-y: auto; z-index: 2000; transition: transform 0.3s ease; }
+    .sidebar.left { left: 0; transform: translateX(-100%); border-right: 2px solid #d4bfa6; }
+    .sidebar.right { right: 0; transform: translateX(100%); border-left: 2px solid #d4bfa6; }
+    .sidebar.visible { transform: translateX(0); }
+    .sidebar button { display: block; width: 100%; font-size: 14px; padding: 8px; background: #fff; border: 1px solid #d4bfa6; border-radius: 8px; cursor: pointer; margin-bottom: 5px; font-weight: bold; }
+
+    .sidebar button.active {
+      background-color: #d35400;
+      color: #fff;
+      border: 2px solid #a04000;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .sidebar button.active b {
+      color: #fff;
+    }
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      z-index: 1020;
+      padding: 10px 20px;
+      background: #8d6e63;
+      border: none;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 25px;
+      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'UTM Avo', sans-serif;
+    }
+    .toggle-left { left: 0; border-radius: 0 8px 8px 0; }
+    .toggle-right { right: 0; border-radius: 8px 0 0 8px; }
+
+    .tool-btn { padding: 10px 18px; border-radius: 10px; border: 1px solid #8b5e3c; background: #fff; cursor: pointer; font-weight: bold; color: #8b5e3c; font-size: 16px; }
+    .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+    /* ĐÁP ÁN CÂN ĐỐI VỚI CÂU HỎI */
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+    .option-button { padding: 20px; font-size: 32px; background-color: #e0e0e0; border: 2px solid #ccc; border-radius: 10px; cursor: pointer; }
+    .correct { background-color: #8bc34a !important; color: white; border-color: #689f38; }
+    .incorrect { background-color: #f44336 !important; color: white; border-color: #d32f2f; }
+
+    .word { cursor: pointer; border-radius: 4px; padding: 0 2px; }
+    .word-type { color: #2d6a4f; font-style: italic; font-size: 18px; font-weight: bold; }
+    #dictPopup, #sentenceTranslation { position: absolute; background: #fffbe7; border: 2px solid #8b5e3c; padding: 15px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; min-width: 280px; }
+  </style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+<body>
+
+  <header>
+   <button onclick="window.location.href='../conversation_01/conversation_01.html'">
+    Conversation 01
+  </button>
+  
+  <button class="active-nav" onclick="window.location.href='../conversation_02/conversation_02.html'">
+    <b>Conversation 02</b>
+  </button>
+  
+  <button onclick="window.location.href='../conversation_03/conversation_03.html'">
+    Conversation 03
+  </button>
+  
+  <button onclick="window.location.href='../conversation_04/conversation_04.html'">
+    Conversation 04
+  </button>
+  </header>
+
+  <button class="toggle-btn toggle-left" onclick="toggleSidebar('left')">Menu ☰</button>
+  <button class="toggle-btn toggle-right" onclick="toggleSidebar('right')">Menu ☰</button>
+
+  <div class="sidebar left">
+    <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+    <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+    <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+    <button onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+    <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+    <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+    <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+  </div>
+
+  <div class="sidebar right">
+    <button class="active" onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+    <button onclick="location.href='story.html'"><b>story</b></button>
+  </div>
+
+  <div id="main-container">
+    <canvas id="inkCanvas"></canvas>
+    <div class="content">
+        <div style="margin-bottom:20px;">
+          <!-- Tạm thời để tên file âm thanh là conversation_02.mp3 -->
+          <audio id="mainAudio" controls style="height: 40px;">
+            <source src="sounds/A1-10-2-Object-Pronouns-Friend.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+        <div id="game-container"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="display: flex; gap: 10px;">
+      <button id="penBtn" class="tool-btn" onclick="toggleInk()">Pen: OFF</button>
+      <button class="tool-btn" onclick="clearInk()">Clear</button>
+    </div>
+    <div style="font-weight: bold; color: #8b5e3c; font-size: 24px;">
+      ✅: <span id="correctCount">0</span> | ❌: <span id="incorrectCount">0</span> | ⏱️: <span id="timer">0</span>s
+    </div>
+    <button class="tool-btn" style="background: #7dbd3e; color: white; border: none; font-size: 20px;" onclick="loadNextQuestion()">Next Question ↓</button>
+  </footer>
+
+  <div id="dictPopup"></div>
+  <div id="sentenceTranslation"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+// ===== TỪ ĐIỂN CONVERSATION 02 =====
+const dictionary = {
+  "who": { meaning: "ai", phonetic: "/huː/", type: "pronoun" },
+  "is": { meaning: "là, thì, ở", phonetic: "/ɪz/", type: "verb" },
+  "your": { meaning: "của bạn", phonetic: "/jɔːr/", type: "pronoun" },
+  "best": { meaning: "tốt nhất, thân nhất", phonetic: "/best/", type: "adjective" },
+  "friend": { meaning: "bạn bè", phonetic: "/frend/", type: "noun" },
+  "my": { meaning: "của tôi", phonetic: "/maɪ/", type: "pronoun" },
+  "sue": { meaning: "tên riêng (Sue)", phonetic: "/suː/", type: "proper noun" },
+  "do": { meaning: "làm / trợ động từ hỏi", phonetic: "/duː/", type: "verb" },
+  "you": { meaning: "bạn", phonetic: "/juː/", type: "pronoun" },
+  "talk": { meaning: "nói chuyện", phonetic: "/tɔːk/", type: "verb" },
+  "to": { meaning: "đến, với", phonetic: "/tuː/", type: "preposition" },
+  "her": { meaning: "cô ấy", phonetic: "/hɜːr/", type: "pronoun" },
+  "every": { meaning: "mỗi, mọi", phonetic: "/ˈev.ri/", type: "determiner" },
+  "day": { meaning: "ngày", phonetic: "/deɪ/", type: "noun" },
+  "yes": { meaning: "vâng, đúng vậy", phonetic: "/jes/", type: "adverb" },
+  "i": { meaning: "tôi", phonetic: "/aɪ/", type: "pronoun" },
+  "see": { meaning: "nhìn thấy, gặp", phonetic: "/siː/", type: "verb" },
+  "at": { meaning: "tại, ở", phonetic: "/æt/", type: "preposition" },
+  "school": { meaning: "trường học", phonetic: "/skuːl/", type: "noun" },
+  "always": { meaning: "luôn luôn", phonetic: "/ˈɔːl.weɪz/", type: "adverb" },
+  "meet": { meaning: "gặp gỡ", phonetic: "/miːt/", type: "verb" },
+  "for": { meaning: "cho (bữa trưa)", phonetic: "/fɔːr/", type: "preposition" },
+  "lunch": { meaning: "bữa trưa", phonetic: "/lʌntʃ/", type: "noun" },
+  "oh": { meaning: "ồ, à", phonetic: "/oʊ/", type: "exclamation" },
+  "why": { meaning: "tại sao", phonetic: "/waɪ/", type: "adverb" },
+  "like": { meaning: "thích", phonetic: "/laɪk/", type: "verb" },
+  "she": { meaning: "cô ấy", phonetic: "/ʃiː/", type: "pronoun" },
+  "nice": { meaning: "tốt bụng, dễ thương", phonetic: "/naɪs/", type: "adjective" },
+  "and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+  "funny": { meaning: "hài hước, vui tính", phonetic: "/ˈfʌn.i/", type: "adjective" },
+  "makes": { meaning: "làm cho (make)", phonetic: "/meɪks/", type: "verb" },
+  "me": { meaning: "tôi (tân ngữ)", phonetic: "/miː/", type: "pronoun" },
+  "laugh": { meaning: "cười lớn", phonetic: "/lɑːf/", type: "verb" },
+
+  // CÁC TỪ THÊM TRONG ĐÁP ÁN TRẮC NGHIỆM
+  "where": { meaning: "ở đâu", phonetic: "/weər/", type: "adverb" },
+  "when": { meaning: "khi nào", phonetic: "/wen/", type: "adverb" },
+  "does": { meaning: "trợ động từ số ít", phonetic: "/dʌz/", type: "auxiliary verb" },
+  "the": { meaning: "mạo từ xác định", phonetic: "/ðə/", type: "article" },
+  "woman": { meaning: "người phụ nữ", phonetic: "/ˈwʊmən/", type: "noun" },
+  "man": { meaning: "người đàn ông", phonetic: "/mæn/", type: "noun" },
+  "mary": { meaning: "tên riêng (Mary)", phonetic: "/ˈmeəri/", type: "proper noun" },
+  "lisa": { meaning: "tên riêng (Lisa)", phonetic: "/ˈliːsə/", type: "proper noun" },
+  "anne": { meaning: "tên riêng (Anne)", phonetic: "/æn/", type: "proper noun" },
+  "home": { meaning: "nhà", phonetic: "/həʊm/", type: "noun" },
+  "park": { meaning: "công viên", phonetic: "/pɑːk/", type: "noun" },
+  "library": { meaning: "thư viện", phonetic: "/ˈlaɪ.brər.i/", type: "noun" },
+  "breakfast": { meaning: "bữa sáng", phonetic: "/ˈbrek.fəst/", type: "noun" },
+  "dinner": { meaning: "bữa tối", phonetic: "/ˈdɪn.ər/", type: "noun" },
+  "coffee": { meaning: "cà phê", phonetic: "/ˈkɒf.i/", type: "noun" },
+  "boring": { meaning: "nhàm chán", phonetic: "/ˈbɔː.rɪŋ/", type: "adjective" },
+  "quiet": { meaning: "yên lặng", phonetic: "/ˈkwaɪ.ət/", type: "adjective" },
+  "strict": { meaning: "nghiêm khắc", phonetic: "/strɪkt/", type: "adjective" },
+  "cry": { meaning: "khóc", phonetic: "/kraɪ/", type: "verb" },
+  "sing": { meaning: "hát", phonetic: "/sɪŋ/", type: "verb" },
+  "angry": { meaning: "tức giận", phonetic: "/ˈæŋ.ɡri/", type: "adjective" }
+};
+
+// ===== BẢN DỊCH CÂU CONVERSATION 02 =====
+const translations = {
+  "Who is the woman's best friend?": "Ai là bạn thân nhất của người phụ nữ?",
+  "Where does the woman see her friend?": "Người phụ nữ gặp bạn mình ở đâu?",
+  "When do they always meet?": "Họ luôn gặp nhau khi nào?",
+  "Why does the woman like Sue?": "Tại sao người phụ nữ lại thích Sue?",
+  "What does Sue make the woman do?": "Sue làm cho người phụ nữ thế nào?",
+  "Does the woman talk to Sue every day?": "Người phụ nữ có nói chuyện với Sue mỗi ngày không?",
+
+  "Sue": "Sue",
+  "Mary": "Mary",
+  "Lisa": "Lisa",
+  "Anne": "Anne",
+
+  "At school": "Ở trường",
+  "At home": "Ở nhà",
+  "At the park": "Ở công viên",
+  "In the library": "Trong thư viện",
+
+  "For lunch": "Vào bữa trưa",
+  "For breakfast": "Vào bữa sáng",
+  "For dinner": "Vào bữa tối",
+  "For morning coffee": "Uống cà phê sáng",
+
+  "She is nice and funny": "Cô ấy tốt bụng và vui tính",
+  "She is quiet and boring": "Cô ấy yên lặng và nhàm chán",
+  "She is very strict": "Cô ấy rất nghiêm khắc",
+  "She helps with homework": "Cô ấy giúp làm bài tập",
+
+  "Laugh": "Cười",
+  "Cry": "Khóc",
+  "Sing": "Hát",
+  "Feel angry": "Cảm thấy tức giận",
+
+  "Yes, every day": "Có, mỗi ngày",
+  "No, only on weekends": "Không, chỉ vào cuối tuần",
+  "No, never": "Không, không bao giờ",
+  "Only on Mondays": "Chỉ vào các ngày thứ Hai"
+};
+
+// ===== CÂU HỎI TRẮC NGHIỆM CONVERSATION 02 =====
+let miniGameData = [
+  {
+    question: "Who is the woman's best friend?",
+    options: ["Sue", "Mary", "Lisa", "Anne"],
+    correct: "Sue"
+  },
+  {
+    question: "Where does the woman see her friend?",
+    options: ["At school", "At home", "At the park", "In the library"],
+    correct: "At school"
+  },
+  {
+    question: "When do they always meet?",
+    options: ["For lunch", "For breakfast", "For dinner", "For morning coffee"],
+    correct: "For lunch"
+  },
+  {
+    question: "Why does the woman like Sue?",
+    options: [
+      "She is nice and funny",
+      "She is quiet and boring",
+      "She is very strict",
+      "She helps with homework"
+    ],
+    correct: "She is nice and funny"
+  },
+  {
+    question: "What does Sue make the woman do?",
+    options: ["Laugh", "Cry", "Sing", "Feel angry"],
+    correct: "Laugh"
+  },
+  {
+    question: "Does the woman talk to Sue every day?",
+    options: [
+      "Yes, every day",
+      "No, only on weekends",
+      "No, never",
+      "Only on Mondays"
+    ],
+    correct: "Yes, every day"
+  }
+];
+
+    let currentIdx = -1, correct = 0, incorrect = 0, seconds = 0, timerInterval, inkCanvas, inkCtx, isDrawing = false;
+    const correctAudio = new Audio('../../shared-sounds/firework.mp3');
+    const incorrectAudio = new Audio('sounds/incorrect.mp3');
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function initInk() {
+      inkCanvas = document.getElementById("inkCanvas");
+      inkCtx = inkCanvas.getContext("2d");
+      const container = document.getElementById("main-container");
+      inkCanvas.width = container.offsetWidth;
+      inkCanvas.height = container.offsetHeight;
+
+      const getPos = (e) => {
+        const rect = inkCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      };
+
+      const start = (e) => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; const pos = getPos(e); inkCtx.beginPath(); inkCtx.moveTo(pos.x, pos.y); } };
+      const move = (e) => { if (isDrawing) { const pos = getPos(e); inkCtx.lineTo(pos.x, pos.y); inkCtx.strokeStyle = "#d35400"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round"; inkCtx.stroke(); } };
+      const stop = () => { isDrawing = false; };
+
+      inkCanvas.addEventListener("mousedown", start);
+      inkCanvas.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", stop);
+      inkCanvas.addEventListener("touchstart", (e) => { if(inkCanvas.classList.contains("drawing")) e.preventDefault(); start(e); }, {passive: false});
+      inkCanvas.addEventListener("touchmove", (e) => { if(inkCanvas.classList.contains("drawing")) e.preventDefault(); move(e); }, {passive: false});
+      inkCanvas.addEventListener("touchend", stop);
+    }
+
+    function toggleInk() {
+      const active = inkCanvas.classList.toggle("drawing");
+      document.getElementById("penBtn").textContent = active ? "Pen: ON" : "Pen: OFF";
+      document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    function speak(text) {
+      const u = new SpeechSynthesisUtterance(text);
+      const voices = speechSynthesis.getVoices();
+      u.voice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha")) || voices[0];
+      u.rate = 0.9;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function loadNextQuestion() {
+      currentIdx++;
+
+      if (currentIdx >= miniGameData.length) {
+        shuffleArray(miniGameData);
+        currentIdx = 0;
+      }
+
+      if (currentIdx === 0 && correct === 0 && incorrect === 0) {
+        shuffleArray(miniGameData);
+      }
+
+      if (!timerInterval) {
+        timerInterval = setInterval(() => {
+          seconds++;
+          document.getElementById("timer").textContent = seconds;
+        }, 1000);
+      }
+
+      render();
+    }
+
+    function render() {
+      const q = miniGameData[currentIdx];
+
+      const shuffledOptions = [...q.options];
+      shuffleArray(shuffledOptions);
+
+      document.getElementById("game-container").innerHTML =
+        `<h3>${wrapWords(q.question)}</h3><div class="options-grid">` +
+        shuffledOptions.map((o) =>
+          `<div class="option-button" data-choice="${o}" data-answer="${q.correct}">
+            ${wrapWords(o)}
+          </div>`
+        ).join("") +
+        `</div>`;
+
+      document.querySelectorAll(".option-button").forEach(btn => {
+        btn.onclick = function () {
+          check(this, this.dataset.choice, this.dataset.answer);
+        };
+      });
+
+      speak(q.question);
+      attachWordLogic();
+    }
+
+    function wrapWords(t) { return t.split(" ").map(w => `<span class="word" data-word="${w.toLowerCase().replace(/\W/g,'')}">${w}</span>`).join(" "); }
+
+    function attachWordLogic() {
+      document.querySelectorAll(".word").forEach(w => {
+        w.onclick = (e) => {
+          if (inkCanvas.classList.contains("drawing")) return;
+          e.stopPropagation();
+          const d = dictionary[w.dataset.word];
+          if (d) {
+            const p = document.getElementById("dictPopup");
+            p.innerHTML = `<strong>${w.textContent}</strong> <span class="word-type">(${d.type})</span><br>${d.phonetic}<br>${d.meaning}`;
+            p.style.display = "block"; p.style.top = (e.pageY + 10) + "px"; p.style.left = e.pageX + "px";
+            speak(w.textContent);
+          }
+        };
+      });
+      document.getElementById("game-container").oncontextmenu = (e) => {
+        e.preventDefault();
+        const txt = e.target.closest("h3, .option-button")?.innerText.trim();
+        if (txt && translations[txt]) {
+          const p = document.getElementById("sentenceTranslation");
+          p.innerHTML = translations[txt];
+          p.style.display = "block"; 
+          p.style.top = e.pageY + "px"; 
+          p.style.left = e.pageX + "px";
+        }
+      };
+    }
+
+    function check(btn, choice, ans) {
+      if (btn.classList.contains('correct') || btn.classList.contains('incorrect')) return;
+      const cleanChoice = choice.replace(/[\u2018\u2019]/g, "'").trim();
+      const cleanAns = ans.replace(/[\u2018\u2019]/g, "'").trim();
+
+      if (cleanChoice === cleanAns) { 
+        btn.classList.add("correct"); 
+        correct++; 
+        correctAudio.play().catch(()=>{});
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+      } else { 
+        btn.classList.add("incorrect"); 
+        incorrect++; 
+        incorrectAudio.play().catch(()=>{});
+        speak("Wrong answer. Correct is " + ans); 
+      }
+      document.getElementById("correctCount").textContent = correct;
+      document.getElementById("incorrectCount").textContent = incorrect;
+    }
+
+    function toggleSidebar(side) {
+      const sb = document.querySelector('.sidebar.' + side);
+      if (sb) sb.classList.toggle('visible');
+    }
+
+    window.onload = () => { initInk(); loadNextQuestion(); };
+    document.addEventListener("click", () => { 
+      document.getElementById("dictPopup").style.display = "none"; 
+      document.getElementById("sentenceTranslation").style.display = "none"; 
+    });
+    
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "PageDown" || e.code === "ArrowRight" || e.code === "Enter") {
+        loadNextQuestion();
+      }
+    });
+  </script>
+</body>
+</html>

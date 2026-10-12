@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Mastering English - Subject Pronouns</title>
+    <style>
+        @font-face { font-family: 'UTM Avo'; src: local('UTM Avo'); }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'UTM Avo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+            touch-action: none; 
+            padding-top: 10px;
+        }
+
+        /* --- HEADER & MENU --- */
+        header {
+            background-color: #d8c8b4; padding: 10px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid #d4bfa6; 
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 65px;
+            transition: all 0.3s ease;
+        }
+        .header-center { display: flex; gap: 10px; }
+        header button {
+            background-color: #fff; border: 2px solid #d4bfa6; padding: 8px 16px; border-radius: 20px;
+            cursor: pointer; font-family: 'UTM Avo'; color: #8b5e3c; transition: 0.3s;
+        }
+        header button.active-conv {
+            background-color: #8b5e3c; color: white; font-weight: bold; border-color: #5c3e26;
+        }
+        .menu-btn {
+            background-color: #8b7362 !important; color: white !important; border: none !important;
+            padding: 10px 20px !important; border-radius: 20px !important; font-weight: bold; cursor: pointer;
+        }
+
+        /* --- CONTROL BAR --- */
+        #controlBar {
+            background-color: #fff9f0; padding: 10px 20px; border-bottom: 2px solid #d4bfa6;
+            position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
+            display: flex; align-items: center; gap: 12px; height: 55px;
+            transition: all 0.3s ease;
+        }
+        .tool-btn {
+            padding: 6px 14px; border-radius: 12px; border: 1px solid #8b5e3c;
+            background: #fff; cursor: pointer; font-size: 15px; font-weight: bold; color: #8b5e3c; font-family: 'UTM Avo';
+            transition: 0.2s;
+        }
+        .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+        .tab-switcher {
+            display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; border: 1px solid #cbd5e1;
+        }
+        .tab-btn {
+            padding: 6px 16px; border-radius: 8px; border: none; background: transparent;
+            cursor: pointer; font-family: 'UTM Avo'; font-size: 14px; font-weight: bold; color: #475569; transition: 0.2s;
+        }
+        .tab-btn.active { background: white; color: #1e3a8a; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+        /* --- SIDEBAR MENU --- */
+        .side-menu {
+            position: fixed; top: 130px; bottom: 20px; width: 220px;
+            background-color: #f3dbc1; border: 2px solid #d4bfa6;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease;
+            z-index: 1100; padding: 20px; overflow-y: auto; 
+        }
+        .side-menu.left { left: 0; border-radius: 0 20px 20px 0; transform: translateX(-100%); }
+        .side-menu.right { right: 0; border-radius: 20px 0 0 20px; transform: translateX(100%); }
+        .side-menu.open { transform: translateX(0); }
+        .side-menu button {
+            display: block; width: 100%; background: #fff; border: 1px solid #d4bfa6;
+            margin-bottom: 10px; padding: 12px; border-radius: 12px; cursor: pointer;
+            font-family: 'UTM Avo'; font-size: 16px; font-weight: bold; color: #8b5e3c;
+        }
+        .side-menu button.active { background: #8b5e3c; color: #fff; }
+
+        /* --- TỪ ĐIỂN PANEL --- */
+        .dict-panel {
+            position: fixed; right: 20px; top: 135px; width: 340px;
+            background: white; border-radius: 20px; padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25); border: 4px solid #bae6fd;
+            display: none; flex-direction: column; gap: 10px; z-index: 1200;
+            transition: top 0.3s ease;
+        }
+        .dict-panel.active { display: flex; }
+        .dict-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        .close-dict { cursor: pointer; font-size: 26px; color: #f87171; font-weight: bold; line-height: 1; }
+        .dict-panel input { padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; font-family: 'UTM Avo'; outline: none;}
+        .dict-result { background: #f8fafc; border-radius: 12px; padding: 15px; min-height: 120px; font-size: 15px; color: #1e293b; border: 1px dashed #cbd5e1; max-height: 350px; overflow-y: auto;}
+        
+        .ipa-text { color: #d97706; font-family: 'Arial', sans-serif; margin-bottom: 4px; font-size: 16px; }
+        .pos-text { color: #10b981; font-style: italic; font-weight: bold; margin-bottom: 6px; }
+        .mean-text { color: #334155; font-size: 15px; line-height: 1.4; }
+
+        /* --- MAIN VIEW CONTAINER --- */
+        .container {
+            background: #fdfbf7; width: 98vw; max-width: 1440px; height: calc(100vh - 145px); 
+            margin-top: 125px; padding: 25px 35px; border-radius: 30px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12); border: 8px solid white;
+            display: flex; flex-direction: column; position: relative; z-index: 10;
+            overflow-y: auto; overflow-x: hidden;
+            background-image: radial-gradient(circle at 10% 20%, #e0f2fe 0%, transparent 30%), radial-gradient(circle at 90% 80%, #ffedd5 0%, transparent 30%);
+            transition: all 0.3s ease;
+        }
+        .container::-webkit-scrollbar { width: 0px; }
+        
+        .tab-content { display: none; flex-direction: column; height: 100%; width: 100%; position: relative; }
+        .tab-content.active { display: flex; }
+
+        /* --- HIỆU ỨNG STEP --- */
+        .step { opacity: 0.02; filter: blur(4px); transform: translateY(15px) scale(0.98); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
+        .step.active { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); pointer-events: auto; }
+
+        /* Từ tương tác (Clickable Words) */
+        .word { display: inline-block; cursor: pointer; transition: 0.2s; border-radius: 6px; padding: 0 3px; position: relative; z-index: 10; font-weight: inherit;}
+        .word:hover { background-color: #fef08a; transform: translateY(-3px); box-shadow: 0 3px 0px rgba(0,0,0,0.1); color: #000 !important; }
+        .interactable { cursor: context-menu; transition: background 0.2s; border-radius: 8px; }
+        .interactable:hover { background-color: rgba(226, 232, 240, 0.5); }
+
+        /* --- BỐ CỤC CHÍNH INFOGRAPHIC --- */
+        .main-title { text-align: center; font-size: 42px; color: #0f172a; font-weight: 900; margin-bottom: 25px; letter-spacing: -1px;}
+        
+        .layout-wrapper { display: flex; width: 100%; gap: 25px; align-items: stretch; flex: 1;}
+
+        /* Cột bên Trái & Phải */
+        .side-col { flex: 0.25; display: flex; flex-direction: column; gap: 25px; }
+        
+        .side-box {
+            background: white; border-radius: 20px; padding: 25px 15px; border: 4px solid #e0f2fe;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px;
+            position: relative;
+        }
+        .sb-title { font-size: 22px; font-weight: 900; color: #1e293b; line-height: 1.2; padding-bottom: 10px; border-bottom: 2px dashed #cbd5e1; width: 90%;}
+        
+        .sb-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .sb-icon { font-size: 65px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); line-height: 1; }
+        .sb-label { font-size: 22px; font-weight: 900; color: #0f172a; background: #f1f5f9; padding: 2px 15px; border-radius: 12px; border: 2px solid #e2e8f0;}
+        .sb-desc { font-size: 14px; font-weight: bold; color: #475569; padding: 0 10px;}
+
+        .flex-row { display: flex; justify-content: center; gap: 15px; width: 100%; flex-wrap: wrap;}
+
+        /* Cột Trung Tâm (Bảng Matrix) */
+        .center-col { flex: 0.5; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        
+        .center-title { font-size: 26px; font-weight: 900; color: #0f172a; background: #fff; padding: 5px 25px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;}
+        .center-desc { font-size: 15px; color: #334155; font-weight: bold; text-align: center; margin-bottom: 5px; max-width: 90%; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 15px;}
+
+        /* Lưới Bảng Matrix */
+        .matrix-grid {
+            display: grid; grid-template-columns: 110px 1fr 1fr 1fr 90px; gap: 12px;
+            width: 100%; position: relative; padding: 15px;
+            background: rgba(255,255,255,0.7); border-radius: 30px; box-shadow: inset 0 0 20px rgba(0,0,0,0.03), 0 10px 30px rgba(0,0,0,0.05);
+            border: 3px solid #f1f5f9;
+        }
+
+        .m-tab-left { background: #2dd4bf; color: #0f172a; font-weight: 900; font-size: 16px; border-radius: 15px 5px 5px 15px; display: flex; justify-content: center; align-items: center; padding: 10px; text-align: center; box-shadow: 0 4px 0 #14b8a6; transform: translateY(-4px);}
+        .m-tab-right { background: #fde047; color: #0f172a; font-weight: 900; font-size: 16px; border-radius: 5px 15px 15px 5px; display: flex; justify-content: center; align-items: center; padding: 10px; box-shadow: 0 4px 0 #eab308; transform: translateY(-4px);}
+        
+        .m-header-1 { background: #ccfbf1; color: #0f172a; font-weight: 900; font-size: 18px; border-radius: 15px 15px 5px 5px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 2px solid #fff;}
+        .m-header-2 { background: #fef08a; color: #0f172a; font-weight: 900; font-size: 18px; border-radius: 15px 15px 5px 5px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 2px solid #fff;}
+        
+        .m-cell { background: #ffffff; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px 10px; font-weight: 900; font-size: 22px; color: #1e293b; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 2px solid #f1f5f9; text-align: center; transition: 0.2s;}
+        .m-cell:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: #bae6fd;}
+        
+        .m-cell-icon { font-size: 38px; margin-top: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); line-height: 1;}
+
+        .bottom-title { font-size: 26px; font-weight: 900; color: #0f172a; margin-top: auto; background: #fff; padding: 5px 25px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid #e2e8f0;}
+
+        #inkCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; pointer-events: none; }
+        #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+    </style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+
+<!-- MENU SIDEBAR -->
+<nav class="side-menu left" id="leftMenu">
+    <button onclick="location.href='#'">Vocabulary 1</button>
+    <button onclick="location.href='#'">Vocabulary 2</button>
+    <button onclick="location.href='#'">Memory Matching</button>
+    <button onclick="location.href='#'" class="active">Grammar</button>
+    <button onclick="location.href='#'">Sentence Swap</button>
+    <button onclick="location.href='#'">Reorder</button>
+    <button onclick="location.href='#'">Dropdown</button>
+</nav>
+
+<nav class="side-menu right" id="rightMenu">
+    <button onclick="location.href='#'">Quiz</button>
+    <button onclick="location.href='#'">True / False</button>
+    <button onclick="location.href='#'">WH Questions</button>
+    <button onclick="location.href='#'">Speaking</button>
+    <button onclick="location.href='#'">Sentence</button>
+    <button onclick="location.href='#'">Cloze</button>
+    <button onclick="location.href='#'">Dictation</button>
+  <button onclick="location.href='story.html'"><b>story</b></button>
+
+</nav>
+
+<!-- HEADER -->
+<header id="mainHeader">
+    <button class="menu-btn" onclick="toggleMenu('left')">Menu ☰</button>
+    <div class="header-center">
+        <button onclick="location.href='#'"class="active-conv">Conversation 01</button>
+        <button onclick="location.href='#'">Conversation 02</button>
+        <button onclick="location.href='#'">Conversation 03</button>
+        <button onclick="location.href='#'" >Conversation 04</button>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu('right')">Menu ☰</button>
+</header>
+
+<!-- CONTROL BAR -->
+<div id="controlBar">
+    <button id="focusBtn" class="tool-btn" onclick="toggleFocusMode()" style="background: #10b981; color: white; border-color: #059669;">Phóng to 🔲</button>
+    <button id="penBtn" class="tool-btn" onclick="toggleInk()">Bút vẽ: Off</button>
+    <button class="tool-btn" onclick="clearInk()">Xóa mực</button>
+    
+    <div style="flex-grow: 1;"></div>
+    
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchPresentationTab('englishTab')">🇬🇧 English Tab</button>
+        <button class="tab-btn" onclick="switchPresentationTab('vietnameseTab')">🇻🇳 Vietnamese Tab</button>
+    </div>
+
+    <button class="tool-btn" onclick="goPrev()">⬅ Back</button>
+    <button class="tool-btn" onclick="goNext()">Next ➡</button>
+</div>
+
+<!-- TỪ ĐIỂN PANEL -->
+<div class="dict-panel" id="dictPanel">
+    <div class="dict-header">
+        <span style="font-weight: bold; color: #0369a1; font-family: 'UTM Avo';">Tra từ & Dịch Nghĩa 📖</span>
+        <div class="close-dict" onclick="toggleDict()">×</div>
+    </div>
+    <input type="text" id="searchInput" placeholder="Click vào từ hoặc gõ vào đây..." onkeyup="handleSearch(event)">
+    <div class="dict-result" id="resultArea">
+        <i>💡 Hướng dẫn:<br>👉 <b>Click chuột trái</b> vào chữ tiếng Anh để tra từ.<br>👉 <b>Click chuột phải</b> vào khối chữ để dịch toàn bộ.</i>
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <button class="tool-btn" style="flex: 1; background: #0369a1; color: white;" onclick="translateInput()">Dịch câu</button>
+        <button class="tool-btn" style="flex: 1;" onclick="speakInput()">Nghe 🎙️</button>
+    </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="container" id="mainContainer">
+
+    <!-- ==================== ENGLISH TAB ==================== -->
+    <div id="englishTab" class="tab-content active">
+        <h1 class="main-title step interactable">Subject Pronouns: A Quick Reference Guide</h1>
+
+        <div class="layout-wrapper">
+            
+            <div class="side-col">
+                <div class="side-box step" style="border-color: #ccfbf1; background: #f0fdfa;">
+                    <div class="sb-title interactable">1st Person (I, We)</div>
+                    
+                    <div class="sb-item">
+                        <div class="sb-icon">🙋‍♂️</div>
+                        <div class="sb-label interactable">I</div>
+                        <div class="sb-desc interactable">(Refers to the speaker alone)</div>
+                    </div>
+                    
+                    <div class="sb-item" style="margin-top: 10px;">
+                        <div class="sb-icon">👨‍👩‍👧‍👦</div>
+                        <div class="sb-label interactable">We</div>
+                        <div class="sb-desc interactable">(Refers to the speaker as part of a group)</div>
+                    </div>
+                </div>
+
+                <div class="side-box step" style="border-color: #e0f2fe; background: #f8fafc;">
+                    <div class="sb-title interactable">Singular (He, She, It)</div>
+                    
+                    <div class="flex-row">
+                        <div class="sb-item" style="width: 30%;">
+                            <div class="sb-icon" style="font-size: 45px;">👦</div>
+                            <div class="sb-label interactable" style="font-size: 16px;">He</div>
+                            <div class="sb-desc interactable" style="font-size: 11px;">(Replaces male)</div>
+                        </div>
+                        <div class="sb-item" style="width: 30%;">
+                            <div class="sb-icon" style="font-size: 45px;">👧</div>
+                            <div class="sb-label interactable" style="font-size: 16px;">She</div>
+                            <div class="sb-desc interactable" style="font-size: 11px;">(Replaces female)</div>
+                        </div>
+                        <div class="sb-item" style="width: 30%;">
+                            <div class="sb-icon" style="font-size: 45px;">📘</div>
+                            <div class="sb-label interactable" style="font-size: 16px;">It</div>
+                            <div class="sb-desc interactable" style="font-size: 11px;">(Replaces object)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="center-col">
+                <div class="step" style="text-align: center; width: 100%;">
+                    <div class="center-title interactable" style="display: inline-block;">1st and 2nd Person: The Dialogue</div>
+                    <div class="center-desc interactable" style="margin: 10px auto 0;">Subject pronouns replace names to avoid repetition, categorized by speaker perspective and number.</div>
+                </div>
+
+                <div class="matrix-grid">
+                    <div class="m-tab-left step" style="background: #14b8a6; color: white;"><span class="interactable">Person</span></div>
+                    <div class="m-header-1 step"><span style="font-size: 24px;">💬</span><span class="interactable">1st Person</span></div>
+                    <div class="m-header-2 step"><span style="font-size: 24px;">🗣️👂</span><span class="interactable">2nd Person</span></div>
+                    <div class="m-header-1 step"><span style="font-size: 24px;">👥</span><span class="interactable">3rd Person</span></div>
+                    <div class="m-tab-right step" style="background: transparent; box-shadow: none;"></div>
+
+                    <div class="m-tab-left step"><span class="interactable">Singular</span></div>
+                    <div class="m-cell step interactable">I</div>
+                    <div class="m-cell step">
+                        <span class="interactable">You</span>
+                        <div class="m-cell-icon">👉👦</div>
+                    </div>
+                    <div class="m-cell step">
+                        <span class="interactable">He / She / It</span>
+                        <div class="m-cell-icon" style="font-size: 28px;">👦👧📘</div>
+                    </div>
+                    <div class="m-tab-right step" style="background: transparent; box-shadow: none;"></div>
+
+                    <div class="m-tab-left step" style="background: #eab308; box-shadow: 0 4px 0 #ca8a04;"><span class="interactable">Plural</span></div>
+                    <div class="m-cell step interactable">We</div>
+                    <div class="m-cell step interactable">You (all)</div>
+                    <div class="m-cell step interactable">They</div>
+                    <div class="m-tab-right step"><span class="interactable">Plural</span></div>
+                </div>
+
+                <div class="step bottom-title interactable">3rd Person: People and Things</div>
+            </div>
+
+            <div class="side-col">
+                <div class="side-box step" style="border-color: #e0f2fe; background: #f8fafc;">
+                    <div class="sb-title interactable">2nd Person (You)</div>
+                    
+                    <div class="sb-item">
+                        <div class="sb-icon">👉👦</div>
+                        <div class="sb-label interactable">You</div>
+                        <div class="sb-desc interactable">(Refers directly to the listener)</div>
+                    </div>
+                    
+                    <div class="sb-item" style="margin-top: 10px;">
+                        <div class="sb-icon">👉👥</div>
+                        <div class="sb-label interactable">You (all)</div>
+                        <div class="sb-desc interactable">(Refers to a group of listeners)</div>
+                    </div>
+                </div>
+
+                <div class="side-box step" style="border-color: #ccfbf1; background: #f0fdfa;">
+                    <div class="sb-title interactable">Plural (They)</div>
+                    
+                    <div class="sb-item">
+                        <div class="sb-icon">👨‍👩‍👦‍👦</div>
+                        <div class="sb-label interactable">They</div>
+                        <div class="sb-desc interactable">(Replaces the names of multiple people or more than one thing)</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TAB VIETNAMESE -->
+    <div id="vietnameseTab" class="tab-content">
+        <h1 class="main-title step interactable">Đại từ nhân xưng: Bảng tra cứu nhanh</h1>
+
+        <div class="layout-wrapper">
+            
+            <div class="side-col">
+                <div class="side-box step" style="border-color: #ccfbf1; background: #f0fdfa;">
+                    <div class="sb-title interactable">Ngôi thứ nhất (I, We)</div>
+                    
+                    <div class="sb-item">
+                        <div class="sb-icon">🙋‍♂️</div>
+                        <div class="sb-label interactable">I</div>
+                        <div class="sb-desc interactable">(Chỉ một mình người nói)</div>
+                    </div>
+                    
+                    <div class="sb-item" style="margin-top: 10px;">
+                        <div class="sb-icon">👨‍👩‍👧‍👦</div>
+                        <div class="sb-label interactable">We</div>
+                        <div class="sb-desc interactable">(Chỉ người nói với tư cách là một phần của nhóm)</div>
+                    </div>
+                </div>
+
+                <div class="side-box step" style="border-color: #e0f2fe; background: #f8fafc;">
+                    <div class="sb-title interactable">Số ít (He, She, It)</div>
+                    
+                    <div class="flex-row">
+                        <div class="sb-item" style="width: 30%;">
+                            <div class="sb-icon" style="font-size: 45px;">👦</div>
+                            <div class="sb-label interactable" style="font-size: 16px;">He</div>
+                            <div class="sb-desc interactable" style="font-size: 11px;">(Thay thế người nam)</div>
+                        </div>
+                        <div class="sb-item" style="width: 30%;">
+                            <div class="sb-icon" style="font-size: 45px;">👧</div>
+                            <div class="sb-label interactable" style="font-size: 16px;">She</div>
+                            <div class="sb-desc interactable" style="font-size: 11px;">(Thay thế người nữ)</div>
+                        </div>
+                        <div class="sb-item" style="width: 30%;">
+                            <div class="sb-icon" style="font-size: 45px;">📘</div>
+                            <div class="sb-label interactable" style="font-size: 16px;">It</div>
+                            <div class="sb-desc interactable" style="font-size: 11px;">(Thay thế đồ vật)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="center-col">
+                <div class="step" style="text-align: center; width: 100%;">
+                    <div class="center-title interactable" style="display: inline-block;">Ngôi thứ 1 và thứ 2: Cuộc hội thoại</div>
+                    <div class="center-desc interactable" style="margin: 10px auto 0;">Đại từ nhân xưng thay thế tên để tránh lặp lại, được phân loại theo góc nhìn của người nói và số lượng.</div>
+                </div>
+
+                <div class="matrix-grid">
+                    <div class="m-tab-left step" style="background: #14b8a6; color: white;"><span class="interactable">Ngôi</span></div>
+                    <div class="m-header-1 step"><span style="font-size: 24px;">💬</span><span class="interactable">Ngôi thứ 1</span></div>
+                    <div class="m-header-2 step"><span style="font-size: 24px;">🗣️👂</span><span class="interactable">Ngôi thứ 2</span></div>
+                    <div class="m-header-1 step"><span style="font-size: 24px;">👥</span><span class="interactable">Ngôi thứ 3</span></div>
+                    <div class="m-tab-right step" style="background: transparent; box-shadow: none;"></div>
+
+                    <div class="m-tab-left step"><span class="interactable">Số ít</span></div>
+                    <div class="m-cell step interactable">I</div>
+                    <div class="m-cell step">
+                        <span class="interactable">You</span>
+                        <div class="m-cell-icon">👉👦</div>
+                    </div>
+                    <div class="m-cell step">
+                        <span class="interactable">He / She / It</span>
+                        <div class="m-cell-icon" style="font-size: 28px;">👦👧📘</div>
+                    </div>
+                    <div class="m-tab-right step" style="background: transparent; box-shadow: none;"></div>
+
+                    <div class="m-tab-left step" style="background: #eab308; box-shadow: 0 4px 0 #ca8a04;"><span class="interactable">Số nhiều</span></div>
+                    <div class="m-cell step interactable">We</div>
+                    <div class="m-cell step interactable">You (all)</div>
+                    <div class="m-cell step interactable">They</div>
+                    <div class="m-tab-right step"><span class="interactable">Số nhiều</span></div>
+                </div>
+
+                <div class="step bottom-title interactable">Ngôi thứ 3: Người và Vật</div>
+            </div>
+
+            <div class="side-col">
+                <div class="side-box step" style="border-color: #e0f2fe; background: #f8fafc;">
+                    <div class="sb-title interactable">Ngôi thứ hai (You)</div>
+                    
+                    <div class="sb-item">
+                        <div class="sb-icon">👉👦</div>
+                        <div class="sb-label interactable">You</div>
+                        <div class="sb-desc interactable">(Chỉ trực tiếp người nghe)</div>
+                    </div>
+                    
+                    <div class="sb-item" style="margin-top: 10px;">
+                        <div class="sb-icon">👉👥</div>
+                        <div class="sb-label interactable">You (all)</div>
+                        <div class="sb-desc interactable">(Chỉ một nhóm người nghe)</div>
+                    </div>
+                </div>
+
+                <div class="side-box step" style="border-color: #ccfbf1; background: #f0fdfa;">
+                    <div class="sb-title interactable">Số nhiều (They)</div>
+                    
+                    <div class="sb-item">
+                        <div class="sb-icon">👨‍👩‍👦‍👦</div>
+                        <div class="sb-label interactable">They</div>
+                        <div class="sb-desc interactable">(Thay thế tên của nhiều người hoặc nhiều đồ vật)</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let stepsArray = [];
+    let currentStepIndex = -1;
+    let isFocusMode = false;
+
+    // --- DOM TREE WALKER: BỌC TỪ THÔNG MINH ---
+    function wrapWords() {
+        const interactables = document.querySelectorAll('.interactable');
+        
+        interactables.forEach(el => {
+            const fullSentence = el.innerText; 
+            
+            function wrapTextNodes(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.nodeValue;
+                    if (!text.trim()) return; 
+                    
+                    const fragment = document.createDocumentFragment();
+                    const words = text.split(/(\s+)/); 
+                    
+                    words.forEach(wordStr => {
+                        if (!wordStr.trim()) {
+                            fragment.appendChild(document.createTextNode(wordStr));
+                        } else {
+                            const span = document.createElement('span');
+                            span.className = 'word';
+                            span.textContent = wordStr;
+                            
+                            span.onclick = (e) => {
+                                e.stopPropagation();
+                                const cleanWord = wordStr.replace(/[^a-zA-Z0-9-']/g, '');
+                                if(cleanWord) lookUpSpecific(cleanWord);
+                            };
+                            
+                            span.oncontextmenu = (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                lookUpSpecific(fullSentence, true);
+                            };
+                            
+                            fragment.appendChild(span);
+                        }
+                    });
+                    node.parentNode.replaceChild(fragment, node);
+                } 
+                else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('word') && node.nodeName.toLowerCase() !== 'svg') {
+                    Array.from(node.childNodes).forEach(wrapTextNodes);
+                }
+            }
+            Array.from(el.childNodes).forEach(wrapTextNodes);
+        });
+    }
+
+    // --- DICTIONARY & TRANSLATION CORE ---
+    function lookUpSpecific(text, isSentence = false) {
+        document.getElementById('searchInput').value = text.replace(/\n/g, ' ');
+        if(!document.getElementById('dictPanel').classList.contains('active')) toggleDict();
+        if(!isSentence) speak(text);
+        
+        if(isSentence) {
+            translateInput();
+        } else {
+            fetchDictionary(text);
+        }
+    }
+
+    async function fetchDictionary(word) {
+        const resArea = document.getElementById('resultArea');
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang kết nối từ điển <b>"${word}"</b>... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const data = await res.json();
+            
+            const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(word)}`);
+            const transData = await transRes.json();
+            const vietMeaning = transData[0][0][0];
+
+            if(data.title || !Array.isArray(data)) { 
+                resArea.innerHTML = `
+                    <div style="font-size:22px; font-weight:bold; color:#0f172a;">${word}</div>
+                    <div class="mean-text" style="margin-top:10px;"><b>Nghĩa tiếng Việt:</b> <span style="color:#b91c1c; font-weight:bold;">${vietMeaning}</span></div>
+                `;
+                return; 
+            }
+
+            const entry = data[0];
+            let phonetic = entry.phonetic || (entry.phonetics && entry.phonetics.find(p => p.text)?.text) || '';
+            let audioUrl = (entry.phonetics && entry.phonetics.find(p => p.audio)?.audio) || '';
+            const pos = entry.meanings[0] ? entry.meanings[0].partOfSpeech : 'vocabulary';
+            const enDef = entry.meanings[0] && entry.meanings[0].definitions[0] ? entry.meanings[0].definitions[0].definition : '';
+
+            resArea.innerHTML = `
+                <div style="font-size:24px; font-weight:bold; color:#1e3a8a; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${word}</span>
+                    <button onclick="playDirectAudio('${audioUrl}', '${word}')" style="background:#e0f2fe; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; font-size:18px;">🔊</button>
+                </div>
+                <div class="ipa-text">${phonetic ? phonetic : '[no phonetic]'}</div>
+                <div class="pos-text">(${pos})</div>
+                <div style="height:1px; background:#e2e8f0; margin: 8px 0;"></div>
+                <div class="mean-text"><b>🇻🇳 Nghĩa:</b> <span style="color:#b91c1c; font-weight:bold; font-size:16px;">${vietMeaning}</span></div>
+                ${enDef ? `<div class="mean-text" style="margin-top:6px; font-size:13px; color:#64748b;"><b>English Def:</b> ${enDef}</div>` : ''}
+            `;
+            if(audioUrl) playDirectAudio(audioUrl, word);
+        } catch(e) { 
+            resArea.innerHTML = `<span style="color:red;">Lỗi phân tích hoặc không tìm thấy từ.</span>`; 
+        }
+    }
+
+    async function translateInput() {
+        let text = document.getElementById('searchInput').value.trim();
+        const resArea = document.getElementById('resultArea');
+        if (!text) return;
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang biên dịch... ⏳</div>`;
+        try {
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(text)}`);
+            const data = await res.json();
+            let transResult = data[0].map(item => item[0]).join('');
+            resArea.innerHTML = `
+                <div style="font-size:13px; color:#64748b; font-style:italic; margin-bottom:8px; border-left:3px solid #cbd5e1; padding-left:8px;">"${text}"</div>
+                <div style="font-size:16px; color:#1e293b; font-weight:bold;">🇻🇳 Bản dịch Việt ngữ:</div>
+                <div class="mean-text" style="color:#0369a1; font-weight:bold; font-size:16px; margin-top:4px;">${transResult}</div>
+            `;
+        } catch(e) { resArea.innerHTML = "Lỗi kết nối. Thử lại sau."; }
+    }
+
+    function toggleDict() { document.getElementById('dictPanel').classList.toggle('active'); }
+    
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/[^a-zA-Z0-9 ,.!?'"-]/g, '').replace(/\n/g, ' ');
+        const u = new SpeechSynthesisUtterance(cleanText);
+        u.lang = 'en-US'; u.rate = 0.85;
+        window.speechSynthesis.speak(u);
+    }
+    
+    function playDirectAudio(url, wordFallback) {
+        if(url && url.startsWith('http')) {
+            let audio = new Audio(url);
+            audio.play().catch(() => speak(wordFallback));
+        } else {
+            speak(wordFallback);
+        }
+    }
+
+    function speakInput() { speak(document.getElementById('searchInput').value); }
+    function handleSearch(e) { if (e.key === 'Enter') translateInput(); }
+
+    // --- FOCUS MODE ---
+    function toggleFocusMode() {
+        isFocusMode = !isFocusMode;
+        const header = document.getElementById('mainHeader');
+        const controlBar = document.getElementById('controlBar');
+        const container = document.getElementById('mainContainer');
+        const focusBtn = document.getElementById('focusBtn');
+        const sideMenus = document.querySelectorAll('.side-menu');
+        const dictPanel = document.getElementById('dictPanel');
+
+        if (isFocusMode) {
+            header.style.transform = 'translateY(-100%)';
+            controlBar.style.top = '0px';
+            container.style.marginTop = '70px';
+            container.style.height = 'calc(100vh - 85px)';
+            sideMenus.forEach(m => m.style.top = '70px');
+            dictPanel.style.top = '75px';
+            focusBtn.innerHTML = 'Thu nhỏ 🔳';
+            focusBtn.style.background = '#fef3c7';
+            focusBtn.style.color = '#d97706';
+            focusBtn.style.borderColor = '#d97706';
+        } else {
+            header.style.transform = 'translateY(0)';
+            controlBar.style.top = '65px';
+            container.style.marginTop = '125px';
+            container.style.height = 'calc(100vh - 145px)';
+            sideMenus.forEach(m => m.style.top = '130px');
+            dictPanel.style.top = '135px';
+            focusBtn.innerHTML = 'Phóng to 🔲';
+            focusBtn.style.background = '#10b981';
+            focusBtn.style.color = 'white';
+            focusBtn.style.borderColor = '#059669';
+        }
+    }
+
+    // --- TAB SWITCHING & STEP SYNC ---
+    function switchPresentationTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector(`[onclick="switchPresentationTab('${tabId}')"]`).classList.add('active');
+        
+        const prevIndex = currentStepIndex;
+        initStepsForActiveTab();
+        
+        for(let i = 0; i <= prevIndex; i++) {
+            if(stepsArray[i]) stepsArray[i].classList.add('active');
+        }
+        currentStepIndex = prevIndex;
+    }
+
+    function initStepsForActiveTab() {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab) {
+            stepsArray = activeTab.querySelectorAll('.step');
+        }
+        currentStepIndex = -1;
+    }
+
+    // --- STEP CONTROLS ---
+    function goNext() {
+        if (currentStepIndex < stepsArray.length - 1) {
+            currentStepIndex++;
+            stepsArray[currentStepIndex].classList.add('active');
+            stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function goPrev() {
+        if (currentStepIndex >= 0) {
+            stepsArray[currentStepIndex].classList.remove('active');
+            currentStepIndex--;
+            if(currentStepIndex >= 0) {
+                stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' ', 'Enter', 'N', 'n'].includes(e.key)) { e.preventDefault(); goNext(); }
+        if (['ArrowLeft', 'PageUp', 'P', 'p', 'Backspace'].includes(e.key)) { e.preventDefault(); goPrev(); }
+    });
+
+    function toggleMenu(side) { document.getElementById(side + 'Menu').classList.toggle('open'); }
+
+    // --- PEN TOOL ---
+    let inkCanvas, inkCtx, isDrawing = false, lastX = 0, lastY = 0;
+    function initInk() {
+        inkCanvas = document.getElementById("inkCanvas");
+        inkCtx = inkCanvas.getContext("2d");
+        inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        
+        window.addEventListener("resize", () => {
+            inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        });
+
+        inkCanvas.addEventListener("pointerdown", e => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; lastX = e.clientX; lastY = e.clientY; } });
+        inkCanvas.addEventListener("pointermove", e => {
+            if (!isDrawing) return;
+            inkCtx.strokeStyle = "#e67e22"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round";
+            inkCtx.beginPath(); inkCtx.moveTo(lastX, lastY); inkCtx.lineTo(e.clientX, e.clientY); inkCtx.stroke();
+            lastX = e.clientX; lastY = e.clientY;
+        });
+        window.addEventListener("pointerup", () => isDrawing = false);
+    }
+    
+    function toggleInk() {
+        const active = inkCanvas.classList.toggle("drawing");
+        document.getElementById("penBtn").textContent = active ? "Bút vẽ: On" : "Bút vẽ: Off";
+        document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    // --- INIT ---
+    window.onload = () => {
+        initInk();
+        wrapWords();
+        initStepsForActiveTab(); 
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conversation – Modern Learning</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;font-family: 'UTM Avo', 'Quicksand', sans-serif;}
+
+body{
+  background: #f0e6d6;
+  padding-top: 170px; 
+  overflow-x: hidden;
+  color: #333;
+}
+header button, header select {
+  background-color: #fff;
+  border: 2px solid #d4bfa6;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: normal;
+  color: #8b5e3c;
+  transition: 0.3s;
+}
+
+header button.active-nav {
+  font-weight: bold;
+  background-color: #e6ccb2;
+  border-color: #8b5e3c;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+header{
+  position:fixed;top:0;left:0;right:0;
+  background: #e5d8c1;
+  padding: 15px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #d3c4a9;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 5px;
+  border-radius: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #8a6542;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.nav-links a.active-link {
+  background: #c36a2d;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.controls{
+  display:flex;justify-content:center;gap:12px;flex-wrap:wrap;
+  align-items: center;
+}
+
+.btn{
+  padding:10px 20px;
+  border-radius:12px;
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+  color: #333;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #dcdcdc;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+select.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+  background: #ffffff url('data:image/svg+xml;utf8,<svg viewBox="0 0 140 140" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><g><path d="m121.3,34.6c-1.6-1.6-4.2-1.6-5.8,0l-51,51.1-51.1-51.1c-1.6-1.6-4.2-1.6-5.8,0-1.6,1.6-1.6,4.2 0,5.8l53.9,53.9c0.8,0.8 1.8,1.2 2.9,1.2 1,0 2.1-0.4 2.9-1.2l53.9-53.9c1.7-1.6 1.7-4.2 0.1-5.8z" fill="%23333"/></g></svg>') no-repeat right 10px center;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #dcdcdc;
+}
+
+.btn-side {
+  background: #c36a2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #a04000;
+}
+
+.btn-side:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 #a04000;
+}
+
+.btn.active{
+  background: #fff !important;
+  color: #c36a2d !important;
+  border-color: #c36a2d;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  z-index: 2000;
+  transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+  padding: 30px 15px;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar.left { left: -250px; border-right: 4px solid #c36a2d; }
+.sidebar.right { right: -250px; border-left: 4px solid #c36a2d; }
+.sidebar.open { transform: translateX(250px); }
+.sidebar.right.open { transform: translateX(-250px); }
+
+.sidebar button {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar button.active { background: #c36a2d; color: #fff; }
+
+.content{ text-align:center; padding: 0 10px; }
+
+/* Bọc Video và Quiz */
+.video-quiz-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: left; 
+  gap: 20px; 
+  max-width: 1200px; 
+  margin: 0 auto;
+}
+
+#mainVideo{
+  width:100%; max-width:500px;
+  border-radius:24px;
+  cursor:pointer;
+  background:#000;
+  border: 10px solid #000; 
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+/* Giao diện Quiz */
+.quiz-panel {
+  display: none;
+  width: 100%; max-width: 500px;
+  background: #ffffff;
+  border: 4px solid #c36a2d;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.quiz-option {
+  display: block; width: 100%;
+  padding: 12px; margin-bottom: 10px;
+  border: 2px solid #eee; border-radius: 12px;
+  background: #fff; cursor: pointer;
+  font-size: 24px; font-weight: 700; color: #333;
+  transition: 0.2s; text-align: left;
+}
+.quiz-option:hover { border-color: #c36a2d; }
+.quiz-option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.quiz-option.wrong { 
+  background: #f8d7da; border-color: #dc3545; color: #721c24; 
+  animation: shake 0.4s ease-in-out;
+}
+
+@media (max-width: 800px) {
+  .video-quiz-wrapper { flex-direction: column; align-items: center; }
+}
+
+.speech{
+  margin: 30px auto;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 25px;
+  font-size: 35px;
+  font-weight: 700;
+  box-shadow: 0 10px 0 #dcdcdc;
+  line-height: 1.4;
+}
+
+.word{
+  cursor:pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  display:inline-block;
+}
+
+.word.reading{
+  background: #ffeb3b;
+  color: #c36a2d;
+  transform: scale(1.1);
+}
+
+canvas{
+  position:fixed; top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none; z-index:900;
+  touch-action: none;
+}
+canvas.pen-active{ pointer-events:auto; }
+
+#dictPopup {
+  position: fixed;
+  background: white;
+  border-top: 5px solid #c36a2d;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 2000;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  min-width: 180px;
+  pointer-events: none;
+}
+
+</style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+<div id="dictPopup"></div>
+
+<div id="sidebarLeft" class="sidebar left">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📚 Lessons</h3>
+   <button onclick="location.href='01 Vocabulary 1.html'">Vocabulary 1</button>
+  <button onclick="location.href='02 Vocabulary 2.html'">Vocabulary 2</button>
+  <button onclick="location.href='03 Vocabulary memory matching.html'">Memory Matching</button>
+  <button onclick="location.href='04 grammar.html'">Grammar</button>
+  <button onclick="location.href='05 Sentence Swap Game.html'">Sentence Swap</button>
+  <button onclick="location.href='06 Reorder.html'">Reorder</button>
+  <button onclick="location.href='07 Dropdown.html'">Dropdown</button>
+</div>
+
+<div id="sidebarRight" class="sidebar right">
+  <h3 style="margin-bottom:15px; color:#c36a2d">📝 Practice</h3>
+  <button onclick="toggleQuiz(); toggleSidebar('sidebarRight')"><b>Quiz</b></button>
+  <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+  <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+  <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+  <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+  <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+  <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+  <button class="active" onclick="location.href='story.html'"><b>story</b></button>
+</div>
+
+<header>
+  <div class="top-nav">
+    <button class="btn-side" onclick="toggleSidebar('sidebarLeft')">☰ Menu</button>
+    <nav class="nav-links">
+  <a href="../conversation_01/conversation_01.html" >Conversation 01</a>
+  <a href="../conversation_02/conversation_02.html" >Conversation 02</a>
+  <a href="../conversation_03/conversation_03.html" class="active-link">Conversation 03</a>
+  <a href="../conversation_04/conversation_04.html" >Conversation 04</a>
+</nav>
+    <button class="btn-side" onclick="toggleSidebar('sidebarRight')">Menu ☰</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="playConversation()"><span>🔊</span> Play All</button>
+    <button class="btn" onclick="pauseToggle()"><span>⏸</span> Pause</button>
+    <button class="btn" onclick="stopConversation()"><span>⏹</span> Stop</button>
+    <select class="btn" id="speedControl" onchange="changeSpeed()">
+      <option value="0.5">🐢 0.5x Slower</option>
+      <option value="0.75">🚶 0.75x Slow</option>
+      <option value="1" selected>▶️ 1.0x Normal</option>
+      <option value="1.25">🏃 1.25x Fast</option>
+      <option value="1.5">🚀 1.5x Faster</option>
+    </select>
+    <button class="btn" id="penBtn" onclick="togglePen()"><span>✏️</span> Pen: OFF</button>
+    <button class="btn" onclick="clearCanvas()"><span>🗑️</span> Clear</button>
+    <button class="btn" id="subBtn" onclick="toggleSubtitle()">
+      <span>💬</span> Subtitle: ON
+    </button>
+    <button class="btn" id="quizBtnTop" onclick="toggleQuiz()"><span>❓</span> Quiz: OFF</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="video-quiz-wrapper">
+    <video id="mainVideo" onclick="handleVideoClick()" playsinline>
+      <source src="./videos/story1.mp4" type="video/mp4">
+    </video>
+    <div id="quizPanel" class="quiz-panel">
+      <h3 style="color: #c36a2d; margin-bottom: 15px; text-align: center; font-size: 20px;">Mini Quiz</h3>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <div class="speech" id="currentLine">Bấm Play All để bắt đầu học!</div>
+</div>
+
+<script>
+let subtitleOn = false;
+const video = document.getElementById("mainVideo");
+const bubble = document.getElementById("currentLine");
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+const dictPopup = document.getElementById("dictPopup");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let animationFrameId, isSyncing=false, isDrawing=false;
+
+function toggleSidebar(id) {
+  const sb = document.getElementById(id);
+  const isOpen = sb.classList.contains('open');
+  document.getElementById('sidebarLeft').classList.remove('open');
+  document.getElementById('sidebarRight').classList.remove('open');
+  if(!isOpen) sb.classList.add('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sidebar') && !e.target.closest('.btn-side')) {
+    document.getElementById('sidebarLeft').classList.remove('open');
+    document.getElementById('sidebarRight').classList.remove('open');
+  }
+});
+
+function togglePen(){
+  canvas.classList.toggle("pen-active");
+  const btn = document.getElementById("penBtn");
+  if(canvas.classList.contains("pen-active")) {
+    btn.innerHTML = "<span>✏️</span> Pen: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>✏️</span> Pen: OFF";
+    btn.classList.remove("active");
+  }
+}
+
+function changeSpeed() {
+  const speed = document.getElementById("speedControl").value;
+  video.playbackRate = parseFloat(speed);
+}
+
+// ================= LỚP ÂM THANH & HIỆU ỨNG =================
+let audioCtx;
+
+function playSound(type) {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  if (type === 'correct') {
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      const now = audioCtx.currentTime;
+      osc.start(now + i * 0.1);
+      gain.gain.setValueAtTime(0, now + i * 0.1);
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.1 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.5);
+      osc.stop(now + i * 0.1 + 0.5);
+    });
+  } else {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 120;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    osc.start(now);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    osc.stop(now + 0.4);
+  }
+}
+
+function shootFireworks() {
+  var duration = 2000;
+  var animationEnd = Date.now() + duration;
+  var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  var interval = setInterval(function() {
+    var timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    var particleCount = 50 * (timeLeft / duration);
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+  }, 250);
+}
+// ==========================================================
+
+// --- LOGIC QUIZ (CẬP NHẬT CHUẨN VIDEO STORY1.MP4) ---
+const quizData = [
+  {
+    question: "Who are the two children fighting in the story?",
+    options: [
+      "Maya and Leo",
+      "Lucy and Luka",
+      "Tom and Jerry",
+      "Anna and Elsa"
+    ],
+    correct: "Maya and Leo"
+  },
+  {
+    question: "What did Leo put into the washing machine?",
+    options: [
+      "Blue detergent",
+      "Cold water",
+      "Small toys",
+      "Fresh milk"
+    ],
+    correct: "Blue detergent"
+  },
+  {
+    question: "Why did Maya put more soap into the machine?",
+    options: [
+      "To make clothes very clean",
+      "Because she was bored",
+      "To hide it from Dad",
+      "To change color"
+    ],
+    correct: "To make clothes very clean"
+  },
+  {
+    question: "What did Dad bring home?",
+    options: [
+      "A new electric fan",
+      "A big television",
+      "A modern robot",
+      "Some delicious food"
+    ],
+    correct: "A new electric fan"
+  },
+  {
+    question: "What did the children think about the new fan?",
+    options: [
+      "It looks cool and modern",
+      "It looks very old",
+      "It is too big",
+      "They didn't like it"
+    ],
+    correct: "It looks cool and modern"
+  },
+  {
+    question: "Why did Maya say she should use the remote first?",
+    options: [
+      "Because she is elder sister",
+      "Because she bought it",
+      "Because Leo was sleeping",
+      "Because Dad gave her"
+    ],
+    correct: "Because she is elder sister"
+  },
+  {
+    question: "What happened to the remote during the fight?",
+    options: [
+      "It fell and broke",
+      "The dog ate it",
+      "It flew out window",
+      "It started making music"
+    ],
+    correct: "It fell and broke"
+  },
+  {
+    question: "What did Dad tell them they should do?",
+    options: [
+      "Share and give in each other",
+      "Buy new remote control",
+      "Go to their bedrooms",
+      "Never watch tv again"
+    ],
+    correct: "Share and give in each other"
+  }
+];
+
+let currentQIndex = 0;
+
+function wrapWordsForDict(text) {
+  return text.split(/\s+/).map(w => {
+    const clean = w.replace(/[.,!?"“”]/g, "").toLowerCase();
+    const cleanEscaped = clean.replace(/'/g, "\\'");
+    return `<span class="word" onclick="handleWordClick(event, '${cleanEscaped}')">${w}</span>`;
+  }).join(" ");
+}
+
+function renderQuiz() {
+  const qp = document.getElementById("quizContent");
+
+  if (currentQIndex >= quizData.length) {
+    qp.innerHTML = `
+      <h4 style='text-align:center; color:#28a745; margin-top:20px;'>
+        🎉 You finished the quiz!
+      </h4>
+      <button class='quiz-option' style='margin-top:20px; text-align:center;' onclick='resetQuiz()'>
+        Play Again
+      </button>`;
+    shootFireworks();
+    return;
+  }
+
+  const q = quizData[currentQIndex];
+
+  let html = `
+    <div>
+      <div style="font-weight:bold; margin-bottom:15px; font-size:24px;">
+        Question ${currentQIndex + 1}: ${wrapWordsForDict(q.question)}
+      </div>
+  `;
+
+  q.options.forEach(opt => {
+    const isCorrect = (opt === q.correct);
+    html += `
+      <button class="quiz-option"
+        onclick="checkAns(this, ${isCorrect})">
+        ${wrapWordsForDict(opt)}
+      </button>`;
+  });
+  html += `</div>`;
+  qp.innerHTML = html;
+}
+
+function checkAns(btn, isCorrect) {
+  const btns = btn.parentElement.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.style.pointerEvents = 'none'); 
+  if (isCorrect) {
+    btn.classList.add('correct');
+    playSound('correct');
+    shootFireworks();
+    
+    setTimeout(() => {
+      currentQIndex++;
+      renderQuiz();
+    }, 2500);
+  } else {
+    btn.classList.add('wrong');
+    playSound('wrong');
+    
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      btns.forEach(b => b.style.pointerEvents = 'auto');
+    }, 800);
+  }
+}
+
+function resetQuiz() {
+  currentQIndex = 0;
+  renderQuiz();
+}
+
+function toggleQuiz() {
+  const qp = document.getElementById("quizPanel");
+  const topBtn = document.getElementById("quizBtnTop");
+  
+  if (qp.style.display === "none" || qp.style.display === "") {
+    qp.style.display = "block";
+    topBtn.classList.add("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: ON";
+    if(currentQIndex === 0) renderQuiz();
+  } else {
+    qp.style.display = "none";
+    topBtn.classList.remove("active");
+    topBtn.innerHTML = "<span>❓</span> Quiz: OFF";
+  }
+}
+// --------------------------
+
+// --- DICTIONARY (CẬP NHẬT KHÔNG BỎ SÓT BẤT KỲ TỪ NÀO) ---
+const dictionary = {
+  // Pronouns & Nouns
+  "i": { meaning: "tôi / mình / chị / em", phonetic: "/aɪ/", type: "pronoun" },
+  "me": { meaning: "tôi / mình", phonetic: "/miː/", type: "pronoun" },
+  "we": { meaning: "chúng ta", phonetic: "/wiː/", type: "pronoun" },
+  "it": { meaning: "nó", phonetic: "/ɪt/", type: "pronoun" },
+  "you": { meaning: "bạn / con / các con", phonetic: "/juː/", type: "pronoun" },
+  "she": { meaning: "cô ấy / chị ấy", phonetic: "/ʃiː/", type: "pronoun" },
+  "they": { meaning: "họ / chúng", phonetic: "/ðeɪ/", type: "pronoun" },
+  "them": { meaning: "họ / chúng", phonetic: "/ðem/", type: "pronoun" },
+  "her": { meaning: "cô ấy / của cô ấy", phonetic: "/hɜːr/", type: "pronoun" },
+  "this": { meaning: "cái này", phonetic: "/ðɪs/", type: "pronoun" },
+  "what": { meaning: "cái gì", phonetic: "/wɒt/", type: "pronoun" },
+  "who": { meaning: "ai", phonetic: "/huː/", type: "pronoun" },
+
+  "dad": { meaning: "bố", phonetic: "/dæd/", type: "noun" },
+  "children": { meaning: "những đứa trẻ", phonetic: "/ˈtʃɪldrən/", type: "noun" },
+  "sister": { meaning: "chị / em gái", phonetic: "/ˈsɪstər/", type: "noun" },
+  "buttons": { meaning: "những nút bấm", phonetic: "/ˈbʌtənz/", type: "noun" },
+  "lot": { meaning: "nhiều", phonetic: "/lɒt/", type: "noun" },
+  "soap": { meaning: "xà phòng", phonetic: "/səʊp/", type: "noun" },
+  "bubbles": { meaning: "bong bóng / bọt", phonetic: "/ˈbʌbəlz/", type: "noun" },
+  "clothes": { meaning: "quần áo", phonetic: "/kləʊðz/", type: "noun" },
+  "fan": { meaning: "cái quạt", phonetic: "/fæn/", type: "noun" },
+  "house": { meaning: "ngôi nhà", phonetic: "/haʊs/", type: "noun" },
+  "remote": { meaning: "điều khiển từ xa", phonetic: "/rɪˈməʊt/", type: "noun" },
+  "control": { meaning: "sự điều khiển", phonetic: "/kənˈtrəʊl/", type: "noun" },
+  "story": { meaning: "câu chuyện", phonetic: "/ˈstɔːri/", type: "noun" },
+  "washing": { meaning: "việc giặt giũ", phonetic: "/ˈwɒʃɪŋ/", type: "noun" },
+  "machine": { meaning: "máy móc", phonetic: "/məˈʃiːn/", type: "noun" },
+  "detergent": { meaning: "chất tẩy rửa", phonetic: "/dɪˈtɜːdʒənt/", type: "noun" },
+  "water": { meaning: "nước", phonetic: "/ˈwɔːtər/", type: "noun" },
+  "toys": { meaning: "đồ chơi", phonetic: "/tɔɪz/", type: "noun" },
+  "milk": { meaning: "sữa", phonetic: "/mɪlk/", type: "noun" },
+  "color": { meaning: "màu sắc", phonetic: "/ˈkʌlər/", type: "noun" },
+  "television": { meaning: "ti vi", phonetic: "/ˈtelɪvɪʒən/", type: "noun" },
+  "tv": { meaning: "ti vi", phonetic: "/ˌtiːˈviː/", type: "noun" },
+  "robot": { meaning: "rô-bốt", phonetic: "/ˈrəʊbɒt/", type: "noun" },
+  "food": { meaning: "thức ăn", phonetic: "/fuːd/", type: "noun" },
+  "fight": { meaning: "cuộc đánh nhau / tranh giành", phonetic: "/faɪt/", type: "noun" },
+  "floor": { meaning: "sàn nhà", phonetic: "/flɔːr/", type: "noun" },
+  "dog": { meaning: "con chó", phonetic: "/dɒɡ/", type: "noun" },
+  "window": { meaning: "cửa sổ", phonetic: "/ˈwɪndəʊ/", type: "noun" },
+  "music": { meaning: "âm nhạc", phonetic: "/ˈmjuːzɪk/", type: "noun" },
+  "bedrooms": { meaning: "phòng ngủ", phonetic: "/ˈbedruːmz/", type: "noun" },
+
+  // Proper nouns
+  "leo": { meaning: "Leo (tên riêng)", phonetic: "/ˈliː.əʊ/", type: "proper noun" },
+  "maya": { meaning: "Maya (tên riêng)", phonetic: "/ˈmaɪ.ə/", type: "proper noun" },
+  "lucy": { meaning: "Lucy (tên riêng)", phonetic: "/ˈluːsi/", type: "proper noun" },
+  "luka": { meaning: "Luka (tên riêng)", phonetic: "/ˈluːkə/", type: "proper noun" },
+  "tom": { meaning: "Tom (tên riêng)", phonetic: "/tɒm/", type: "proper noun" },
+  "jerry": { meaning: "Jerry (tên riêng)", phonetic: "/ˈdʒeri/", type: "proper noun" },
+  "anna": { meaning: "Anna (tên riêng)", phonetic: "/ˈæn.ə/", type: "proper noun" },
+  "elsa": { meaning: "Elsa (tên riêng)", phonetic: "/ˈel.sə/", type: "proper noun" },
+
+  // Verbs
+  "want": { meaning: "muốn", phonetic: "/wɒnt/", type: "verb" },
+  "press": { meaning: "bấm / nhấn", phonetic: "/pres/", type: "verb" },
+  "give": { meaning: "đưa / cho / nhường", phonetic: "/ɡɪv/", type: "verb" },
+  "got": { meaning: "có được / lấy được", phonetic: "/ɡɒt/", type: "verb" },
+  "put": { meaning: "đặt / cho vào", phonetic: "/pʊt/", type: "verb" },
+  "make": { meaning: "làm / tạo ra", phonetic: "/meɪk/", type: "verb" },
+  "look": { meaning: "nhìn", phonetic: "/lʊk/", type: "verb" },
+  "looks": { meaning: "trông có vẻ", phonetic: "/lʊks/", type: "verb" },
+  "have": { meaning: "có", phonetic: "/hæv/", type: "verb" },
+  "has": { meaning: "có", phonetic: "/hæz/", type: "verb" },
+  "is": { meaning: "là / thì / ở", phonetic: "/ɪz/", type: "verb" },
+  "are": { meaning: "là / thì / ở", phonetic: "/ɑːr/", type: "verb" },
+  "was": { meaning: "đã là / đã ở", phonetic: "/wɒz/", type: "verb" },
+  "try": { meaning: "thử", phonetic: "/traɪ/", type: "verb" },
+  "use": { meaning: "sử dụng", phonetic: "/juːz/", type: "verb" },
+  "broke": { meaning: "đã bị hỏng / vỡ", phonetic: "/brəʊk/", type: "verb" },
+  "share": { meaning: "chia sẻ", phonetic: "/ʃeər/", type: "verb" },
+  "fighting": { meaning: "đánh nhau / tranh giành", phonetic: "/ˈfaɪtɪŋ/", type: "verb" },
+  "did": { meaning: "đã làm (trợ động từ)", phonetic: "/dɪd/", type: "verb" },
+  "do": { meaning: "làm", phonetic: "/duː/", type: "verb" },
+  "hide": { meaning: "giấu / trốn", phonetic: "/haɪd/", type: "verb" },
+  "change": { meaning: "thay đổi", phonetic: "/tʃeɪndʒ/", type: "verb" },
+  "bring": { meaning: "mang đến", phonetic: "/brɪŋ/", type: "verb" },
+  "think": { meaning: "nghĩ", phonetic: "/θɪŋk/", type: "verb" },
+  "like": { meaning: "thích", phonetic: "/laɪk/", type: "verb" },
+  "say": { meaning: "nói", phonetic: "/seɪ/", type: "verb" },
+  "buy": { meaning: "mua", phonetic: "/baɪ/", type: "verb" },
+  "bought": { meaning: "đã mua", phonetic: "/bɔːt/", type: "verb" },
+  "sleeping": { meaning: "đang ngủ", phonetic: "/ˈsliːpɪŋ/", type: "verb" },
+  "gave": { meaning: "đã cho", phonetic: "/ɡeɪv/", type: "verb" },
+  "happened": { meaning: "đã xảy ra", phonetic: "/ˈhæpənd/", type: "verb" },
+  "fell": { meaning: "đã ngã / rơi", phonetic: "/fel/", type: "verb" },
+  "ate": { meaning: "đã ăn", phonetic: "/eɪt/", type: "verb" },
+  "flew": { meaning: "đã bay", phonetic: "/fluː/", type: "verb" },
+  "started": { meaning: "đã bắt đầu", phonetic: "/ˈstɑːtɪd/", type: "verb" },
+  "making": { meaning: "đang làm / tạo ra", phonetic: "/ˈmeɪkɪŋ/", type: "verb" },
+  "tell": { meaning: "bảo / kể", phonetic: "/tel/", type: "verb" },
+  "go": { meaning: "đi", phonetic: "/ɡəʊ/", type: "verb" },
+  "watch": { meaning: "xem", phonetic: "/wɒtʃ/", type: "verb" },
+
+  // Modals & Contractions
+  "that's": { meaning: "đó là", phonetic: "/ðæts/", type: "contraction" },
+  "i'm": { meaning: "tôi là / mình là", phonetic: "/aɪm/", type: "contraction" },
+  "let's": { meaning: "chúng ta hãy", phonetic: "/lets/", type: "contraction" },
+  "didn't": { meaning: "đã không", phonetic: "/ˈdɪdənt/", type: "contraction" },
+  "will": { meaning: "sẽ", phonetic: "/wɪl/", type: "modal verb" },
+  "should": { meaning: "nên", phonetic: "/ʃʊd/", type: "modal verb" },
+  "cannot": { meaning: "không thể", phonetic: "/ˈkænɒt/", type: "modal verb" },
+
+  // Adjectives
+  "fair": { meaning: "công bằng", phonetic: "/feər/", type: "adjective" },
+  "first": { meaning: "trước / đầu tiên", phonetic: "/fɜːst/", type: "adjective" },
+  "clean": { meaning: "sạch sẽ", phonetic: "/kliːn/", type: "adjective" },
+  "new": { meaning: "mới", phonetic: "/njuː/", type: "adjective" },
+  "cool": { meaning: "ngầu / tuyệt vời", phonetic: "/kuːl/", type: "adjective" },
+  "modern": { meaning: "hiện đại", phonetic: "/ˈmɒdən/", type: "adjective" },
+  "dear": { meaning: "thân yêu", phonetic: "/dɪər/", type: "adjective" },
+  "small": { meaning: "nhỏ", phonetic: "/smɔːl/", type: "adjective" },
+  "elder": { meaning: "lớn tuổi hơn (anh/chị)", phonetic: "/ˈeldər/", type: "adjective" },
+  "blue": { meaning: "màu xanh dương", phonetic: "/bluː/", type: "adjective" },
+  "cold": { meaning: "lạnh", phonetic: "/kəʊld/", type: "adjective" },
+  "fresh": { meaning: "tươi", phonetic: "/freʃ/", type: "adjective" },
+  "bored": { meaning: "buồn chán", phonetic: "/bɔːd/", type: "adjective" },
+  "electric": { meaning: "thuộc về điện", phonetic: "/ɪˈlektrɪk/", type: "adjective" },
+  "big": { meaning: "to lớn", phonetic: "/bɪɡ/", type: "adjective" },
+  "delicious": { meaning: "thơm ngon", phonetic: "/dɪˈlɪʃəs/", type: "adjective" },
+  "old": { meaning: "cũ / già", phonetic: "/əʊld/", type: "adjective" },
+  "loud": { meaning: "to (âm thanh)", phonetic: "/laʊd/", type: "adjective" },
+  "my": { meaning: "của tôi", phonetic: "/maɪ/", type: "determiner" },
+  "our": { meaning: "của chúng ta", phonetic: "/ˈaʊər/", type: "determiner" },
+  "their": { meaning: "của họ", phonetic: "/ðeər/", type: "determiner" },
+  "some": { meaning: "một vài", phonetic: "/sʌm/", type: "determiner" },
+  "each": { meaning: "mỗi", phonetic: "/iːtʃ/", type: "determiner" },
+  "other": { meaning: "khác", phonetic: "/ˈʌðər/", type: "determiner" },
+  "a": { meaning: "một", phonetic: "/ə/", type: "article" },
+  "the": { meaning: "cái / con / người...", phonetic: "/ðə/", type: "article" },
+  "two": { meaning: "số hai", phonetic: "/tuː/", type: "number" },
+
+  // Adverbs & Prepositions
+  "not": { meaning: "không", phonetic: "/nɒt/", type: "adverb" },
+  "now": { meaning: "bây giờ", phonetic: "/naʊ/", type: "adverb" },
+  "more": { meaning: "nhiều hơn", phonetic: "/mɔːr/", type: "adverb" },
+  "very": { meaning: "rất", phonetic: "/ˈveri/", type: "adverb" },
+  "so": { meaning: "quá / thật sự", phonetic: "/səʊ/", type: "adverb" },
+  "really": { meaning: "thực sự", phonetic: "/ˈriːəli/", type: "adverb" },
+  "no": { meaning: "không", phonetic: "/nəʊ/", type: "adverb" },
+  "too": { meaning: "quá / cũng", phonetic: "/tuː/", type: "adverb" },
+  "never": { meaning: "không bao giờ", phonetic: "/ˈnevər/", type: "adverb" },
+  "again": { meaning: "lần nữa", phonetic: "/əˈɡen/", type: "adverb" },
+  "yes": { meaning: "vâng / dạ", phonetic: "/jes/", type: "adverb" },
+  "to": { meaning: "đến / để", phonetic: "/tuː/", type: "preposition" },
+  "of": { meaning: "của", phonetic: "/əv/", type: "preposition" },
+  "for": { meaning: "cho", phonetic: "/fɔːr/", type: "preposition" },
+  "in": { meaning: "trong / vào", phonetic: "/ɪn/", type: "preposition" },
+  "into": { meaning: "vào trong", phonetic: "/ˈɪntuː/", type: "preposition" },
+  "from": { meaning: "từ", phonetic: "/frɒm/", type: "preposition" },
+  "about": { meaning: "về", phonetic: "/əˈbaʊt/", type: "preposition" },
+  "during": { meaning: "trong suốt", phonetic: "/ˈdjʊərɪŋ/", type: "preposition" },
+  "on": { meaning: "trên", phonetic: "/ɒn/", type: "preposition" },
+  "out": { meaning: "ra ngoài", phonetic: "/aʊt/", type: "preposition" },
+  "and": { meaning: "và", phonetic: "/ænd/", type: "conjunction" },
+  "because": { meaning: "bởi vì", phonetic: "/bɪˈkɒz/", type: "conjunction" },
+
+  // Interjections
+  "wow": { meaning: "chà / ồ", phonetic: "/waʊ/", type: "interjection" },
+  "oh": { meaning: "ôi / ồ", phonetic: "/əʊ/", type: "interjection" }
+};
+
+// --- SENTENCES (TIMESTAMPS KHỚP 100% VIDEO STORY1.MP4) ---
+const sentences = [
+  { text: "That's not fair!", start: 0, end: 3, translation: "Thật không công bằng!" },
+  { text: "I want to press the buttons now!", start: 3.5, end: 6, translation: "Em muốn bấm những nút này ngay bây giờ!" },
+  { text: "I'm first, give it to me, Leo!", start: 9, end: 13, translation: "Chị trước, đưa nó cho chị, Leo!" },
+  { text: "I got it!", start: 13.5, end: 16, translation: "Chị lấy được rồi!" },
+  { text: "Let's put a lot of soap to make bubbles, Maya!", start: 17, end: 20.5, translation: "Hãy cho thật nhiều xà phòng để tạo bọt nhé, Maya!" },
+  { text: "Wow! More soap will make the clothes very clean!", start: 21, end: 26.5, translation: "Chà! Thêm xà phòng sẽ làm quần áo rất sạch!" },
+  { text: "Look!", start: 27.5, end: 28.8, translation: "Nhìn này!" },
+  { text: "I have a new fan for our house!", start: 29, end: 33.5, translation: "Bố có một chiếc quạt mới cho nhà mình đây!" },
+  { text: "Wow! It looks so cool and very modern, Dad!", start: 34, end: 39.5, translation: "Chà! Trông nó thật tuyệt và rất hiện đại, bố ơi!" },
+  { text: "Look my dear children, this fan has a very small remote control!", start: 40.5, end: 47.5, translation: "Nhìn này các con yêu, chiếc quạt này có một điều khiển từ xa rất nhỏ!" },
+  { text: "Wow! That is so cool, I really want to try it now!", start: 48, end: 54, translation: "Chà! Thật là tuyệt, con thực sự muốn thử nó ngay bây giờ!" },
+  { text: "No, I'm the elder sister, I should use it first!", start: 55.5, end: 62, translation: "Không, chị là chị cả, chị nên dùng nó trước!" },
+  { text: "That's not fair!", start: 62.5, end: 65, translation: "Thật không công bằng!" },
+  { text: "I want to press the buttons now!", start: 65.5, end: 69, translation: "Em muốn bấm những nút này ngay bây giờ!" },
+  { text: "Oh no!", start: 75.5, end: 78, translation: "Ôi không!" },
+  { text: "It broke.", start: 78.5, end: 80.5, translation: "Nó bị hỏng mất rồi." },
+  { text: "Now we cannot use the remote.", start: 81.5, end: 84.5, translation: "Bây giờ chúng ta không thể dùng điều khiển nữa." },
+  { text: "You should share and give in each other.", start: 85, end: 89, translation: "Các con nên nhường nhịn và chia sẻ với nhau." },
+  { text: "Yes, dad.", start: 90, end: 93, translation: "Vâng ạ, bố." }
+];
+
+function renderSentence(s){
+  const words=s.text.split(/\s+/);
+  bubble.innerHTML=words.map((w)=>{
+    const clean=w.replace(/[.,!?"“”]/g,"").toLowerCase();
+    return `<span class="word" onclick="handleWordClick(event, '${clean}')">${w}</span>`;
+  }).join(" ");
+  bubble.dataset.activeStart=s.start;
+}
+
+bubble.addEventListener('contextmenu', function(e) {
+  e.preventDefault(); 
+  
+  const activeStart = bubble.dataset.activeStart;
+  if (activeStart) {
+    const s = sentences.find(x => String(x.start) === activeStart);
+    if (s && s.translation) {
+      dictPopup.innerHTML = `
+        <b style="color: #c36a2d; font-size: 16px;">🌐 Dịch câu:</b>
+        <p style="margin-top: 8px; font-size: 16px; color: #333;">${s.translation}</p>
+      `;
+      
+      dictPopup.style.left = e.clientX + "px";
+      dictPopup.style.top = (e.clientY - 90) + "px";
+      dictPopup.style.display = "block";
+
+      clearTimeout(window.dictTimeout);
+      window.dictTimeout = setTimeout(() => {
+        dictPopup.style.display = "none";
+      }, 4000);
+    }
+  }
+});
+
+function handleWordClick(event, word) {
+  if(event) event.stopPropagation();
+
+  if(!canvas.classList.contains("pen-active")) {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = "en-US";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  const data = dictionary[word];
+  if (data) {
+    dictPopup.innerHTML = `
+      <b style="text-transform: capitalize;">${word}</b> 
+      <i style="color: #666; font-size: 16px;">(${data.type || 'n/a'})</i><br>
+      <span style="color: #c36a2d; font-size: 16px;">${data.phonetic}</span>
+      <p style="margin-top: 8px;">➡️ ${data.meaning}</p>
+    `;
+    
+    dictPopup.style.left = event.clientX + "px";
+    dictPopup.style.top = (event.clientY - 130) + "px";
+    dictPopup.style.display = "block";
+
+    clearTimeout(window.dictTimeout);
+    window.dictTimeout = setTimeout(() => {
+      dictPopup.style.display = "none";
+    }, 3000);
+  }
+}
+
+function toggleSubtitle(){
+  subtitleOn = !subtitleOn;
+  const btn = document.getElementById("subBtn");
+
+  if(subtitleOn){
+    btn.innerHTML = "<span>💬</span> Subtitle: ON";
+    btn.classList.add("active");
+  } else {
+    btn.innerHTML = "<span>💬</span> Subtitle: OFF";
+    btn.classList.remove("active");
+    bubble.innerHTML = ""; 
+  }
+}
+
+function syncSubtitle(){
+  if(!isSyncing) return;
+
+  const ct = video.currentTime;
+
+  if(!subtitleOn){
+    bubble.innerHTML = "";
+  } else {
+    const s = sentences.find(x => ct >= x.start && ct <= x.end);
+    if(s && bubble.dataset.activeStart != s.start) renderSentence(s);
+  }
+
+  animationFrameId = requestAnimationFrame(syncSubtitle);
+}
+
+function playConversation(){
+  cancelAnimationFrame(animationFrameId);
+  isSyncing=true;
+  video.play();
+  syncSubtitle();
+}
+
+function pauseToggle(){
+  video.paused ? video.play() : video.pause();
+}
+
+function stopConversation(){
+  video.pause(); video.currentTime=0; isSyncing=false;
+  bubble.innerText="Bấm Play All để bắt đầu học!";
+}
+
+function handleVideoClick(){ video.paused?playConversation():pauseToggle(); }
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+canvas.addEventListener("mousedown", (e) => {
+  if(!canvas.classList.contains("pen-active")) return;
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if(!isDrawing) return;
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke();
+});
+
+canvas.addEventListener("mouseup", () => isDrawing = false);
+canvas.addEventListener("mouseleave", () => isDrawing = false);
+
+canvas.addEventListener("touchstart", (e) => { 
+  if(!canvas.classList.contains("pen-active")) return;
+  if (e.cancelable) e.preventDefault(); 
+  isDrawing = true; ctx.beginPath();
+  const p = getPos(e); ctx.moveTo(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => { 
+  if (e.cancelable) e.preventDefault(); 
+  if(!isDrawing) return; 
+  const p = getPos(e);
+  ctx.lineTo(p.x, p.y); ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+  ctx.lineCap = 'round'; ctx.stroke(); 
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => isDrawing = false);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PageDown" || e.key === "ArrowRight" || e.key === "PageUp" || e.key === "ArrowLeft" || e.code === "Space") {
+    e.preventDefault(); handleVideoClick();
+  }
+});
+
+window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+
+</script>
+</body>
+</html>

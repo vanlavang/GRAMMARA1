@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Mastering English - Be Verbs Yes/No Questions</title>
+    <style>
+        @font-face { font-family: 'UTM Avo'; src: local('UTM Avo'); }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'UTM Avo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+            touch-action: none; 
+            padding-top: 10px;
+        }
+
+        /* --- HEADER & MENU --- */
+        header {
+            background-color: #d8c8b4; padding: 10px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid #d4bfa6; 
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 65px;
+            transition: all 0.3s ease;
+        }
+        .header-center { display: flex; gap: 10px; }
+        header button {
+            background-color: #fff; border: 2px solid #d4bfa6; padding: 8px 16px; border-radius: 20px;
+            cursor: pointer; font-family: 'UTM Avo'; color: #8b5e3c; transition: 0.3s;
+        }
+        header button.active-conv {
+            background-color: #8b5e3c; color: white; font-weight: bold; border-color: #5c3e26;
+        }
+        .menu-btn {
+            background-color: #8b7362 !important; color: white !important; border: none !important;
+            padding: 10px 20px !important; border-radius: 20px !important; font-weight: bold; cursor: pointer;
+        }
+
+        /* --- CONTROL BAR --- */
+        #controlBar {
+            background-color: #fff9f0; padding: 10px 20px; border-bottom: 2px solid #d4bfa6;
+            position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
+            display: flex; align-items: center; gap: 12px; height: 55px;
+            transition: all 0.3s ease;
+        }
+        .tool-btn {
+            padding: 6px 14px; border-radius: 12px; border: 1px solid #8b5e3c;
+            background: #fff; cursor: pointer; font-size: 15px; font-weight: bold; color: #8b5e3c; font-family: 'UTM Avo';
+            transition: 0.2s;
+        }
+        .tool-btn.active { background: #8b5e3c; color: #fff; }
+
+        .tab-switcher {
+            display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; border: 1px solid #cbd5e1;
+        }
+        .tab-btn {
+            padding: 6px 16px; border-radius: 8px; border: none; background: transparent;
+            cursor: pointer; font-family: 'UTM Avo'; font-size: 14px; font-weight: bold; color: #475569; transition: 0.2s;
+        }
+        .tab-btn.active { background: white; color: #1e3a8a; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+        /* --- SIDEBAR MENU --- */
+        .side-menu {
+            position: fixed; top: 130px; bottom: 20px; width: 220px;
+            background-color: #f3dbc1; border: 2px solid #d4bfa6;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s ease;
+            z-index: 1100; padding: 10px; overflow-y: auto; 
+        }
+        .side-menu.left { left: 0; border-radius: 0 20px 20px 0; transform: translateX(-100%); }
+        .side-menu.right { right: 0; border-radius: 20px 0 0 20px; transform: translateX(100%); }
+        .side-menu.open { transform: translateX(0); }
+        .side-menu button {
+            display: block; width: 100%; background: #fff; border: 1px solid #d4bfa6;
+            margin-bottom: 10px; padding: 12px; border-radius: 12px; cursor: pointer;
+            font-family: 'UTM Avo'; font-size: 16px; font-weight: bold; color: #8b5e3c;
+        }
+        .side-menu button.active { background: #8b5e3c; color: #fff; }
+
+        /* --- TỪ ĐIỂN PANEL --- */
+        .dict-panel {
+            position: fixed; right: 20px; top: 135px; width: 340px;
+            background: white; border-radius: 20px; padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25); border: 4px solid #bae6fd;
+            display: none; flex-direction: column; gap: 10px; z-index: 1200;
+            transition: top 0.3s ease;
+        }
+        .dict-panel.active { display: flex; }
+        .dict-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        .close-dict { cursor: pointer; font-size: 26px; color: #f87171; font-weight: bold; line-height: 1; }
+        .dict-result { background: #f8fafc; border-radius: 12px; padding: 15px; min-height: 120px; font-size: 15px; color: #1e293b; border: 1px dashed #cbd5e1; max-height: 350px; overflow-y: auto;}
+        
+        .ipa-text { color: #d97706; font-family: 'Arial', sans-serif; margin-bottom: 4px; font-size: 16px; }
+        .pos-text { color: #10b981; font-style: italic; font-weight: bold; margin-bottom: 6px; }
+        .mean-text { color: #334155; font-size: 15px; line-height: 1.4; }
+
+        /* --- MAIN VIEW CONTAINER --- */
+        .container {
+            background: #ffffff; width: 98vw; max-width: 1500px; height: calc(100vh - 145px); margin-top: 125px;
+            padding: 30px 40px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            display: flex; flex-direction: column; position: relative; z-index: 10; overflow-y: auto; overflow-x: hidden;
+            transition: all 0.3s ease; border: 8px solid #f8fafc;
+        }
+        .container::-webkit-scrollbar { width: 0px; }
+        
+        .tab-content { display: none; flex-direction: column; height: 100%; width: 100%; position: relative; }
+        .tab-content.active { display: flex; }
+
+        /* --- CẤU TRÚC ĐỒ HỌA MỚI (LỚN VÀ RÕ RÀNG HƠN) --- */
+        .main-title { text-align: center; font-size: 42px; color: #0f172a; margin-bottom: 10px; font-weight: 900; letter-spacing: -0.5px;}
+        .main-subtitle { font-size: 18px; color: #475569; font-weight: 700; text-align: center; margin-bottom: 30px; }
+
+        .two-columns { display: flex; justify-content: space-between; width: 100%; gap: 30px; flex: 1; align-items: stretch;}
+        
+        .col { flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 25px; border-radius: 30px; }
+        .col-left { background-color: #f0fdfa; border: 3px solid #ccfbf1; } /* Xanh ngọc nhạt */
+        .col-right { background-color: #faf5ff; border: 3px solid #f3e8fd; } /* Tím nhạt */
+        
+        .col-title { text-align: center; font-size: 30px; color: #1e293b; margin-bottom: 15px; font-weight: 900; }
+
+        /* --- SINGULAR FLOW (Dòng chảy mũi tên ngang) --- */
+        .s-flow-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: white; border-radius: 20px; padding: 15px 20px; margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 2px solid #e2e8f0;
+        }
+
+        .subj-node {
+            display: flex; flex-direction: column; align-items: center; min-width: 90px;
+        }
+        .subj-icon {
+            width: 75px; height: 75px; border-radius: 50%; border: 4px solid; 
+            display: flex; align-items: center; justify-content: center; font-size: 40px; 
+            background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 5px;
+        }
+        .subj-lbl { font-size: 18px; font-weight: 900; color: #1e293b; }
+
+        .flow-line { height: 6px; flex-grow: 1; margin: 0 15px; border-radius: 3px; position: relative; }
+        .flow-line::after {
+            content: '▶'; position: absolute; right: -10px; top: -9px; font-size: 20px;
+        }
+
+        .q-node {
+            border: 4px solid; border-radius: 20px; padding: 12px 25px; font-size: 26px; font-weight: 900; 
+            background: white; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .q-node span { font-size: 20px; color: #475569; }
+
+        .ans-group { display: flex; flex-direction: column; gap: 8px; min-width: 150px;}
+        .ans-pill { padding: 8px 15px; border-radius: 12px; font-size: 15px; font-weight: 800; text-align: center; border: 2px solid; }
+
+        /* Colors for Singular */
+        .c-teal .subj-icon, .c-teal .q-node { border-color: #0d9488; }
+        .c-teal .flow-line { background: #0d9488; color: #0d9488; }
+        .c-teal .q-node { color: #0d9488; }
+        
+        .c-orange .subj-icon, .c-orange .q-node { border-color: #ea580c; }
+        .c-orange .flow-line { background: #ea580c; color: #ea580c; }
+        .c-orange .q-node { color: #ea580c; }
+
+        .c-green .subj-icon, .c-green .q-node { border-color: #16a34a; }
+        .c-green .flow-line { background: #16a34a; color: #16a34a; }
+        .c-green .q-node { color: #16a34a; }
+
+        .ans-yes { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+        .ans-no { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+
+        /* --- PLURAL FLOW --- */
+        .univ-box {
+            background: white; border: 6px solid #a855f7; border-radius: 25px; padding: 25px;
+            text-align: center; margin-bottom: 20px; box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+        }
+        .univ-title { font-size: 30px; font-weight: 900; color: #7e22ce; margin-bottom: 10px;}
+        .univ-desc { font-size: 18px; font-weight: 700; color: #475569; margin-bottom: 15px;}
+        .univ-icons { font-size: 50px; letter-spacing: 10px;}
+
+        .plural-cards-row { display: flex; gap: 15px; align-items: stretch; justify-content: space-between; margin-bottom: 20px;}
+        .p-card {
+            background: white; border: 3px solid #d8b4fe; border-radius: 20px; padding: 20px;
+            flex: 1; text-align: center; display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .p-card-icon { font-size: 45px; }
+        .p-card-title { font-size: 20px; font-weight: 900; color: #1e293b; }
+        .p-card-q { font-size: 20px; font-weight: 800; color: #9333ea; background: #faf5ff; padding: 5px; border-radius: 10px;}
+
+        /* Table */
+        .p-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+        .p-table th { font-size: 15px; font-weight: 900; color: #475569; text-align: center; padding: 5px; }
+        .p-table td { background: white; padding: 15px; text-align: center; font-weight: 800; font-size: 16px; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0;}
+        .p-table td:first-child { border-left: 2px solid #e2e8f0; border-top-left-radius: 20px; border-bottom-left-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .p-table td:last-child { border-right: 2px solid #e2e8f0; border-top-right-radius: 20px; border-bottom-right-radius: 20px; }
+        
+        .icon-check { color: #10b981; font-size: 18px; margin-right: 5px;}
+        .icon-cross { color: #ef4444; font-size: 18px; margin-right: 5px;}
+
+        /* --- STEP BY STEP DYNAMIC SHOW/HIDE --- */
+        .step { opacity: 0.02; filter: blur(4px); transform: scale(0.97) translateY(5px); transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
+        .step.active { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); pointer-events: auto; }
+
+        /* Word slice features */
+        .dict-word { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 4px; transition: 0.15s; }
+        .dict-word:hover { background-color: #bae6fd; color: #0369a1; }
+        .clickable-block { cursor: context-menu; transition: background 0.2s; }
+        .clickable-block:hover { background-color: rgba(226, 232, 240, 0.4); border-radius: 6px; }
+
+        #inkCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 500; pointer-events: none; }
+        #inkCanvas.drawing { pointer-events: auto; cursor: crosshair; }
+    </style>
+<link rel="stylesheet" href="../../mobile.css?v=mobile-chapters-07-11-20261012">
+</head>
+<body>
+
+<canvas id="inkCanvas"></canvas>
+
+<!-- MENU SIDEBAR -->
+<nav class="side-menu left" id="leftMenu">
+    <button onclick="location.href='01 Vocabulary 1.html'"><b>Vocabulary 1</b></button>
+    <button onclick="location.href='02 Vocabulary 2.html'"><b>Vocabulary 2</b></button>
+    <button onclick="location.href='03 Vocabulary memory matching.html'"><b>Memory Matching</b></button>
+    <button class="active" onclick="location.href='04 grammar.html'"><b>Grammar</b></button>
+    <button onclick="location.href='05 Sentence Swap Game.html'"><b>Sentence Swap</b></button>
+    <button onclick="location.href='06 Reorder.html'"><b>Reorder</b></button>
+    <button onclick="location.href='07 Dropdown.html'"><b>Dropdown</b></button>
+
+</nav>
+
+<nav class="side-menu right" id="rightMenu">
+     <button onclick="location.href='08 quiz.html'"><b>Quiz</b></button>
+    <button onclick="location.href='09 true false.html'"><b>True / False</b></button>
+    <button onclick="location.href='10 Wh questions.html'"><b>WH Questions</b></button>
+    <button onclick="location.href='11 Speaking.html'"><b>Speaking</b></button>
+    <button onclick="location.href='12 Sentence.html'"><b>Sentence</b></button>
+    <button onclick="location.href='13 Cloze.html'"><b>Cloze</b></button>
+    <button onclick="location.href='14 Dictation.html'"><b>Dictation</b></button>
+    <button onclick="location.href='story.html'"><b>Story</b></button>
+</nav>
+
+<header id="mainHeader">
+    <button class="menu-btn" onclick="toggleMenu('left')">Menu ☰</button>
+    <div class="header-center">
+<button  onclick="window.location.href='../conversation_01/conversation_01.html'">Conversation 01</button>
+<button class="active-conv" onclick="window.location.href='../conversation_02/conversation_02.html'"><b>Conversation 02</b></button>
+<button onclick="window.location.href='../conversation_03/conversation_03.html'">Conversation 03</button>
+<button onclick="window.location.href='../conversation_04/conversation_04.html'">Conversation 04</button>
+    </div>
+    <button class="menu-btn" onclick="toggleMenu('right')">Menu ☰</button>
+</header>
+
+<!-- CONTROL BAR -->
+<div id="controlBar">
+    <button id="focusBtn" class="tool-btn" onclick="toggleFocusMode()" style="background: #10b981; color: white; border-color: #059669;">Phóng to 🔲</button>
+    <button id="penBtn" class="tool-btn" onclick="toggleInk()">Bút vẽ: Off</button>
+    <button class="tool-btn" onclick="clearInk()">Xóa mực</button>
+    
+    <div style="flex-grow: 1;"></div>
+    
+    <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchPresentationTab('englishTab')">🇬🇧 English Tab</button>
+        <button class="tab-btn" onclick="switchPresentationTab('vietnameseTab')">🇻🇳 Vietnamese Tab</button>
+    </div>
+
+    <button class="tool-btn" onclick="goPrev()">⬅ Back</button>
+    <button class="tool-btn" onclick="goNext()">Next ➡</button>
+</div>
+
+<!-- TỪ ĐIỂN PANEL -->
+<div class="dict-panel" id="dictPanel">
+    <div class="dict-header">
+        <span style="font-weight: bold; color: #0369a1; font-family: 'UTM Avo';">Tra từ & Dịch Nghĩa 📖</span>
+        <div class="close-dict" onclick="toggleDict()">×</div>
+    </div>
+    <div class="dict-result" id="resultArea">
+        <i>💡 Hướng dẫn:<br>👉 <b>Click chuột trái</b> vào chữ tiếng Anh để tra từ.<br>👉 <b>Click chuột phải</b> vào khối chữ để dịch toàn bộ.</i>
+    </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="container" id="mainContainer">
+
+    <!-- ==================== ENGLISH TAB ==================== -->
+    <div id="englishTab" class="tab-content active">
+        
+        <div class="main-header-row step">
+            <h1 class="main-title clickable-block">Mastering Yes/No Questions with "Be" Verbs</h1>
+            <div class="main-subtitle clickable-block">A clear guide on forming and answering Yes/No questions in Present Simple.</div>
+        </div>
+
+        <div class="two-columns">
+            
+            <!-- LEFT COLUMN: SINGULAR -->
+            <div class="col col-left step">
+                <h2 class="col-title clickable-block">Singular Subjects</h2>
+
+                <!-- Row 1: I -->
+                <div class="s-flow-row c-teal step">
+                    <div class="subj-node">
+                        <div class="subj-icon">🙋‍♂️</div>
+                        <div class="subj-lbl clickable-block">I</div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="q-node clickable-block">Am <span>I...?</span></div>
+                    <div class="flow-line"></div>
+                    <div class="ans-group">
+                        <div class="ans-pill ans-yes clickable-block">Yes, you are.</div>
+                        <div class="ans-pill ans-no clickable-block">No, I'm not.</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: You -->
+                <div class="s-flow-row c-orange step">
+                    <div class="subj-node">
+                        <div class="subj-icon">🫵</div>
+                        <div class="subj-lbl clickable-block">You</div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="q-node clickable-block">Are <span>you...?</span></div>
+                    <div class="flow-line"></div>
+                    <div class="ans-group">
+                        <div class="ans-pill ans-yes clickable-block">Yes, I am.</div>
+                        <div class="ans-pill ans-no clickable-block">No, I'm not.</div>
+                    </div>
+                </div>
+
+                <!-- Row 3: He/She/It -->
+                <div class="s-flow-row c-green step">
+                    <div class="subj-node">
+                        <div class="subj-icon" style="font-size: 26px;">👦👧</div>
+                        <div class="subj-lbl clickable-block">He/She/It</div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="q-node clickable-block">Is <span>he/she...?</span></div>
+                    <div class="flow-line"></div>
+                    <div class="ans-group">
+                        <div class="ans-pill ans-yes clickable-block">Yes, he is.</div>
+                        <div class="ans-pill ans-no clickable-block">No, he isn't.</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: PLURAL -->
+            <div class="col col-right step">
+                <h2 class="col-title clickable-block">Plural Subjects</h2>
+
+                <!-- The Universal ARE -->
+                <div class="univ-box step">
+                    <div class="univ-title clickable-block">The Universal "Are"</div>
+                    <div class="univ-desc clickable-block">Use "Are" for ALL plural subjects, including We, They, and plural You.</div>
+                    <div class="univ-icons">👨‍👩‍👧‍👦🤝👥</div>
+                </div>
+
+                <!-- 3 Cards for We/They/You -->
+                <div class="plural-cards-row step">
+                    <div class="p-card clickable-block">
+                        <div class="p-card-icon">🙌</div>
+                        <div class="p-card-title">We</div>
+                        <div class="p-card-q">Are we...?</div>
+                    </div>
+                    <div class="p-card clickable-block">
+                        <div class="p-card-icon">👥</div>
+                        <div class="p-card-title">They</div>
+                        <div class="p-card-q">Are they...?</div>
+                    </div>
+                    <div class="p-card clickable-block">
+                        <div class="p-card-icon">🗣️</div>
+                        <div class="p-card-title">You (all)</div>
+                        <div class="p-card-q">Are you...?</div>
+                    </div>
+                </div>
+
+                <!-- Plural Table -->
+                <table class="p-table step">
+                    <thead>
+                        <tr class="clickable-block">
+                            <th>Subject</th>
+                            <th>Positive Answer</th>
+                            <th>Negative Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="clickable-block step">
+                            <td>👥 They</td>
+                            <td><span class="icon-check">✔</span> Yes, they are.</td>
+                            <td><span class="icon-cross">✖</span> No, they aren't.</td>
+                        </tr>
+                        <tr class="clickable-block step">
+                            <td>🙌 We</td>
+                            <td><span class="icon-check">✔</span> Yes, we are.</td>
+                            <td><span class="icon-cross">✖</span> No, we aren't.</td>
+                        </tr>
+                        <tr class="clickable-block step">
+                            <td>🗣️ You (Plural)</td>
+                            <td><span class="icon-check">✔</span> Yes, we are.</td>
+                            <td><span class="icon-cross">✖</span> No, we aren't.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==================== VIETNAMESE TAB ==================== -->
+    <div id="vietnameseTab" class="tab-content">
+        
+        <div class="main-header-row step">
+            <h1 class="main-title clickable-block">Làm chủ Câu hỏi Yes/No với Động từ "Be"</h1>
+            <div class="main-subtitle clickable-block">Hướng dẫn rõ ràng về Hỏi & Đáp thì Hiện tại đơn với Am, Is, và Are.</div>
+        </div>
+
+        <div class="two-columns">
+            
+            <!-- LEFT COLUMN: SINGULAR -->
+            <div class="col col-left step">
+                <h2 class="col-title clickable-block">Chủ Ngữ Số Ít</h2>
+
+                <!-- Row 1: I -->
+                <div class="s-flow-row c-teal step">
+                    <div class="subj-node">
+                        <div class="subj-icon">🙋‍♂️</div>
+                        <div class="subj-lbl clickable-block">I</div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="q-node clickable-block">Am <span>I...?</span></div>
+                    <div class="flow-line"></div>
+                    <div class="ans-group">
+                        <div class="ans-pill ans-yes clickable-block">Yes, you are.</div>
+                        <div class="ans-pill ans-no clickable-block">No, I'm not.</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: You -->
+                <div class="s-flow-row c-orange step">
+                    <div class="subj-node">
+                        <div class="subj-icon">🫵</div>
+                        <div class="subj-lbl clickable-block">You</div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="q-node clickable-block">Are <span>you...?</span></div>
+                    <div class="flow-line"></div>
+                    <div class="ans-group">
+                        <div class="ans-pill ans-yes clickable-block">Yes, I am.</div>
+                        <div class="ans-pill ans-no clickable-block">No, I'm not.</div>
+                    </div>
+                </div>
+
+                <!-- Row 3: He/She/It -->
+                <div class="s-flow-row c-green step">
+                    <div class="subj-node">
+                        <div class="subj-icon" style="font-size: 26px;">👦👧</div>
+                        <div class="subj-lbl clickable-block">He/She/It</div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="q-node clickable-block">Is <span>he/she...?</span></div>
+                    <div class="flow-line"></div>
+                    <div class="ans-group">
+                        <div class="ans-pill ans-yes clickable-block">Yes, he is.</div>
+                        <div class="ans-pill ans-no clickable-block">No, he isn't.</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: PLURAL -->
+            <div class="col col-right step">
+                <h2 class="col-title clickable-block">Chủ Ngữ Số Nhiều</h2>
+
+                <!-- The Universal ARE -->
+                <div class="univ-box step">
+                    <div class="univ-title clickable-block">"Are" Dùng Chung</div>
+                    <div class="univ-desc clickable-block">Dùng "Are" cho TẤT CẢ chủ ngữ số nhiều, bao gồm We, They, và You (số nhiều).</div>
+                    <div class="univ-icons">👨‍👩‍👧‍👦🤝👥</div>
+                </div>
+
+                <!-- 3 Cards for We/They/You -->
+                <div class="plural-cards-row step">
+                    <div class="p-card clickable-block">
+                        <div class="p-card-icon">🙌</div>
+                        <div class="p-card-title">We</div>
+                        <div class="p-card-q">Are we...?</div>
+                    </div>
+                    <div class="p-card clickable-block">
+                        <div class="p-card-icon">👥</div>
+                        <div class="p-card-title">They</div>
+                        <div class="p-card-q">Are they...?</div>
+                    </div>
+                    <div class="p-card clickable-block">
+                        <div class="p-card-icon">🗣️</div>
+                        <div class="p-card-title">You (số nhiều)</div>
+                        <div class="p-card-q">Are you...?</div>
+                    </div>
+                </div>
+
+                <!-- Plural Table -->
+                <table class="p-table step">
+                    <thead>
+                        <tr class="clickable-block">
+                            <th>Chủ ngữ</th>
+                            <th>Trả lời Khẳng định</th>
+                            <th>Trả lời Phủ định</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="clickable-block step">
+                            <td>👥 They</td>
+                            <td><span class="icon-check">✔</span> Yes, they are.</td>
+                            <td><span class="icon-cross">✖</span> No, they aren't.</td>
+                        </tr>
+                        <tr class="clickable-block step">
+                            <td>🙌 We</td>
+                            <td><span class="icon-check">✔</span> Yes, we are.</td>
+                            <td><span class="icon-cross">✖</span> No, we aren't.</td>
+                        </tr>
+                        <tr class="clickable-block step">
+                            <td>🗣️ You (Số nhiều)</td>
+                            <td><span class="icon-check">✔</span> Yes, we are.</td>
+                            <td><span class="icon-cross">✖</span> No, we aren't.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let stepsArray = [];
+    let currentStepIndex = -1;
+    let isFocusMode = false;
+
+    // --- TÍNH NĂNG MỞ RỘNG MÀN HÌNH (FOCUS MODE) ---
+    function toggleFocusMode() {
+        isFocusMode = !isFocusMode;
+        const header = document.getElementById('mainHeader');
+        const controlBar = document.getElementById('controlBar');
+        const container = document.getElementById('mainContainer');
+        const focusBtn = document.getElementById('focusBtn');
+        const sideMenus = document.querySelectorAll('.side-menu');
+        const dictPanel = document.getElementById('dictPanel');
+
+        if (isFocusMode) {
+            header.style.transform = 'translateY(-100%)';
+            controlBar.style.top = '0px';
+            container.style.marginTop = '70px';
+            container.style.height = 'calc(100vh - 85px)';
+            sideMenus.forEach(m => m.style.top = '70px');
+            dictPanel.style.top = '75px';
+            
+            focusBtn.innerHTML = 'Thu nhỏ 🔳';
+            focusBtn.style.background = '#fef3c7';
+            focusBtn.style.color = '#d97706';
+            focusBtn.style.borderColor = '#d97706';
+        } else {
+            header.style.transform = 'translateY(0)';
+            controlBar.style.top = '65px';
+            container.style.marginTop = '125px';
+            container.style.height = 'calc(100vh - 145px)';
+            sideMenus.forEach(m => m.style.top = '130px');
+            dictPanel.style.top = '135px';
+            
+            focusBtn.innerHTML = 'Phóng to 🔲';
+            focusBtn.style.background = '#10b981';
+            focusBtn.style.color = 'white';
+            focusBtn.style.borderColor = '#059669';
+        }
+    }
+
+    // --- CHUYỂN TAB GIẢNG DẠY ---
+    function switchPresentationTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        const activeTab = document.getElementById(tabId);
+        activeTab.classList.add('active');
+        
+        const activeBtn = document.querySelector(`[onclick="switchPresentationTab('${tabId}')"]`);
+        if(activeBtn) activeBtn.classList.add('active');
+        
+        initStepsForActiveTab();
+    }
+
+    function initStepsForActiveTab() {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const activeTab = document.querySelector('.tab-content.active');
+        stepsArray = activeTab.querySelectorAll('.step');
+        currentStepIndex = -1;
+    }
+
+    // --- ĐIỀU HƯỚNG HIỆU ỨNG TỪNG BƯỚC ---
+    function goNext() {
+        if (currentStepIndex < stepsArray.length - 1) {
+            currentStepIndex++;
+            stepsArray[currentStepIndex].classList.add('active');
+            stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function goPrev() {
+        if (currentStepIndex >= 0) {
+            stepsArray[currentStepIndex].classList.remove('active');
+            currentStepIndex--;
+            if(currentStepIndex >= 0) stepsArray[currentStepIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); goNext(); }
+        if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); goPrev(); }
+    });
+
+    // --- MENU SIDEBAR & TỪ ĐIỂN ---
+    function toggleMenu(side) { document.getElementById(side + 'Menu').classList.toggle('open'); }
+    function toggleDict() { document.getElementById('dictPanel').classList.toggle('active'); }
+
+    // ========================================================
+    // CƠ CHẾ TRA TỪ ĐIỂN CLICK TRÁI & PHÁT ÂM AUDIO GỐC
+    // ========================================================
+    async function lookupDictionary(word) {
+        const panel = document.getElementById('dictPanel');
+        if(!panel.classList.contains('active')) panel.classList.add('active');
+        
+        const resArea = document.getElementById('resultArea');
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang kết nối từ điển <b>"${word}"</b>... ⏳</div>`;
+        
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const data = await res.json();
+            
+            const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(word)}`);
+            const transData = await transRes.json();
+            const vietMeaning = transData[0][0][0];
+
+            if(data.title || !Array.isArray(data)) { 
+                resArea.innerHTML = `
+                    <div style="font-size:22px; font-weight:bold; color:#0f172a;">${word}</div>
+                    <div class="mean-text" style="margin-top:10px;"><b>Nghĩa tiếng Việt:</b> <span style="color:#b91c1c; font-weight:bold;">${vietMeaning}</span></div>
+                `;
+                speakFallback(word);
+                return; 
+            }
+
+            const entry = data[0];
+            let phonetic = '';
+            let audioUrl = '';
+            
+            for(let p of entry.phonetics) {
+                if(p.text && !phonetic) phonetic = p.text;
+                if(p.audio && !audioUrl) audioUrl = p.audio;
+            }
+            if(!phonetic && entry.phonetic) phonetic = entry.phonetic;
+
+            const pos = entry.meanings[0] ? entry.meanings[0].partOfSpeech : 'vocabulary';
+            const enDef = entry.meanings[0] && entry.meanings[0].definitions[0] ? entry.meanings[0].definitions[0].definition : '';
+
+            resArea.innerHTML = `
+                <div style="font-size:24px; font-weight:bold; color:#1e3a8a; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${word}</span>
+                    <button onclick="playDirectAudio('${audioUrl}', '${word}')" style="background:#e0f2fe; border:none; border-radius:50%; width:38px; height:38px; cursor:pointer; font-size:18px;">🔊</button>
+                </div>
+                <div class="ipa-text">${phonetic ? phonetic : '[no phonetic]'}</div>
+                <div class="pos-text">(${pos})</div>
+                <div style="height:1px; background:#e2e8f0; margin: 8px 0;"></div>
+                <div class="mean-text"><b>🇻🇳 Nghĩa:</b> <span style="color:#b91c1c; font-weight:bold; font-size:16px;">${vietMeaning}</span></div>
+                ${enDef ? `<div class="mean-text" style="margin-top:6px; font-size:13px; color:#64748b;"><b>English Definition:</b> ${enDef}</div>` : ''}
+            `;
+            
+            playDirectAudio(audioUrl, word);
+
+        } catch(e) { 
+            resArea.innerHTML = `<span style="color:red;">Lỗi phân tích hoặc không tìm thấy từ.</span>`; 
+        }
+    }
+
+    function playDirectAudio(url, wordFallback) {
+        if(url && url.startsWith('http')) {
+            let audio = new Audio(url);
+            audio.play().catch(() => speakFallback(wordFallback));
+        } else {
+            speakFallback(wordFallback);
+        }
+    }
+
+    function speakFallback(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US'; u.rate = 0.8;
+        window.speechSynthesis.speak(u);
+    }
+
+    // ========================================================
+    // CƠ CHẾ CLICK CHUỘT PHẢI - DỊCH TOÀN BỘ CÂU
+    // ========================================================
+    async function translateFullBlock(text) {
+        const panel = document.getElementById('dictPanel');
+        if(!panel.classList.contains('active')) panel.classList.add('active');
+        
+        const resArea = document.getElementById('resultArea');
+        resArea.innerHTML = `<div style="text-align:center; color:#64748b;">Đang biên dịch đoạn... ⏳</div>`;
+        
+        try {
+            const cleanText = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURI(cleanText)}`);
+            const data = await res.json();
+            
+            let fullResult = '';
+            data[0].forEach(segment => { if(segment[0]) fullResult += segment[0]; });
+
+            resArea.innerHTML = `
+                <div style="font-size:13px; color:#64748b; font-style:italic; margin-bottom:8px; border-left:3px solid #cbd5e1; padding-left:8px;">"${cleanText}"</div>
+                <div style="font-size:16px; color:#1e293b; font-weight:bold;">🇻🇳 Bản dịch Việt ngữ:</div>
+                <div class="mean-text" style="color:#0369a1; font-weight:bold; font-size:16px; margin-top:4px;">${fullResult}</div>
+                <div style="text-align:right; margin-top:12px;">
+                    <button class="tool-btn" style="font-size:12px; padding:3px 8px;" onclick="speakFallback('${cleanText.replace(/'/g, "\\'")}')">Nghe đọc khối 🔊</button>
+                </div>
+            `;
+        } catch(e) {
+            resArea.innerHTML = `<span style="color:red;">Lỗi kết nối máy chủ dịch thuật.</span>`;
+        }
+    }
+
+    function makeWordsClickable() {
+        const elements = document.querySelectorAll('.clickable-block');
+        
+        elements.forEach(el => {
+            el.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                translateFullBlock(el.innerText);
+            });
+
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) textNodes.push(node);
+
+            textNodes.forEach(textNode => {
+                if (!textNode.nodeValue.trim()) return;
+                
+                const units = textNode.nodeValue.split(/([ \n.,!?()\/]+)/);
+                const containerFrag = document.createDocumentFragment();
+                
+                units.forEach(unit => {
+                    if (/[a-zA-Z]/.test(unit)) {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'dict-word';
+                        wordSpan.innerText = unit;
+                        
+                        wordSpan.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            lookupDictionary(unit.replace(/[^a-zA-Z']/g, ''));
+                        });
+                        containerFrag.appendChild(wordSpan);
+                    } else {
+                        containerFrag.appendChild(document.createTextNode(unit));
+                    }
+                });
+                textNode.parentNode.replaceChild(containerFrag, textNode);
+            });
+        });
+    }
+
+    // --- CHỨC NĂNG BÚT VẼ (PEN) ---
+    let inkCanvas, inkCtx, isDrawing = false, lastX = 0, lastY = 0;
+    function initInk() {
+        inkCanvas = document.getElementById("inkCanvas");
+        inkCtx = inkCanvas.getContext("2d");
+        inkCanvas.width = window.innerWidth; inkCanvas.height = window.innerHeight;
+        
+        inkCanvas.addEventListener("pointerdown", e => { if (inkCanvas.classList.contains("drawing")) { isDrawing = true; lastX = e.clientX; lastY = e.clientY; } });
+        inkCanvas.addEventListener("pointermove", e => {
+            if (!isDrawing) return;
+            inkCtx.strokeStyle = "#e67e22"; inkCtx.lineWidth = 4; inkCtx.lineCap = "round";
+            inkCtx.beginPath(); inkCtx.moveTo(lastX, lastY); inkCtx.lineTo(e.clientX, e.clientY); inkCtx.stroke();
+            lastX = e.clientX; lastY = e.clientY;
+        });
+        window.addEventListener("pointerup", () => isDrawing = false);
+    }
+    
+    function toggleInk() {
+        const active = inkCanvas.classList.toggle("drawing");
+        document.getElementById("penBtn").textContent = active ? "Bút vẽ: On" : "Bút vẽ: Off";
+        document.getElementById("penBtn").classList.toggle("active");
+    }
+    function clearInk() { inkCtx.clearRect(0, 0, inkCanvas.width, inkCanvas.height); }
+
+    // KHỞI CHẠY HỆ THỐNG
+    window.onload = () => {
+        initInk();
+        makeWordsClickable();
+        initStepsForActiveTab(); 
+    };
+</script>
+
+</body>
+</html>
