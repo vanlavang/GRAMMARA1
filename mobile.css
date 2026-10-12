@@ -324,7 +324,49 @@
 
   body:has(.top-nav) .controls {
     width: 100%;
-    justify-content: flex-start;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch !important;
+    gap: 8px;
+    max-width: 100%;
+    overflow: visible !important;
+    box-sizing: border-box;
+    padding: 2px 0 6px;
+  }
+
+  body:has(.top-nav) .controls > .btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    justify-content: center;
+    padding: 8px 6px !important;
+    white-space: normal;
+    font-size: clamp(0.78rem, 3.5vw, 0.95rem);
+    box-sizing: border-box;
+  }
+
+  /* Keep the conversation menus completely off-screen until opened. The
+     original fixed -250px offset left part of each wider phone drawer visible. */
+  body:has(.top-nav) .sidebar.left {
+    left: 0 !important;
+    right: auto !important;
+    transform: translateX(-105%) !important;
+  }
+
+  body:has(.top-nav) .sidebar.right {
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(105%) !important;
+  }
+
+  body:has(.top-nav) .sidebar.left.open,
+  body:has(.top-nav) .sidebar.right.open {
+    transform: translateX(0) !important;
+  }
+
+  body:has(.top-nav) .sidebar {
+    z-index: 2100;
+    box-sizing: border-box;
   }
 
   body:has(.top-nav) .content {
