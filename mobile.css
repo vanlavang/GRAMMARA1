@@ -1,0 +1,466 @@
+/* Shared phone-friendly layout for the English A1 course. */
+
+@media (max-width: 760px) {
+  html {
+    min-width: 320px;
+    scroll-behavior: smooth;
+    scroll-padding-top: 12px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-width: 320px;
+    max-width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
+    height: auto !important;
+    padding-top: 0 !important;
+    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    touch-action: pan-y !important;
+  }
+
+  img,
+  video,
+  iframe,
+  svg,
+  canvas {
+    max-width: 100%;
+  }
+
+  video,
+  iframe {
+    height: auto;
+  }
+
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+    font-size: 16px !important;
+  }
+
+  button,
+  .btn,
+  .tool-btn,
+  .lesson-link,
+  .nav-links a,
+  header nav a,
+  header nav button {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  header {
+    position: sticky !important;
+    top: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100%;
+    height: auto !important;
+    max-height: none !important;
+    padding: max(6px, env(safe-area-inset-top)) 8px 8px !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    overflow: visible !important;
+  }
+
+  header nav {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  header nav a,
+  header nav button {
+    flex: 0 0 auto;
+    padding: 8px 12px !important;
+    white-space: nowrap;
+  }
+
+  #controlBar,
+  #topInfoBar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+    padding: 8px !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .controls,
+  .toolbar,
+  .controls-container {
+    max-width: 100%;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 2px 6px;
+  }
+
+  .controls > *,
+  .toolbar > *,
+  .controls-container > * {
+    flex: 0 0 auto;
+  }
+
+  .sidebar,
+  .side-menu {
+    top: 0 !important;
+    bottom: 0 !important;
+    width: min(84vw, 320px) !important;
+    height: auto !important;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-top: max(16px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .content,
+  main,
+  .container {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .content {
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dict-panel,
+  #dictPopup {
+    left: 8px !important;
+    right: 8px !important;
+    top: auto !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: 72dvh;
+    overflow: auto;
+  }
+
+  /* Course home page */
+  body:has(.lesson-list) {
+    padding: 12px !important;
+    background: #f1f5f9;
+  }
+
+  body:has(.lesson-list) .container {
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(16px, 5vw, 24px);
+    border-radius: 18px;
+  }
+
+  body:has(.lesson-list) h1 {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    font-size: clamp(1.35rem, 6vw, 2rem);
+    line-height: 1.25;
+  }
+
+  body:has(.lesson-list) .lesson-link {
+    gap: 8px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  body:has(.lesson-list) .folder-icon {
+    flex: 0 0 auto;
+    margin-right: 4px;
+  }
+
+  /* Conversation selection: replace tiny image hotspots with clear touch cards. */
+  body:has(.app-container) {
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    background: #f1f5f9 !important;
+  }
+
+  .app-container {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    padding: max(82px, calc(env(safe-area-inset-top) + 72px)) 14px 18px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    gap: 12px;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  .app-container::before {
+    content: "Chọn bài hội thoại";
+    position: absolute;
+    top: max(18px, env(safe-area-inset-top));
+    left: 12px;
+    right: 12px;
+    color: #1e3a8a;
+    font-size: clamp(1.35rem, 6vw, 1.8rem);
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .app-container .play {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 126px;
+    aspect-ratio: 1.08 / 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #dbeafe !important;
+    border-radius: 20px !important;
+    background: #fff !important;
+    box-shadow: 0 8px 22px rgba(30, 64, 175, 0.12);
+    text-decoration: none;
+  }
+
+  .app-container .play::before {
+    content: attr(aria-label);
+    color: #1e293b;
+    font-size: clamp(0.9rem, 3.8vw, 1.1rem);
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .app-container .play::after {
+    content: "▶";
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin-top: 10px;
+    place-items: center;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #fff;
+    font-size: 1.2rem;
+  }
+
+  .app-container .home-btn {
+    position: fixed !important;
+    top: max(10px, env(safe-area-inset-top)) !important;
+    left: 10px !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.5rem !important;
+    background: #fff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
+  }
+
+  /* Conversation lesson pages */
+  body:has(.top-nav) header {
+    align-items: stretch;
+  }
+
+  body:has(.top-nav) .top-nav {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  body:has(.top-nav) .btn-side {
+    flex: 1 1 120px;
+    min-height: 44px;
+    padding: 8px 10px !important;
+    font-size: 0.9rem;
+  }
+
+  body:has(.top-nav) .nav-links {
+    order: 3;
+    flex: 1 0 100%;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body:has(.top-nav) .nav-links a {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+
+  body:has(.top-nav) .controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  body:has(.top-nav) .content {
+    padding-top: 14px !important;
+  }
+
+  body:has(.top-nav) #mainVideo {
+    width: 100%;
+    max-width: 560px;
+    border-width: 5px;
+    border-radius: 16px;
+  }
+
+  body:has(.top-nav) .speech {
+    margin: 16px auto;
+    padding: 16px;
+    border-radius: 18px;
+    font-size: clamp(1.2rem, 5vw, 1.65rem);
+  }
+
+  /* Grammar infographic pages */
+  body:has(#controlBar) {
+    display: block !important;
+  }
+
+  body:has(#controlBar) .container {
+    width: calc(100% - 16px) !important;
+    height: auto !important;
+    min-height: calc(100svh - 16px);
+    max-height: none !important;
+    margin: 8px auto !important;
+    padding: 14px !important;
+    overflow: visible !important;
+    border-radius: 18px !important;
+  }
+
+  body:has(#controlBar) .tab-content {
+    height: auto !important;
+    min-height: 0;
+  }
+
+  body:has(#controlBar) .infographic-wrapper {
+    min-height: 0 !important;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  body:has(#controlBar) .section-left,
+  body:has(#controlBar) .section-center,
+  body:has(#controlBar) .section-right {
+    width: 100% !important;
+    height: auto !important;
+    gap: 12px;
+  }
+
+  body:has(#controlBar) .pairing-row,
+  body:has(#controlBar) .usage-branches,
+  body:has(#controlBar) .questions-container {
+    flex-wrap: wrap;
+  }
+
+  body:has(#controlBar) .subject-card,
+  body:has(#controlBar) .question-subbox {
+    min-width: 0;
+  }
+
+  body:has(#controlBar) .questions-container {
+    flex-direction: column;
+  }
+
+  body:has(#controlBar) .svg-connections {
+    display: none;
+  }
+
+  /* Sentence ordering activity */
+  body:has(.game-wrapper) {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+  }
+
+  body:has(.game-wrapper) .game-wrapper {
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+    margin: 8px 0 0 !important;
+    padding: 8px !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+  }
+
+  body:has(.game-wrapper) .answer-pool,
+  body:has(.game-wrapper) .quiz-area {
+    flex: none;
+    width: 100%;
+    min-height: 140px;
+    max-height: 42dvh;
+    overflow-y: auto;
+  }
+
+  body:has(.game-wrapper) .question-text,
+  body:has(.game-wrapper) .item {
+    font-size: clamp(1rem, 4.8vw, 1.35rem);
+    line-height: 1.35;
+  }
+
+  body:has(.game-wrapper) footer {
+    bottom: 0;
+    padding: 6px max(6px, env(safe-area-inset-left)) max(6px, env(safe-area-inset-bottom));
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  body:has(.game-wrapper) footer button {
+    flex: 0 0 auto;
+    min-width: 58px;
+    min-height: 44px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-container {
+    gap: 9px;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  .app-container .play {
+    min-height: 116px;
+  }
+
+  body:has(.lesson-list) {
+    padding: 8px !important;
+  }
+
+  body:has(.lesson-list) .container {
+    padding: 16px 12px;
+  }
+}
